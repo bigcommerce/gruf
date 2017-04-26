@@ -37,8 +37,8 @@ module Gruf
     attr_accessor :services
 
     def initialize(services: [])
-      load_services(services)
       setup!
+      load_services(services)
     end
 
     ##
@@ -76,7 +76,7 @@ module Gruf
     #
     def setup!
       Dir["#{Gruf.servers_path}/**/*.rb"].each do |f|
-        logger.info "- Loading gRPC handler: #{f}"
+        logger.info "- Loading gRPC service file: #{f}"
         require f
       end
     end

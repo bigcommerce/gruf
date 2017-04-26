@@ -41,7 +41,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/bigcommerce/gruf'
 
   spec.files         = Dir['README.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'lib/**/*', 'gruf.gemspec']
-  spec.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  spec.executables   << 'gruf'
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency 'bundler', '~> 1.11'

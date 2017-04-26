@@ -27,20 +27,15 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-rails_env = File.expand_path('../../config/environment', __FILE__)
-if File.exists?(rails_env)
-  require rails_env
-else
-  require 'rubygems'
-  require 'bundler'
-  Bundler.setup
-end
+require 'rubygems'
+require 'bundler/setup'
 require 'gruf'
+require 'rails' rescue nil
+load 'config/environment.rb' if defined?(Rails)
 
 begin
   server = Gruf::Server.new
   server.start!
 rescue => e
-  puts e.message
-  puts e.backtrace.join("\n")
+  Gruf.logger.fatal "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
 end

@@ -91,6 +91,7 @@ You'd have this handler in `/app/rpc/demo/thing_server.rb`
 module Demo
   class ThingServer < ::Demo::ThingService::Service
     include Gruf::Endpoint
+    mount # this mounts the endpoint into the server
   
     ##
     # @param [Demo::GetThingReq] req
@@ -110,15 +111,9 @@ module Demo
 end
 ```
 
-Then, you should now have a binstub that you can run `./bin/grpc` to startup the server. You'll want to make sure that
-you have configured `server_binding_url` to point to the correct URL to bind to. In that binstub, you can include the
-server like so:
+Finally, you can start the server by running:
 
-```ruby
-server = Gruf::Server.new
-server.services << Demo::ThingServer
-server.start!
-```
+    bundle exec gruf
 
 ### Authentication
 

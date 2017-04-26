@@ -1,5 +1,10 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.9.2
+
+- Support mount command on services to allow automatic setup on the server
+- Cleanup and consolidate binstub to prevent need for custom binstub per-app
+
 h3. 0.9.1
 
 - Relax licensing to a clean BSD license
