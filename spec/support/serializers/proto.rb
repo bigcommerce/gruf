@@ -43,7 +43,7 @@ module Serializers
     # @return [Gruf::Core::ErrorHeader]
     #
     def deserialize
-      Google::Protobuf.decode(::Gruf::Core::ErrorHeader, error)
+      Google::Protobuf.decode(::Gruf::ErrorHeader, error)
     end
 
     ##
@@ -56,7 +56,7 @@ module Serializers
       }
       data[:field_errors] = []
       error.field_errors.each do |fe|
-        data[:field_errors] << Gruf::Core::FieldError.new(
+        data[:field_errors] << Gruf::FieldError.new(
           field_name: fe.field_name.to_s,
           error_code: fe.error_code.to_s,
           error_message: fe.message.to_s
@@ -64,12 +64,12 @@ module Serializers
       end
       if error.debug_info
         st = error.debug_info.stack_trace
-        data[:debug_info] = Gruf::Core::DebugInfo.new(
+        data[:debug_info] = Gruf::DebugInfo.new(
           detail: error.debug_info.detail.to_s,
           stack_trace: st.is_a?(String) ? st.split("\n") : st.map(&:to_s)
         )
       end
-      Gruf::Core::ErrorHeader.new(data)
+      Gruf::ErrorHeader.new(data)
     end
   end
 end

@@ -105,8 +105,8 @@ class TestClient
     c = Rpc::Test::Call.new('authorization' => "Basic #{Base64.encode64('grpc:magic')}")
     begin
       thing = rpc_client.get_thing(request, c)
-    rescue GRPC::BadStatus => e
-      puts e.details
+    rescue Gruf::Client::Error => e
+      puts e.error.inspect
     end
     thing
   end

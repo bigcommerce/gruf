@@ -184,6 +184,49 @@ Gruf.configure do |c|
 end
 ```
 
+## Hooks
+
+gruf supports hooks that act as interceptors around the grpc server calls, allowing you to perform actions before, 
+after, and even around your server endpoints. This can be used to add tracing data, connection resets in the grpc thread 
+pool, further instrumentation, and other things.
+
+Adding a hook is as simple as creating a class that extends `Gruf::Hooks::Base`, and implementing it via the registry.
+
+For example, a before hook, which passes in the method call signature, request object, and `GRPC::ActiveCall` object:
+```ruby
+class MyBeforeHook < Gruf::Hooks::Base
+  def before(call_signature, request, active_call)
+    # do my thing before the call. Calling `fail!` here will prevent the call from happening.
+  end
+end
+Gruf::Hooks::Registry.add(:my_before_hook, MyBeforeHook)
+```
+
+An after hook, which passes in the response object, method call signature, request object, and `GRPC::ActiveCall` object:
+```ruby
+class MyAfterHook < Gruf::Hooks::Base
+  def after(response, call_signature, request, active_call)
+    # You can modify the response object
+    response
+  end
+end
+Gruf::Hooks::Registry.add(:my_after_hook, MyAfterHook)
+```
+
+An around hook, which passes in the method call signature, request object, `GRPC::ActiveCall` object, and the block 
+being executed:
+```ruby
+class MyAroundHook < Gruf::Hooks::Base
+  def around(call_signature, request, active_call, &block)
+    # do my thing here 
+    resp = yield
+    # do my thing there
+    resp
+  end
+end
+Gruf::Hooks::Registry.add(:my_around_hook, MyAroundHook)
+```
+
 ## License
 
 Copyright (c) 2017, BigCommerce Inc.

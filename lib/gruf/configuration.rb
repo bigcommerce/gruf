@@ -33,7 +33,6 @@ module Gruf
     VALID_CONFIG_KEYS = {
       root_path: '',
       server_binding_url: '0.0.0.0:9001',
-      authentication: :none, # deprecated
       authentication_options: {},
       default_client_host: '',
       use_ssl: false,
