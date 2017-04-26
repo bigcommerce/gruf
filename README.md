@@ -111,7 +111,14 @@ end
 ```
 
 Then, you should now have a binstub that you can run `./bin/grpc` to startup the server. You'll want to make sure that
-you have configured `server_binding_url` to point to the correct URL to bind to.
+you have configured `server_binding_url` to point to the correct URL to bind to. In that binstub, you can include the
+server like so:
+
+```ruby
+server = Gruf::Server.new
+server.services << Demo::ThingServer
+server.start!
+```
 
 ### Authentication
 
