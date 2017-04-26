@@ -54,7 +54,6 @@ Gruf.logger = Logger.new(STDOUT)
 
 begin
   server = Gruf::Server.new
-  server.services << ThingService
   server.start!
 rescue => e
   puts e.message

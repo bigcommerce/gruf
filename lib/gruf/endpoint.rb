@@ -66,6 +66,13 @@ module Gruf
       def self.rpc_handler_names
         self.rpc_descs.keys.map { |n| n.to_s.underscore.to_sym }.uniq
       end
+
+      ##
+      # Mount the service into the server automatically
+      #
+      def self.mount
+        Gruf.services << self.name.constantize
+      end
     end
 
     ##
