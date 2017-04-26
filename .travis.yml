@@ -1,0 +1,8 @@
+language: ruby
+cache:
+  bundler: true
+rvm:
+  - 2.2.5
+before_install: gem install bundler -v 1.11.2
+matrix:
+  fast_finish: true
