@@ -1,4 +1,3 @@
-require 'spec_helper'
 # Copyright 2017, Bigcommerce Inc.
 # All rights reserved.
 #
@@ -27,6 +26,8 @@ require 'spec_helper'
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+require 'spec_helper'
+
 describe Gruf::Authentication::Basic do
   let(:request_username) { 'grpc' }
   let(:request_password) { 'magic' }

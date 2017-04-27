@@ -26,25 +26,46 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/authentication'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/instrumentation/registry'
-require_relative 'gruf/service'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/server'
-
 module Gruf
-  extend Configuration
+  module Instrumentation
+    ##
+    # Base class for a hook. Define before, around, or after methods to utilize functionality.
+    #
+    class Base
+      include Gruf::Loggable
+
+      attr_reader :options, :service, :response, :request, :execution_time, :call_signature, :active_call
+
+      def initialize(service, request, response, execution_time, call_signature, active_call, options = {})
+        @service = service
+        @request = request
+        @response = response
+        @execution_time = execution_time
+        @call_signature = call_signature
+        @active_call = active_call
+        @options = options
+        setup
+      end
+
+      ##
+      # Useful for setting up an instrumentation module post instantiation
+      #
+      def setup
+        # noop
+      end
+
+      ##
+      # @return [Boolean]
+      #
+      def success?
+        !response.is_a?(GRPC::BadStatus)
+      end
+
+      ##
+      #
+      def call
+        raise NotImplementedError
+      end
+    end
+  end
 end

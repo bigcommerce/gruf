@@ -26,10 +26,6 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-
 module Gruf
   ##
   # Module for gRPC endpoints
@@ -115,17 +111,17 @@ module Gruf
     ##
     # Happens after a call
     #
+    # @param [Boolean] success Whether or not the result was successful
     # @param [Object] response The response object returned from the gRPC call
     # @param [Symbol] call_signature The method being called
     # @param [Object] req The request object
     # @param [GRPC::ActiveCall] call The gRPC active call object
     # @return [Object] If extending this method or using the after_call_hook, you must return the response object
     #
-    def after_call(response, call_signature, req, call)
+    def after_call(success, response, call_signature, req, call)
       Gruf::Hooks::Registry.each do |_name, h|
-        response = h.new(Gruf.options).after(response, call_signature, req, call) if h.instance_methods.include?(:after)
+        h.new(Gruf.options).after(success, response, call_signature, req, call) if h.instance_methods.include?(:after)
       end
-      response
     end
 
     ##
@@ -175,8 +171,17 @@ module Gruf
           send(original_call_sig, req, call, &block) # send the actual request to gRPC
         end
       end
-      call.output_metadata.update(Gruf.internal_timer_metadata_key.to_sym => timed.time.to_s)
-      after_call(timed.result, original_call_sig, req, call)
+      after_call(timed.success?,timed.result, original_call_sig, req, call)
+
+      Gruf::Instrumentation::Registry.each do |_name, h|
+        h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
+      end
+
+      if timed.success?
+        timed.result
+      else
+        raise timed.result
+      end
     end
 
     ##

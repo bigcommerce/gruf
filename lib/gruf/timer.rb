@@ -37,11 +37,19 @@ module Gruf
         @result = result
         @time = time.to_f.round(6)
       end
+
+      def success?
+        !result.is_a?(GRPC::BadStatus)
+      end
     end
 
     def self.time
       start_time = Time.now.to_f
-      result = yield
+      begin
+        result = yield
+      rescue => e
+        result = e
+      end
       end_time = Time.now.to_f
       Result.new(result, end_time - start_time)
     end

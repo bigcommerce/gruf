@@ -26,25 +26,54 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/authentication'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/instrumentation/registry'
-require_relative 'gruf/service'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/server'
-
 module Gruf
-  extend Configuration
+  module Instrumentation
+    ##
+    # Adds increment and timing stats to gRPC routes, pushing data to StatsD
+    #
+    class Statsd < Gruf::Instrumentation::Base
+      ##
+      # Push data to StatsD, only doing so if a client is set
+      #
+      def call
+        if client
+          client.increment(route_key)
+          client.timing(route_key, execution_time)
+        else
+          Gruf.logger.error 'Statsd module loaded, but no client configured!'
+        end
+      end
+
+      private
+
+      ##
+      # @return [String]
+      #
+      def route_key
+        "#{key_prefix}#{service.class.name.underscore}.#{call_signature}"
+      end
+
+      ##
+      # @return [String]
+      #
+      def key_prefix
+        prefix = options.fetch(:prefix, '').to_s
+        prefix.empty? ? '' : "#{prefix}."
+      end
+
+      ##
+      # @return [::Statsd]
+      #
+      def client
+        @client ||= options.fetch(:client, nil)
+      end
+
+      ##
+      # @return [Hash]
+      #
+      def options
+        @options.fetch(:statsd, {})
+      end
+    end
+  end
 end

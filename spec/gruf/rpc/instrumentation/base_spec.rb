@@ -26,25 +26,38 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/authentication'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/instrumentation/registry'
-require_relative 'gruf/service'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/server'
+require 'spec_helper'
 
-module Gruf
-  extend Configuration
+describe Gruf::Instrumentation::Base do
+  let(:service) { ThingService.new }
+  let(:id) { rand(1..1000) }
+  let(:request) { Rpc::GetThingRequest.new(id: id) }
+  let(:response) { Rpc::GetThingResponse.new(id: id) }
+  let(:execution_time) { rand(0.001..10.000).to_f }
+  let(:call_signature) { :get_thing }
+  let(:active_call) { Rpc::Test::Call.new }
+  let(:options) { {} }
+  let(:obj) { described_class.new(service, request, response, execution_time, call_signature, active_call, options) }
+
+  describe '#success?' do
+    subject { obj.success? }
+
+    context 'when is a normal response' do
+      it 'should return true' do
+        expect(obj.response).to be_a(Rpc::GetThingResponse)
+        expect(obj.response).to eq response
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'when is a GRPC::BadStatus' do
+      let(:response) { GRPC::BadStatus.new('thing not found') }
+
+      it 'should return false' do
+        expect(obj.response).to be_a(GRPC::BadStatus)
+        expect(obj.response).to eq response
+        expect(subject).to be_falsey
+      end
+    end
+  end
 end

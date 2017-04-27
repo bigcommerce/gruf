@@ -35,6 +35,7 @@ module Gruf
       root_path: '',
       server_binding_url: '0.0.0.0:9001',
       authentication_options: {},
+      instrumentation_options: {},
       default_client_host: '',
       use_ssl: false,
       ssl_crt_file: '',
@@ -45,7 +46,6 @@ module Gruf
       error_metadata_key: :'error-internal-bin',
       error_serializer: nil,
       authorization_metadata_key: 'authorization',
-      internal_timer_metadata_key: 'timer',
       append_server_errors_to_trailing_metadata: true,
       use_default_hooks: true
     }.freeze
@@ -109,6 +109,7 @@ module Gruf
       }
       if self.use_default_hooks
         Gruf::Hooks::Registry.add(:ar_connection_reset, Gruf::Hooks::ActiveRecord::ConnectionReset)
+        Gruf::Instrumentation::Registry.add(:output_metadata_timer, Gruf::Instrumentation::OutputMetadataTimer)
       end
       options
     end
