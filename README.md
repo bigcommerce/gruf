@@ -90,8 +90,7 @@ You'd have this handler in `/app/rpc/demo/thing_server.rb`
 ```ruby
 module Demo
   class ThingServer < ::Demo::ThingService::Service
-    include Gruf::Endpoint
-    mount # this mounts the endpoint into the server
+    include Gruf::Service
   
     ##
     # @param [Demo::GetThingReq] req
