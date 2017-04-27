@@ -34,7 +34,7 @@ module Gruf
   ##
   # Module for gRPC endpoints
   #
-  module Endpoint
+  module Service
     extend ActiveSupport::Concern
 
     included do
@@ -73,6 +73,8 @@ module Gruf
       def self.mount
         Gruf.services << self.name.constantize
       end
+
+      mount
     end
 
     ##

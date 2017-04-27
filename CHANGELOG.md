@@ -1,5 +1,10 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.10.0
+
+- Rename Gruf::Endpoint to Gruf::Service
+- Make services auto-mount to server upon declaration
+
 h3. 0.9.2
 
 - Support mount command on services to allow automatic setup on the server
