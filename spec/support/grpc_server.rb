@@ -86,8 +86,7 @@ module Rpc
 end
 
 class ThingService < Rpc::ThingService::Service
-  include Gruf::Endpoint
-  mount
+  include Gruf::Service
 
   def get_thing(req, _call)
     ::Rpc::GetThingResponse.new(id: req.id)

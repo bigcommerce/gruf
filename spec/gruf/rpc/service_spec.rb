@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require 'spec_helper'
 
-describe Gruf::Endpoint do
+describe Gruf::Service do
   let(:endpoint) { ThingService.new }
   let(:id) { 1 }
   let(:req) { ::Rpc::GetThingRequest.new(id: id) }
