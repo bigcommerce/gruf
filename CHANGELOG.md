@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.1
+
+- Fix issue with interceptor and call signature
+
 h3. 0.11.0
 
 - Add instrumentation layer and ability to register new instrumentors

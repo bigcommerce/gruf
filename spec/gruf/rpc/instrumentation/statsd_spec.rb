@@ -34,7 +34,7 @@ describe Gruf::Instrumentation::Statsd do
   let(:request) { Rpc::GetThingRequest.new(id: id) }
   let(:response) { Rpc::GetThingResponse.new(id: id) }
   let(:execution_time) { rand(0.001..10.000).to_f }
-  let(:call_signature) { :get_thing }
+  let(:call_signature) { :get_thing_without_intercept }
   let(:active_call) { Rpc::Test::Call.new }
   let(:options) { { statsd: statsd_options } }
   let(:statsd_options) { { client: client, prefix: prefix } }
@@ -42,7 +42,7 @@ describe Gruf::Instrumentation::Statsd do
   let(:prefix) { 'app.rpc' }
   let(:obj) { described_class.new(service, request, response, execution_time, call_signature, active_call, options) }
 
-  let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}thing_service.#{call_signature}" }
+  let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}thing_service.get_thing" }
 
   describe '.call' do
     subject { obj.call }
@@ -87,6 +87,14 @@ describe Gruf::Instrumentation::Statsd do
 
     it 'should build the proper route key based on the prefix, service, and call signature' do
       expect(subject).to eq expected_route_key
+    end
+  end
+
+  describe '.service_key' do
+    subject { obj.send(:service_key) }
+
+    it 'should return the proper service key' do
+      expect(subject).to eq 'thing_service'
     end
   end
 

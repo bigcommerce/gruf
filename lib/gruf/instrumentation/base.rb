@@ -41,7 +41,7 @@ module Gruf
         @request = request
         @response = response
         @execution_time = execution_time
-        @call_signature = call_signature
+        @call_signature = call_signature.to_s.gsub('_without_intercept', '').to_sym
         @active_call = active_call
         @options = options
         setup

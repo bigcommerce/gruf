@@ -50,7 +50,14 @@ module Gruf
       # @return [String]
       #
       def route_key
-        "#{key_prefix}#{service.class.name.underscore}.#{call_signature}"
+        "#{key_prefix}#{service_key}.#{call_signature}"
+      end
+
+      ##
+      # @return [String]
+      #
+      def service_key
+        service.class.name.underscore.gsub('/','.')
       end
 
       ##
