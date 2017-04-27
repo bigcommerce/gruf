@@ -206,9 +206,8 @@ Gruf::Hooks::Registry.add(:my_before_hook, MyBeforeHook)
 An after hook, which passes in the response object, method call signature, request object, and `GRPC::ActiveCall` object:
 ```ruby
 class MyAfterHook < Gruf::Hooks::Base
-  def after(response, call_signature, request, active_call)
+  def after(success, response, call_signature, request, active_call)
     # You can modify the response object
-    response
   end
 end
 Gruf::Hooks::Registry.add(:my_after_hook, MyAfterHook)
@@ -227,6 +226,39 @@ class MyAroundHook < Gruf::Hooks::Base
 end
 Gruf::Hooks::Registry.add(:my_around_hook, MyAroundHook)
 ```
+
+## Instrumentation
+
+gruf comes out of the box with a couple of instrumentors packed in: output metadata timings, and StatsD
+support. 
+
+### Output Metadata Timing
+
+Enabled by default, this will push timings for _successful responses_ through the response output metadata back to the 
+client.
+
+### StatsD
+
+The StatsD support is not enabled by default. To enable it, you'll want to do:
+
+```ruby
+Gruf.configure do |c|
+  c.instrumentation_options = {
+    statsd: {
+      client: ::Statsd.new('my.statsd.host', 8125),
+      prefix: 'my_application_prefix.rpc'
+    }
+  }
+end
+Gruf::Instrumentation::Registry.add(:statsd, Gruf::Instrumentation::Statsd)
+```
+
+This will measure counts and timings for each endpoint.
+
+### Custom Instrumentors
+
+Similar to hooks, simply extend the `Gruf::Instrumentation::Base` class, and implement the `call` method. See the StatsD 
+instrumentor for an example.
 
 ## License
 

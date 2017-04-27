@@ -33,9 +33,8 @@ module Gruf
       # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
       #
       class ConnectionReset < Gruf::Hooks::Base
-        def after(response, _call_signature, _req, _call)
+        def after(_success, _response, _call_signature, _req, _call)
           ::ActiveRecord::Base.clear_active_connections! if defined?(::ActiveRecord::Base)
-          response
         end
       end
     end

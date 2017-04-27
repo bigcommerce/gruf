@@ -26,25 +26,27 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/authentication'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/instrumentation/registry'
-require_relative 'gruf/service'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/server'
-
 module Gruf
-  extend Configuration
+  module Instrumentation
+    ##
+    # Appends the timer metadata to the active call output metadata
+    #
+    class OutputMetadataTimer < Gruf::Instrumentation::Base
+      ##
+      # Handle the instrumented response. Note: this will only instrument timings of _successful_ responses.
+      #
+      def call
+        active_call.output_metadata.update(metadata_key => execution_time.to_s)
+      end
+
+      private
+
+      ##
+      # @return [Symbol]
+      #
+      def metadata_key
+        options.fetch(:output_metadata_timer, {}).fetch(:metadata_key, :timer).to_sym
+      end
+    end
+  end
 end

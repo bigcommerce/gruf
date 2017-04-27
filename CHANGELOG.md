@@ -1,5 +1,10 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.0
+
+- Add instrumentation layer and ability to register new instrumentors
+- Add out-of-the-box statsd instrumentation support
+
 h3. 0.10.0
 
 - Rename Gruf::Endpoint to Gruf::Service
