@@ -33,25 +33,36 @@ module Gruf
       attr_reader :result
       attr_reader :time
 
+      ##
+      # @param [Object] result
+      # @param [Float] time
+      #
       def initialize(result, time)
         @result = result
-        @time = time.to_f.round(6)
+        @time = time.to_f
       end
 
+      ##
+      # @return [Boolean]
+      #
       def success?
         !result.is_a?(GRPC::BadStatus)
       end
     end
 
+    ##
+    # @return [Timer::Result]
+    #
     def self.time
-      start_time = Time.now.to_f
+      start_time = Time.now
       begin
         result = yield
       rescue => e
         result = e
       end
-      end_time = Time.now.to_f
-      Result.new(result, end_time - start_time)
+      end_time = Time.now
+      elapsed = (end_time - start_time) * 1000.0
+      Result.new(result, elapsed)
     end
   end
 end

@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.2
+
+- Ensure timer is measuring in milliseconds
+
 h3. 0.11.1
 
 - Fix issue with interceptor and call signature
