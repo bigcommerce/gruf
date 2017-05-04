@@ -34,8 +34,22 @@ module Gruf
     class Base
       include Gruf::Loggable
 
-      def initialize(options = {})
+      attr_reader :options, :service
+
+      ##
+      # @param [Gruf::Service] service
+      # @param [Hash] options
+      #
+      def initialize(service, options = {})
+        @service = service
         @options = options
+        setup
+      end
+
+      ##
+      # Method that can be used to setup the hook prior to running it
+      def setup
+        # noop
       end
     end
   end

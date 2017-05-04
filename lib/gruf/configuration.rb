@@ -36,6 +36,7 @@ module Gruf
       server_binding_url: '0.0.0.0:9001',
       authentication_options: {},
       instrumentation_options: {},
+      hook_options: {},
       default_client_host: '',
       use_ssl: false,
       ssl_crt_file: '',

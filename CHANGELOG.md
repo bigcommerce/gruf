@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.3
+
+- Pass the service instance into hooks for reference
+
 h3. 0.11.2
 
 - Ensure timer is measuring in milliseconds

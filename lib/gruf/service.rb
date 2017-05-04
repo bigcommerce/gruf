@@ -82,7 +82,7 @@ module Gruf
     #
     def before_call(call_signature, req, call)
       Gruf::Hooks::Registry.each do |_name, h|
-        h.new(Gruf.options).before(call_signature, req, call) if h.instance_methods.include?(:before)
+        h.new(self, Gruf.hook_options).before(call_signature, req, call) if h.instance_methods.include?(:before)
       end
       authenticate(call_signature, req, call)
     end
@@ -101,7 +101,7 @@ module Gruf
       end
       # we only call the _last loaded_ around hook, if there is one
       if around_hook
-        h.new(Gruf.options).around(call_signature, req, call, &block)
+        h.new(self, Gruf.hook_options).around(call_signature, req, call, &block)
       else
         yield
       end
@@ -120,7 +120,7 @@ module Gruf
     #
     def after_call(success, response, call_signature, req, call)
       Gruf::Hooks::Registry.each do |_name, h|
-        h.new(Gruf.options).after(success, response, call_signature, req, call) if h.instance_methods.include?(:after)
+        h.new(self, Gruf.hook_options).after(success, response, call_signature, req, call) if h.instance_methods.include?(:after)
       end
     end
 
