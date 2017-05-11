@@ -165,22 +165,28 @@ module Gruf
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
-      before_call(original_call_sig, req, call)
-      timed = Timer.time do
-        around_call(original_call_sig, req, call) do
-          send(original_call_sig, req, call, &block) # send the actual request to gRPC
+      begin
+        before_call(original_call_sig, req, call)
+        timed = Timer.time do
+          around_call(original_call_sig, req, call) do
+            send(original_call_sig, req, call, &block) # send the actual request to gRPC
+          end
         end
-      end
-      after_call(timed.success?,timed.result, original_call_sig, req, call)
+        after_call(timed.success?,timed.result, original_call_sig, req, call)
 
-      Gruf::Instrumentation::Registry.each do |_name, h|
-        h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
-      end
+        Gruf::Instrumentation::Registry.each do |_name, h|
+          h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
+        end
 
-      if timed.success?
-        timed.result
-      else
-        raise timed.result
+        if timed.success?
+          timed.result
+        else
+          raise timed.result
+        end
+      rescue => e
+        raise e if e.is_a?(GRPC::BadStatus)
+        set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
+        fail!(req, call, :internal, :unknown, e.message)
       end
     end
 

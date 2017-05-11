@@ -48,7 +48,8 @@ module Gruf
       error_serializer: nil,
       authorization_metadata_key: 'authorization',
       append_server_errors_to_trailing_metadata: true,
-      use_default_hooks: true
+      use_default_hooks: true,
+      backtrace_on_error: false
     }.freeze
 
     attr_accessor *VALID_CONFIG_KEYS.keys
