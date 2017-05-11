@@ -1,5 +1,13 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.4
+
+- Add catchall rescue handler to capture uncaught exceptions and
+  raise a GRPC::Internal error.
+- Add Gruf.backtrace_on_error configuration value. If set, Gruf
+  will call Service.set_debug_info with the exception backtrace
+  if an uncaught exception occurs.
+
 h3. 0.11.3
 
 - Pass the service instance into hooks for reference

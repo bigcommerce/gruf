@@ -57,7 +57,7 @@ module Gruf
       start_time = Time.now
       begin
         result = yield
-      rescue => e
+      rescue GRPC::BadStatus => e
         result = e
       end
       end_time = Time.now

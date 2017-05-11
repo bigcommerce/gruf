@@ -54,6 +54,12 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message 'rpc.things.GetExceptionResponse' do
     optional :id, :int64, 1
   end
+  add_message 'rpc.things.GetUncaughtExceptionRequest' do
+    optional :id, :int64, 1
+  end
+  add_message 'rpc.things.GetUncaughtExceptionResponse' do
+    optional :id, :int64, 1
+  end
 end
 
 module Rpc
@@ -65,6 +71,8 @@ module Rpc
   GetFieldErrorFailResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup('rpc.things.GetFieldErrorFailResponse').msgclass
   GetExceptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup('rpc.things.GetExceptionRequest').msgclass
   GetExceptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup('rpc.things.GetExceptionResponse').msgclass
+  GetUncaughtExceptionRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup('rpc.things.GetUncaughtExceptionRequest').msgclass
+  GetUncaughtExceptionResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup('rpc.things.GetUncaughtExceptionResponse').msgclass
 
   module ThingService
     class Service
@@ -79,6 +87,7 @@ module Rpc
       rpc :GetFail, GetFailRequest, GetFailResponse
       rpc :GetFieldErrorFail, GetFieldErrorFailRequest, GetFieldErrorFailResponse
       rpc :GetException, GetExceptionRequest, GetExceptionResponse
+      rpc :GetUncaughtException, GetUncaughtExceptionRequest, GetUncaughtExceptionResponse
     end
 
     Stub = Service.rpc_stub_class
@@ -106,6 +115,14 @@ class ThingService < Rpc::ThingService::Service
   rescue => e
     set_debug_info(e.message, e.backtrace)
     fail!(req, c, :internal, :oh_noes, 'We done failed', oops: :man)
+  end
+
+  def get_uncaught_exception(req, c)
+    raise 'epic fail'
+  end
+
+  def not_an_endpoint
+    'i like turtles'
   end
 end
 
