@@ -32,6 +32,7 @@ describe Gruf::Service do
   let(:endpoint) { ThingService.new }
   let(:id) { 1 }
   let(:req) { ::Rpc::GetThingRequest.new(id: id) }
+  let(:call_signature) { :get_thing }
   let(:active_call) { double(:active_call, output_metadata: {}, metadata: {})}
 
   describe 'hooks' do
@@ -52,6 +53,19 @@ describe Gruf::Service do
     describe '.around_call' do
       it 'should exist on the service' do
         expect(endpoint.respond_to?(:around_call)).to be_truthy
+      end
+
+      context 'with a hook registered' do
+        subject { endpoint.around_call(call_signature, req, active_call) { true } }
+
+        before do
+          Gruf::Hooks::Registry.add(:test_all_hook, TestAllHook)
+        end
+
+        it 'should call the around method on the hook' do
+          expect_any_instance_of(TestAllHook).to receive(:around)
+          subject
+        end
       end
     end
   end

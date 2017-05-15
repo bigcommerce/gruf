@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.11.5
+
+- Fix issue with around hook
+
 h3. 0.11.4
 
 - Add catchall rescue handler to capture uncaught exceptions and

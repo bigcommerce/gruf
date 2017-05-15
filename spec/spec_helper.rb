@@ -46,5 +46,6 @@ RSpec.configure do |config|
 
   config.before do
     Gruf::Authentication::Strategies.clear
+    Gruf::Hooks::Registry.clear
   end
 end

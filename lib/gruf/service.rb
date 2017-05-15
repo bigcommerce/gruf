@@ -97,11 +97,11 @@ module Gruf
     def around_call(call_signature, req, call, &block)
       around_hook = nil
       Gruf::Hooks::Registry.each do |_name, h|
-        around_hook = h.instance_methods.include?(:around)
+        around_hook = h if h.instance_methods.include?(:around)
       end
       # we only call the _last loaded_ around hook, if there is one
       if around_hook
-        h.new(self, Gruf.hook_options).around(call_signature, req, call, &block)
+        around_hook.new(self, Gruf.hook_options).around(call_signature, req, call, &block)
       else
         yield
       end
