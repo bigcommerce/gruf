@@ -95,18 +95,35 @@ module Gruf
     # @param [GRPC::ActiveCall] call The gRPC active call object
     #
     def around_call(call_signature, req, call, &block)
-      around_hook = nil
+      around_hooks = []
       Gruf::Hooks::Registry.each do |_name, h|
-        around_hook = h if h.instance_methods.include?(:around)
+        around_hooks << h.new(self, Gruf.hook_options) if h.instance_methods.include?(:around)
       end
-      # we only call the _last loaded_ around hook, if there is one
-      if around_hook
-        around_hook.new(self, Gruf.hook_options).around(call_signature, req, call, &block)
+      if around_hooks.any?
+        run_around_hook(around_hooks, call_signature, req, call, &block)
       else
         yield
       end
     end
 
+    ##
+    # Run all around hooks recursively, starting with the last loaded
+    #
+    # @param [Array<Gruf::Hooks::Base>] hooks The current stack of hooks
+    # @param [Symbol] call_signature The gRPC method being called
+    # @param [Object] req The request object
+    # @param [GRPC::ActiveCall] call The gRPC active call object
+    #
+    def run_around_hook(hooks, call_signature, req, call, &block)
+      h = hooks.pop
+      h.around(call_signature, req, call) do
+        if hooks.any?
+          run_around_hook(hooks, call_signature, req, call) { yield }
+        else
+          yield
+        end
+      end
+    end
 
     ##
     # Happens after a call

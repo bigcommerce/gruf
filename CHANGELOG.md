@@ -1,5 +1,10 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.12.0
+
+- Add ability to run multiple around hooks
+- Fix bug with error handling that caused error messages to repeat across streams 
+
 h3. 0.11.5
 
 - Fix issue with around hook
