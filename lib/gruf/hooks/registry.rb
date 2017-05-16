@@ -85,7 +85,14 @@ module Gruf
         # @return [Boolean]
         #
         def any?
-          to_h.keys.count > 0
+          count > 0
+        end
+
+        ##
+        # @return [Integer]
+        #
+        def count
+          to_h.keys.count
         end
 
         ##

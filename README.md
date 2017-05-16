@@ -227,6 +227,10 @@ end
 Gruf::Hooks::Registry.add(:my_around_hook, MyAroundHook)
 ```
 
+Around hooks are a special case - because each needs to wrap the call, they are run recursively within each other.
+This means that if you have three hooks - `Hook1`, `Hook2`, and `Hook3` - they will run in LIFO (last in, first out) 
+order. `Hook3` will run, calling `Hook2`, which will then call `Hook1`, ending the chain.  
+
 ## Instrumentation
 
 gruf comes out of the box with a couple of instrumentors packed in: output metadata timings, and StatsD
