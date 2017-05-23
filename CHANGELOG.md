@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.13.0
+
+- Move to gRPC 1.3.4
+
 h4. 0.12.2
 
 - Add outer_around hook for wrapping the entire call chain

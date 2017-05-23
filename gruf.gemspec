@@ -50,7 +50,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'ffaker'
   spec.add_development_dependency 'pry'
 
-  spec.add_runtime_dependency 'grpc', '~> 1.2.5'
-  spec.add_runtime_dependency 'grpc-tools', '~> 1.2.5'
+  spec.add_runtime_dependency 'grpc', '~> 1.3.4'
+  spec.add_runtime_dependency 'grpc-tools', '~> 1.3.4'
   spec.add_runtime_dependency 'activesupport'
 end
