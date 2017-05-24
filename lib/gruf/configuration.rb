@@ -44,6 +44,7 @@ module Gruf
       servers_path: '',
       services: [],
       logger: nil,
+      grpc_logger: nil,
       error_metadata_key: :'error-internal-bin',
       error_serializer: nil,
       authorization_metadata_key: 'authorization',
@@ -93,13 +94,14 @@ module Gruf
       VALID_CONFIG_KEYS.each do |k, v|
         self.send((k.to_s+'=').to_sym, v)
       end
-      if defined?(Rails)
+      if defined?(Rails) && Rails.logger
         self.root_path = Rails.root
         self.logger = Rails.logger
       else
         require 'logger'
         self.logger = ::Logger.new(STDOUT)
       end
+      self.grpc_logger = self.logger if self.grpc_logger.nil?
       self.ssl_crt_file = "#{self.root_path}/config/ssl/#{environment}.crt"
       self.ssl_key_file = "#{self.root_path}/config/ssl/#{environment}.key"
       self.servers_path = "#{self.root_path}/app/rpc"
