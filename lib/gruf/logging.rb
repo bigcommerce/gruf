@@ -32,8 +32,14 @@ module Gruf
       Gruf.logger
     end
   end
+
+  module GrpcLogger
+    def logger
+      Gruf.grpc_logger
+    end
+  end
 end
 
 module GRPC
-  extend Gruf::Logger
+  extend Gruf::GrpcLogger
 end

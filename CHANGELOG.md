@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h4. 0.12.1
+
+- Add ability to specify a separate gRPC logger from the Gruf logger
+
 h3. 0.12.0
 
 - Add ability to run multiple around hooks
