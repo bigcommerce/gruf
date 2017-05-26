@@ -81,10 +81,10 @@ module Gruf
     # @param [GRPC::ActiveCall] call The gRPC active call object
     #
     def before_call(call_signature, req, call)
+      authenticate(call_signature, req, call)
       Gruf::Hooks::Registry.each do |_name, h|
         h.new(self, Gruf.hook_options).before(call_signature, req, call) if h.instance_methods.include?(:before)
       end
-      authenticate(call_signature, req, call)
     end
 
     ##
@@ -114,11 +114,49 @@ module Gruf
     # @param [Object] req The request object
     # @param [GRPC::ActiveCall] call The gRPC active call object
     #
-    def run_around_hook(hooks, call_signature, req, call, &block)
+    def run_around_hook(hooks, call_signature, req, call, &_)
       h = hooks.pop
       h.around(call_signature, req, call) do
         if hooks.any?
           run_around_hook(hooks, call_signature, req, call) { yield }
+        else
+          yield
+        end
+      end
+    end
+
+    ##
+    # Happens around the entire call chain - before, around, the call itself, and after hooks.
+    #
+    # @param [Symbol] call_signature The gRPC method being called
+    # @param [Object] req The request object
+    # @param [GRPC::ActiveCall] call The gRPC active call object
+    #
+    def outer_around_call(call_signature, req, call, &block)
+      outer_around_hooks = []
+      Gruf::Hooks::Registry.each do |_name, h|
+        outer_around_hooks << h.new(self, Gruf.hook_options) if h.instance_methods.include?(:outer_around)
+      end
+      if outer_around_hooks.any?
+        run_outer_around_hook(outer_around_hooks, call_signature, req, call, &block)
+      else
+        yield
+      end
+    end
+
+    ##
+    # Run all outer around hooks recursively, starting with the last loaded
+    #
+    # @param [Array<Gruf::Hooks::Base>] hooks The current stack of hooks
+    # @param [Symbol] call_signature The gRPC method being called
+    # @param [Object] req The request object
+    # @param [GRPC::ActiveCall] call The gRPC active call object
+    #
+    def run_outer_around_hook(hooks, call_signature, req, call, &_)
+      h = hooks.pop
+      h.outer_around(call_signature, req, call) do
+        if hooks.any?
+          run_outer_around_hook(hooks, call_signature, req, call) { yield }
         else
           yield
         end
@@ -182,14 +220,14 @@ module Gruf
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
-      begin
+      outer_around_call(original_call_sig, req, call) do
         before_call(original_call_sig, req, call)
         timed = Timer.time do
           around_call(original_call_sig, req, call) do
             send(original_call_sig, req, call, &block) # send the actual request to gRPC
           end
         end
-        after_call(timed.success?,timed.result, original_call_sig, req, call)
+        after_call(timed.success?, timed.result, original_call_sig, req, call)
 
         Gruf::Instrumentation::Registry.each do |_name, h|
           h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
@@ -200,11 +238,11 @@ module Gruf
         else
           raise timed.result
         end
-      rescue => e
-        raise e if e.is_a?(GRPC::BadStatus)
-        set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
-        fail!(req, call, :internal, :unknown, e.message)
       end
+    rescue => e
+      raise e if e.is_a?(GRPC::BadStatus)
+      set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
+      fail!(req, call, :internal, :unknown, e.message)
     end
 
     ##

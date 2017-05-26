@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h4. 0.12.2
+
+- Add outer_around hook for wrapping the entire call chain
+
 h4. 0.12.1
 
 - Add ability to specify a separate gRPC logger from the Gruf logger

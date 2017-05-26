@@ -13,7 +13,12 @@ class TestAllHook1 < TestHook
     true
   end
 
-  def around(_call_signature, _req, _call, &block)
+  def around(_call_signature, _req, _call, &_)
+    self.class.verify
+    yield
+  end
+
+  def outer_around(_call_signature, _req, _call, &_)
     self.class.verify
     yield
   end
@@ -45,26 +50,38 @@ class BeforeHook3 < TestHook
     true
   end
 end
+class BeforeExceptionHook1 < TestHook
+  def before(_cs, _r, _c)
+    self.class.verify
+    raise StandardError, 'Exception!'
+  end
+end
 
 ##########################################################################################
 # AROUND HOOKS
 ##########################################################################################
 class AroundHook1 < TestHook
-  def around(_cs, _r, _c, &block)
+  def around(_cs, _r, _c, &_)
     self.class.verify
     yield
   end
 end
 class AroundHook2 < TestHook
-  def around(_cs, _r, _c, &block)
+  def around(_cs, _r, _c, &_)
     self.class.verify
     yield
   end
 end
 class AroundHook3 < TestHook
-  def around(_cs, _r, _c, &block)
+  def around(_cs, _r, _c, &_)
     self.class.verify
     yield
+  end
+end
+class AroundExceptionHook1 < TestHook
+  def around(_cs, _r, _c, &_)
+    self.class.verify
+    raise StandardError, 'Exception!'
   end
 end
 
@@ -87,5 +104,39 @@ class AfterHook3 < TestHook
   def after(_s, _rsp, _cs, _req, _c)
     self.class.verify
     true
+  end
+end
+class AfterExceptionHook1 < TestHook
+  def before(_s, _rsp, _cs, _req, _c)
+    self.class.verify
+    raise StandardError, 'Exception!'
+  end
+end
+
+##########################################################################################
+# OUTER AROUND HOOKS
+##########################################################################################
+class OuterAroundHook1 < TestHook
+  def outer_around(_cs, _r, _c, &_)
+    self.class.verify
+    yield
+  end
+end
+class OuterAroundHook2 < TestHook
+  def outer_around(_cs, _r, _c, &_)
+    self.class.verify
+    yield
+  end
+end
+class OuterAroundHook3 < TestHook
+  def outer_around(_cs, _r, _c, &_)
+    self.class.verify
+    yield
+  end
+end
+class OuterAroundExceptionHook1 < TestHook
+  def around(_cs, _r, _c, &_)
+    self.class.verify
+    raise StandardError, 'Exception!'
   end
 end

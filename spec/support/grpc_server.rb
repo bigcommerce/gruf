@@ -98,6 +98,7 @@ class ThingService < Rpc::ThingService::Service
   include Gruf::Service
 
   def get_thing(req, _call)
+    Math.sqrt(4) # used for testing
     ::Rpc::GetThingResponse.new(id: req.id)
   end
 
