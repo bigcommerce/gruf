@@ -8,8 +8,7 @@ provide a more streamlined integration into Ruby and Ruby on Rails applications.
 It provides an abstracted server and client for gRPC services, along with other tools to help get gRPC services in Ruby
 up fast and efficiently at scale. Some of its features include:
 
-
-* Abstracted server endpoints with before, around, and after hooks during an endpoint call
+* Abstracted server endpoints with before, around, outer around, and after hooks during an endpoint call
 * Robust client error handling and metadata transport abilities
 * Server authentication strategy support, with basic auth with multiple key support built in
 * TLS support for client-server auth, though we recommend using [linkerd](https://linkerd.io/) instead
@@ -193,7 +192,9 @@ pool, further instrumentation, and other things.
 
 Adding a hook is as simple as creating a class that extends `Gruf::Hooks::Base`, and implementing it via the registry.
 
-For example, a before hook, which passes in the method call signature, request object, and `GRPC::ActiveCall` object:
+### Before
+
+A before hook passes in the method call signature, request object, and `GRPC::ActiveCall` object:
 ```ruby
 class MyBeforeHook < Gruf::Hooks::Base
   def before(call_signature, request, active_call)
@@ -203,7 +204,9 @@ end
 Gruf::Hooks::Registry.add(:my_before_hook, MyBeforeHook)
 ```
 
-An after hook, which passes in the response object, method call signature, request object, and `GRPC::ActiveCall` object:
+### After
+
+An after hook passes in the response object, method call signature, request object, and `GRPC::ActiveCall` object:
 ```ruby
 class MyAfterHook < Gruf::Hooks::Base
   def after(success, response, call_signature, request, active_call)
@@ -213,7 +216,9 @@ end
 Gruf::Hooks::Registry.add(:my_after_hook, MyAfterHook)
 ```
 
-An around hook, which passes in the method call signature, request object, `GRPC::ActiveCall` object, and the block 
+### Around
+
+An around hook passes in the method call signature, request object, `GRPC::ActiveCall` object, and the block 
 being executed:
 ```ruby
 class MyAroundHook < Gruf::Hooks::Base
@@ -230,6 +235,29 @@ Gruf::Hooks::Registry.add(:my_around_hook, MyAroundHook)
 Around hooks are a special case - because each needs to wrap the call, they are run recursively within each other.
 This means that if you have three hooks - `Hook1`, `Hook2`, and `Hook3` - they will run in LIFO (last in, first out) 
 order. `Hook3` will run, calling `Hook2`, which will then call `Hook1`, ending the chain.  
+
+### Outer Around
+
+And finally, an "outer" around hook passes in the method call signature, request object, `GRPC::ActiveCall` 
+object, and the block being executed, and executes around the _entire_ call chain (before, around, request, after):
+
+```ruby
+class MyOuterAroundHook < Gruf::Hooks::Base
+  def outer_around(call_signature, request, active_call, &block)
+    # do my thing here 
+    resp = yield
+    # do my thing there
+    resp
+  end
+end
+Gruf::Hooks::Registry.add(:my_outer_around_hook, MyOuterAroundHook)
+```
+
+Outer around hooks behave similarly in execution order to around hooks.
+
+Note: It's important to note that the authentication step happens immediately before the first _before_ hook is called,
+so don't perform any actions that you want behind authentication in outer around hooks, as they are not called with
+authentication.
 
 ## Instrumentation
 

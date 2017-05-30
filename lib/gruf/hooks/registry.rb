@@ -51,7 +51,7 @@ module Gruf
           hook.class_eval(&block) if block_given?
 
           # all hooks require either the before, after, or around method
-          raise NoMethodError unless hook.method_defined?(:before) || hook.method_defined?(:after) || hook.method_defined?(:around)
+          raise NoMethodError unless hook.method_defined?(:before) || hook.method_defined?(:after) || hook.method_defined?(:around) || hook.method_defined?(:outer_around)
 
           raise HookDescendantError, "Hooks must descend from #{base}" unless hook.ancestors.include?(base)
 
