@@ -16,7 +16,7 @@ up fast and efficiently at scale. Some of its features include:
 preserving gRPC BadStatus codes
 * Server and client execution timings in responses
 
-gruf currently has active support for gRPC 1.2.x.
+gruf currently has active support for gRPC 1.3.x.
 
 ## Installation
 
