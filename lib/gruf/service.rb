@@ -187,7 +187,7 @@ module Gruf
     # @param [GRPC::ActiveCall] call The gRPC active call object
     #
     def authenticate(_method, req, call)
-      fail!(req, call, :unauthorized) unless Authentication.verify(call)
+      fail!(req, call, :unauthenticated) unless Authentication.verify(call)
     end
 
     ##
