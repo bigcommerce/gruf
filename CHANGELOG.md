@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.14.0
+
+- Send gRPC status 16 (Unauthenticated) instead of 7 (PermissionDenied) when authentication fails
+
 h3. 0.13.0
 
 - Move to gRPC 1.3.4
