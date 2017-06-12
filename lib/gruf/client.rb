@@ -62,27 +62,34 @@ module Gruf
     def call(request_method, params = {}, metadata = {})
       req = request_object(request_method, params)
       md = build_metadata(metadata)
-      call_signature = call_signature(request_method)
-      if call_signature
-        begin
-          timed = Timer.time do
-            self.send(call_signature, req, return_op: true, metadata: md)
-          end
-          Gruf::Response.new(timed.result, timed.time)
-        rescue GRPC::BadStatus => e
-          emk = Gruf.error_metadata_key.to_s
-          if e.respond_to?(:metadata) && e.metadata.key?(emk)
-            raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize
-          else
-            raise # passthrough
-          end
-        end
+      call_sig = call_signature(request_method)
+      if call_sig
+        execute(call_sig, req, md)
       else
         raise NotImplementedError.new("The method #{request_method} has not been implemented in this service.")
+      end
+    rescue GRPC::BadStatus => e
+      emk = Gruf.error_metadata_key.to_s
+      if e.respond_to?(:metadata) && e.metadata.key?(emk)
+        raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize
+      else
+        raise # passthrough
       end
     end
 
     private
+
+    ##
+    # @param [Symbol] call_sig The call signature being executed
+    # @param [Object] req
+    # @param [Hash] md
+    #
+    def execute(call_sig, req, md)
+      timed = Timer.time do
+        self.send(call_sig, req, return_op: true, metadata: md)
+      end
+      Gruf::Response.new(timed.result, timed.time)
+    end
 
     ##
     # @return [Struct<GRPC::RpcDesc>]
@@ -127,6 +134,7 @@ module Gruf
     ##
     # @return [Symbol|GRPC::Core::ChannelCredentials]
     #
+    # :nocov:
     def build_ssl_credentials
       cert = nil
       if opts[:ssl_certificate_file]
@@ -137,6 +145,7 @@ module Gruf
 
       cert ? GRPC::Core::ChannelCredentials.new(cert) : :this_channel_is_insecure
     end
+    # :nocov:
 
     ##
     # @return [Class]

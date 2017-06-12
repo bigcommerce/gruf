@@ -44,6 +44,7 @@ module Gruf
     ##
     # Start the gRPC server
     #
+    # :nocov:
     def start!
       logger.info { 'Booting gRPC Server...' }
       server = GRPC::RpcServer.new
@@ -54,6 +55,9 @@ module Gruf
       server.run_till_terminated
       logger.info { 'Shutting down gRPC server...' }
     end
+    # :nocov:
+
+    private
 
     ##
     # Return all loaded gRPC services
@@ -69,21 +73,22 @@ module Gruf
       @services
     end
 
-    private
-
     ##
     # Auto-load all gRPC handlers
     #
+    # :nocov:
     def setup!
       Dir["#{Gruf.servers_path}/**/*.rb"].each do |f|
         logger.info "- Loading gRPC service file: #{f}"
         require f
       end
     end
+    # :nocov:
 
     ##
     # @return [GRPC::Core::ServerCredentials|Symbol]
     #
+    # :nocov:
     def ssl_credentials
       if Gruf.use_ssl
         private_key = File.read Gruf.ssl_key_file
@@ -94,5 +99,6 @@ module Gruf
         :this_port_is_insecure
       end
     end
+    # :nocov:
   end
 end

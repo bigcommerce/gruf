@@ -58,13 +58,69 @@ describe Gruf::Client do
   describe '.call' do
     let(:metadata) { { foo: 'bar' } }
     let(:params) { { id: 1 } }
-    let(:op) { double(:op, execute: true, metadata: metadata, trailing_metadata: {}, deadline: nil, cancelled?: false) }
-    subject { client.call(:GetThing, params, metadata) }
+    let(:op) { build_operation(metadata: metadata) }
+    subject { client.call(method_name, params, metadata) }
 
-    it 'should call the appropriate method with the right signature' do
-      req = Rpc::GetThingRequest.new(params)
-      expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata).and_return(op)
-      expect(subject).to be_truthy
+    context 'if the call is successful' do
+      let(:req) { Rpc::GetThingRequest.new(params) }
+      let(:method_name) { :GetThing }
+
+      it 'should call the appropriate method with the right signature' do
+        expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata).and_return(op)
+        expect(subject).to be_truthy
+      end
+    end
+
+    context 'if a GRPC::BadStatus is raised' do
+      let(:req) { Rpc::GetFailRequest.new(params) }
+      let(:method_name) { :GetFail }
+      let(:error_message) { 'Thing with ID 1 not found!' }
+      let(:error_code) { :not_found }
+      let(:app_error_code) { :thing_not_found }
+      let(:err_obj) { Gruf::Error.new(code: error_code, app_code: app_error_code, message: error_message) }
+      let(:metadata_response) { { Gruf.error_metadata_key.to_s => err_obj.serialize } }
+      let(:grpc_error) { GRPC::NotFound.new(error_message, metadata_response) }
+
+      before do
+        expect(client).to receive(:execute).and_raise(grpc_error)
+      end
+
+      it 'should raise the error' do
+        expect {
+          subject
+        }.to raise_error(Gruf::Client::Error)
+      end
+
+      context 'and has a serialized error payload' do
+        it 'should pass it through deserialized' do
+          expect {
+            subject
+          }.to raise_error(Gruf::Client::Error) do |e|
+            expect(e.error['code']).to eq error_code.to_s
+            expect(e.error['app_code']).to eq app_error_code.to_s
+            expect(e.error['message']).to eq error_message
+          end
+        end
+      end
+
+      context 'and has no serialized error payload' do
+        let(:metadata_response) { {} }
+
+        it 'should just passthrough the error object as-is' do
+          expect {
+            subject
+          }.to raise_error(GRPC::NotFound)
+        end
+      end
+    end
+
+    context 'if the method does not exist' do
+      let(:req) { Rpc::GetThingRequest.new(params) }
+      let(:method_name) { :GetNonExistentMethodOnTheService }
+
+      it 'should raise a NotImplementedError' do
+        expect{ subject }.to raise_error(NotImplementedError)
+      end
     end
   end
 
@@ -104,6 +160,18 @@ describe Gruf::Client do
           expect(subject).to be_empty
         end
       end
+    end
+  end
+end
+
+describe Gruf::Client::Error do
+  let(:err_obj) { Object.new }
+  let(:error) { described_class.new(err_obj) }
+  subject { error }
+
+  context '.initialize' do
+    it 'should set the error object on the class' do
+      expect(subject.error).to eq err_obj
     end
   end
 end
