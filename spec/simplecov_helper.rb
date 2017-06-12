@@ -26,42 +26,18 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-module Gruf
-  ##
-  # Wraps the active call operation to provide metadata and timing around the request
-  #
-  class Response
-    attr_reader :operation, :metadata, :trailing_metadata, :deadline, :cancelled, :execution_time
+require 'simplecov'
+require 'fileutils'
 
-    ##
-    # @param [GRPC::ActiveCall::Operation] op
-    # @param [Float] execution_time
-    #
-    def initialize(op, execution_time = nil)
-      @operation = op
-      @message = op.execute
-      @metadata = op.metadata
-      @trailing_metadata = op.trailing_metadata
-      @deadline = op.deadline
-      @cancelled = op.cancelled?
-      @execution_time = execution_time || 0.0
-    end
+if File.directory?('./coverage/')
+  coverage_path = File.realpath('./coverage/')
+  FileUtils.rm_rf(coverage_path)
+end
 
-    ##
-    # Return the message returned by the request
-    #
-    def message
-      @message ||= op.execute
-    end
-
-    ##
-    # Return execution time of the call internally on the server in ms
-    #
-    # @return [Integer]
-    #
-    def internal_execution_time
-      key = Gruf.instrumentation_options.fetch(:output_metadata_timer, {}).fetch(:metadata_key, 'timer')
-      trailing_metadata[key].to_f
-    end
-  end
+SimpleCov.command_name 'Unit Tests'
+SimpleCov.start do
+  add_filter '/bin/'
+  add_filter '/coverage/'
+  add_filter '/spec/'
+  add_filter '/vendor/'
 end

@@ -75,6 +75,56 @@ describe Gruf::Error do
     end
   end
 
+  describe '.metadata=' do
+    let(:md) { { foo: 'bar' } }
+    let(:expected_md) { { foo: 'bar' } }
+
+    subject { error.metadata = md }
+    it 'should set the metadata on the error object' do
+      subject
+      expect(error.metadata).to eq expected_md
+    end
+
+    context 'when some values are not strings' do
+      let(:md) { { foo: :bar, abc: 123 } }
+      let(:expected_md) { { foo: 'bar', abc: '123' } }
+
+      it 'should serialize all values into strings' do
+        subject
+        expect(error.metadata).to eq expected_md
+      end
+    end
+  end
+
+  describe '.set_debug_info' do
+    let(:detail) { FFaker::Lorem.sentence }
+    let(:stack_trace) { FFaker::Lorem.sentences(2) }
+
+    subject { error.set_debug_info(detail, stack_trace) }
+
+    it 'should set the debug info object with the provided arguments' do
+      expect(subject).to be_a(Gruf::Errors::DebugInfo)
+      expect(subject.detail).to eq detail
+      expect(subject.stack_trace).to eq stack_trace
+    end
+  end
+
+  describe '.add_field_error' do
+    let(:field_name) { FFaker::Lorem.word.to_sym }
+    let(:error_code) { FFaker::Lorem.word.to_sym }
+    let(:message) { FFaker::Lorem.sentence }
+
+    subject { error.add_field_error(field_name, error_code, message) }
+
+    it 'should set a field error with the provided arguments' do
+      errors = subject
+      expect(errors.last).to be_a(Gruf::Errors::Field)
+      expect(errors.last.field_name).to eq field_name
+      expect(errors.last.error_code).to eq error_code
+      expect(errors.last.message).to eq message
+    end
+  end
+
   describe '.fail!' do
     let(:subject) { error.fail!(call) }
 

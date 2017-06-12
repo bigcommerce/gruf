@@ -27,6 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+require_relative 'simplecov_helper'
 require 'gruf'
 require 'ffaker'
 require 'pry'
@@ -48,4 +49,6 @@ RSpec.configure do |config|
     Gruf::Authentication::Strategies.clear
     Gruf::Hooks::Registry.clear
   end
+
+  include Gruf::Helpers
 end
