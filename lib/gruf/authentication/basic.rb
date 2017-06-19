@@ -33,7 +33,7 @@ module Gruf
           if username.empty?
             request_password == password
           else
-            "#{username}:#{password}" == request_credentials
+            request_credentials == "#{username}:#{password}"
           end
         end
       end
