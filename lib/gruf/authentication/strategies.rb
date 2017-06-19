@@ -20,7 +20,7 @@ module Gruf
     # Provides a modifiable repository of strategies for authentication
     #
     class Strategies
-      class StrategyDescendantError; end
+      class StrategyDescendantError < StandardError; end
 
       class << self
         ##

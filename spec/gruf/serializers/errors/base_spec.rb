@@ -14,22 +14,36 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Hooks
-    module ActiveRecord
-      ##
-      # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
-      #
-      class ConnectionReset < Gruf::Hooks::Base
-        def after(_success, _response, _call_signature, _req, _call)
-          ::ActiveRecord::Base.clear_active_connections! if enabled?
-        end
+require 'spec_helper'
 
-        private
+describe Gruf::Serializers::Errors::Base do
+  let(:error) { Gruf::Error.new }
+  let(:serializer) { Serializers::Proto.new(error) }
 
-        def enabled?
-          defined?(::ActiveRecord::Base)
-        end
+  describe '.initialize' do
+    subject { serializer }
+
+    it 'should set the error on the object' do
+      expect(subject.error).to eq error
+    end
+  end
+
+  describe 'base methods' do
+    let(:serializer) { described_class.new(error) }
+
+    describe '.serialize' do
+      subject { serializer.serialize }
+
+      it 'should raise NotImplementedError' do
+        expect { subject }.to raise_error NotImplementedError
+      end
+    end
+
+    describe '.deserialize' do
+      subject { serializer.deserialize }
+
+      it 'should raise NotImplementedError' do
+        expect { subject }.to raise_error NotImplementedError
       end
     end
   end

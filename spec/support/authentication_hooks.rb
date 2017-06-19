@@ -14,23 +14,38 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Hooks
-    module ActiveRecord
-      ##
-      # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
-      #
-      class ConnectionReset < Gruf::Hooks::Base
-        def after(_success, _response, _call_signature, _req, _call)
-          ::ActiveRecord::Base.clear_active_connections! if enabled?
-        end
 
-        private
+# Base test hook
+class TestAuthenticationHook < Gruf::Authentication::Base
+  def self.verify
+    true
+  end
 
-        def enabled?
-          defined?(::ActiveRecord::Base)
-        end
-      end
-    end
+  def valid?
+    true
+  end
+end
+
+class TestAuthenticationHook2 < TestAuthenticationHook
+
+end
+
+class TestAuthenticationHook3 < TestAuthenticationHook
+
+end
+
+class TestInvalidInheritanceAuthenticationHook < StandardError
+  def self.verify
+    true
+  end
+
+  def valid?
+    true
+  end
+end
+
+class TestNoValidAuthenticationHook < Gruf::Authentication::Base
+  def self.verify
+    true
   end
 end

@@ -39,9 +39,6 @@ module Gruf
           hook ||= Class.new(base)
           hook.class_eval(&block) if block_given?
 
-          # all hooks require either the before, after, or around method
-          raise NoMethodError unless hook.method_defined?(:call)
-
           raise HookDescendantError, "Hooks must descend from #{base}" unless hook.ancestors.include?(base)
 
           _registry[name.to_sym] = hook

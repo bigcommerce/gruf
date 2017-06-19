@@ -14,23 +14,35 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Hooks
-    module ActiveRecord
-      ##
-      # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
-      #
-      class ConnectionReset < Gruf::Hooks::Base
-        def after(_success, _response, _call_signature, _req, _call)
-          ::ActiveRecord::Base.clear_active_connections! if enabled?
-        end
+require 'spec_helper'
+require 'base64'
 
-        private
+module ActiveRecord
+  class Base
+  end
+end
 
-        def enabled?
-          defined?(::ActiveRecord::Base)
-        end
-      end
+describe Gruf::Hooks::ActiveRecord::ConnectionReset do
+  let(:service) { ThingService.new }
+  let(:hook) { described_class.new(service) }
+
+  subject { hook.after(true, nil, :get_thing, nil, nil) }
+
+  context 'if ActiveRecord is loaded' do
+    it 'should try to clear any active connections' do
+      expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
+      subject
+    end
+  end
+
+  context 'if ActiveRecord is not loaded' do
+    before do
+      allow(hook).to receive(:enabled?).and_return(false)
+    end
+
+    it 'should not try to clear any active connections' do
+      expect(::ActiveRecord::Base).to_not receive(:clear_active_connections!)
+      subject
     end
   end
 end
