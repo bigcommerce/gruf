@@ -110,6 +110,11 @@ describe Gruf::Error do
       expect(errors.last.field_name).to eq field_name
       expect(errors.last.error_code).to eq error_code
       expect(errors.last.message).to eq message
+      expect(errors.last.to_h).to eq({
+        field_name: field_name,
+        error_code: error_code,
+        message: message
+      })
     end
   end
 

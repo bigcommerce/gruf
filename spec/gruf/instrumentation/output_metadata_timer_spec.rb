@@ -14,44 +14,28 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require 'spec_helper'
 
-# Base test hook
-class TestAuthenticationHook < Gruf::Authentication::Base
-  def self.verify
-    true
-  end
+describe Gruf::Instrumentation::OutputMetadataTimer do
+  let(:service) { ThingService.new }
+  let(:id) { rand(1..1000) }
+  let(:request) { Rpc::GetThingRequest.new(id: id) }
+  let(:response) { Rpc::GetThingResponse.new(id: id) }
+  let(:execution_time) { rand(0.001..10.000).to_f }
+  let(:call_signature) { :get_thing_without_intercept }
+  let(:active_call) { Rpc::Test::Call.new }
 
-  def valid?
-    true
-  end
-end
+  let(:options) { { output_metadata_timer: output_metadata_timer_options } }
+  let(:output_metadata_timer_options) { { metadata_key: :timer } }
 
-class TestAuthenticationHook2 < TestAuthenticationHook
+  let(:hook) { described_class.new(service, request, response, execution_time, call_signature, active_call, options) }
 
-end
+  describe '.call' do
+    subject { hook.call }
 
-class TestAuthenticationHook3 < TestAuthenticationHook
-
-end
-
-class TestInvalidInheritanceAuthenticationHook < StandardError
-  def self.verify
-    true
-  end
-
-  def valid?
-    true
-  end
-end
-
-class TestNoValidAuthenticationHook < Gruf::Authentication::Base
-  def self.verify
-    true
-  end
-end
-
-class TestExceptionAuthenticationHook < TestAuthenticationHook
-  def valid?
-    raise StandardError, 'oops'
+    it 'should set the execution time to the output metadata' do
+      expect { subject }.to_not raise_error
+      expect(active_call.output_metadata[:timer]).to_not be_nil
+    end
   end
 end

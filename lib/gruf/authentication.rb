@@ -52,8 +52,6 @@ module Gruf
         # we're not using any strategies, so no auth
         true
       end
-    rescue
-      false
     end
   end
 end

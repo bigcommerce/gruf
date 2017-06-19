@@ -40,6 +40,9 @@ module Gruf
 
       private
 
+      ##
+      # @return [Array<Hash>]
+      #
       def server_credentials
         options.fetch(:credentials, [])
       end
@@ -47,19 +50,22 @@ module Gruf
       ##
       # @return [String]
       #
-      def server_credentials_old
-        prefix = username.empty? ? '' : "#{username}:"
-        Base64.encode64("#{prefix}#{password}").strip
-      end
-
       def request_credentials
         Base64.decode64(credentials.to_s.gsub('Basic ', '').strip)
       end
 
+      ##
+      # @return [String]
+      # @deprecated
+      # :nocov:
       def request_username
         @request_username ||= request_credentials.split(':').first
       end
+      # :nocov:
 
+      ##
+      # @return [String]
+      #
       def request_password
         @request_password ||= request_credentials.split(':').last
       end

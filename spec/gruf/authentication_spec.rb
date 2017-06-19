@@ -78,5 +78,17 @@ describe Gruf::Authentication do
         end
       end
     end
+
+    context 'with a strategy that throws an exception' do
+      before do
+        Gruf::Authentication::Strategies.add(:exception, TestExceptionAuthenticationHook)
+        Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
+      end
+
+      it 'should log an error and noop' do
+        expect(Gruf.logger).to receive(:error)
+        expect(subject).to be_truthy
+      end
+    end
   end
 end
