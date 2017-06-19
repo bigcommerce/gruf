@@ -1,0 +1,1 @@
+yardoc 'lib/gruf/**/*.rb' -m markdown --no-private
