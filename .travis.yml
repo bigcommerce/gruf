@@ -4,7 +4,9 @@ cache:
 sudo: false
 dist: trusty
 rvm:
-  - 2.2.5
+  - 2.2
+  - 2.3
+  - 2.4
 before_install: gem install bundler -v 1.11.2
 script: ./.travis.sh
 env:
