@@ -12,5 +12,10 @@ engines:
 ratings:
   paths:
   - "**.rb"
+  - "bin/*"
 exclude_paths:
-- spec/
+- "*.md"
+- doc/**/*
+- gruf.gemspec
+- Rakefile
+- spec/**/*
