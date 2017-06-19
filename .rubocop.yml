@@ -1,0 +1,13 @@
+inherit_from:
+  - .rubocop_todo.yml
+
+AllCops:
+  Exclude:
+    - spec/**/*
+    - .bundle/**/*
+    - bin/**/*
+    - vendor/**/*
+    - tmp/**/*
+    - log/**/*
+    - Rakefile
+    - gruf.gemspec

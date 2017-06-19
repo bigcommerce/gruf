@@ -57,7 +57,9 @@ module Gruf
     # Initialize the error, setting default values
     #
     def initialize(args = {})
-      args.each {|k,v| self.send("#{k.to_sym}=", v) if self.respond_to?(k.to_sym) }
+      args.each do |k, v|
+        send("#{k.to_sym}=", v) if respond_to?(k.to_sym)
+      end
       @field_errors = []
     end
 
@@ -84,7 +86,7 @@ module Gruf
     # Ensure all metadata values are strings
     #
     def metadata=(md)
-      @metadata = md.map{|k,str| [k, str.to_s] }.to_h
+      @metadata = md.map { |k, str| [k, str.to_s] }.to_h
     end
 
     ##

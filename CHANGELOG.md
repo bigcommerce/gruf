@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 0.14.2
+
+- Added rubocop style-guide checks
+
 h3. 0.14.1
 
 - Updated license to MIT

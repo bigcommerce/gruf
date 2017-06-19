@@ -18,8 +18,13 @@ source 'https://rubygems.org'
 
 gemspec
 
+group :development do
+  gem 'rubocop', '~> 0.48'
+end
+
 group :test do
-  gem 'rspec', '~> 3.5'
+  gem 'bundler-audit'
   gem 'ffaker'
+  gem 'rspec', '~> 3.5'
   gem 'simplecov', require: false
 end

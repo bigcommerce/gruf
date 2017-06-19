@@ -51,18 +51,14 @@ module Gruf
       req = request_object(request_method, params)
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
-      if call_sig
-        execute(call_sig, req, md)
-      else
-        raise NotImplementedError.new("The method #{request_method} has not been implemented in this service.")
-      end
+
+      raise NotImplementedError, "The method #{request_method} has not been implemented in this service." unless call_sig
+
+      execute(call_sig, req, md)
     rescue GRPC::BadStatus => e
       emk = Gruf.error_metadata_key.to_s
-      if e.respond_to?(:metadata) && e.metadata.key?(emk)
-        raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize
-      else
-        raise # passthrough
-      end
+      raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize if e.respond_to?(:metadata) && e.metadata.key?(emk)
+      raise # passthrough
     end
 
     private
@@ -74,7 +70,7 @@ module Gruf
     #
     def execute(call_sig, req, md)
       timed = Timer.time do
-        self.send(call_sig, req, return_op: true, metadata: md)
+        send(call_sig, req, return_op: true, metadata: md)
       end
       Gruf::Response.new(timed.result, timed.time)
     end
@@ -91,11 +87,7 @@ module Gruf
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
-      if desc && desc.input
-        desc.input.new(params)
-      else
-        nil
-      end
+      desc && desc.input ? desc.input.new(params) : nil
     end
 
     ##
@@ -114,7 +106,7 @@ module Gruf
         username = opts.fetch(:username, 'grpc').to_s
         username = username.empty? ? '' : "#{username}:"
         auth_string = Base64.encode64("#{username}#{opts[:password]}")
-        metadata[:authorization] = "Basic #{auth_string}".gsub("\n",'')
+        metadata[:authorization] = "Basic #{auth_string}".tr("\n", '')
       end
       metadata
     end

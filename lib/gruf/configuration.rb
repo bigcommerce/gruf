@@ -67,7 +67,7 @@ module Gruf
     #
     def options
       opts = {}
-      VALID_CONFIG_KEYS.each do |k, v|
+      VALID_CONFIG_KEYS.each do |k, _v|
         opts.merge!(k => send(k))
       end
       opts
@@ -80,7 +80,7 @@ module Gruf
     #
     def reset
       VALID_CONFIG_KEYS.each do |k, v|
-        self.send((k.to_s+'=').to_sym, v)
+        send((k.to_s + '=').to_sym, v)
       end
       if defined?(Rails) && Rails.logger
         self.root_path = Rails.root
@@ -89,17 +89,17 @@ module Gruf
         require 'logger'
         self.logger = ::Logger.new(STDOUT)
       end
-      self.grpc_logger = self.logger if self.grpc_logger.nil?
-      self.ssl_crt_file = "#{self.root_path}/config/ssl/#{environment}.crt"
-      self.ssl_key_file = "#{self.root_path}/config/ssl/#{environment}.key"
-      self.servers_path = "#{self.root_path}/app/rpc"
+      self.grpc_logger = logger if grpc_logger.nil?
+      self.ssl_crt_file = "#{root_path}/config/ssl/#{environment}.crt"
+      self.ssl_key_file = "#{root_path}/config/ssl/#{environment}.key"
+      self.servers_path = "#{root_path}/app/rpc"
       self.authentication_options = {
         credentials: [{
           username: 'grpc',
           password: 'magic'
         }]
       }
-      if self.use_default_hooks
+      if use_default_hooks
         Gruf::Hooks::Registry.add(:ar_connection_reset, Gruf::Hooks::ActiveRecord::ConnectionReset)
         Gruf::Instrumentation::Registry.add(:output_metadata_timer, Gruf::Instrumentation::OutputMetadataTimer)
       end

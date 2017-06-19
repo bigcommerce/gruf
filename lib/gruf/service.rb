@@ -31,31 +31,31 @@ module Gruf
       #
       def self.method_added(method_name)
         return if @__last_methods_added && @__last_methods_added.include?(method_name)
-        if self.rpc_handler_names.include?(method_name)
-          with = :"#{method_name}_with_intercept"
-          without = :"#{method_name}_without_intercept"
-          @__last_methods_added = [method_name, with, without]
-          define_method with do |*args, &block|
-            call_chain(without, args[0], args[1], &block)
-          end
-          alias_method without, method_name
-          alias_method method_name, with
-          @__last_methods_added = nil
+        return unless rpc_handler_names.include?(method_name)
+
+        with = :"#{method_name}_with_intercept"
+        without = :"#{method_name}_without_intercept"
+        @__last_methods_added = [method_name, with, without]
+        define_method with do |*args, &block|
+          call_chain(without, args[0], args[1], &block)
         end
+        alias_method without, method_name
+        alias_method method_name, with
+        @__last_methods_added = nil
       end
 
       ##
       # Properly find all RPC handler methods
       #
       def self.rpc_handler_names
-        self.rpc_descs.keys.map { |n| n.to_s.underscore.to_sym }.uniq
+        rpc_descs.keys.map { |n| n.to_s.underscore.to_sym }.uniq
       end
 
       ##
       # Mount the service into the server automatically
       #
       def self.mount
-        Gruf.services << self.name.constantize
+        Gruf.services << name.constantize
       end
 
       mount
@@ -221,11 +221,9 @@ module Gruf
           h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
         end
 
-        if timed.success?
-          timed.result
-        else
-          raise timed.result
-        end
+        raise timed.result unless timed.success?
+
+        timed.result
       end
     rescue => e
       raise e if e.is_a?(GRPC::BadStatus)

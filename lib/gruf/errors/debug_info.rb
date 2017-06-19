@@ -37,7 +37,7 @@ module Gruf
       def to_h
         {
           detail: detail,
-          stack_trace: stack_trace,
+          stack_trace: stack_trace
         }
       end
     end
