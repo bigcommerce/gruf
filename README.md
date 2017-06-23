@@ -16,7 +16,7 @@ up fast and efficiently at scale. Some of its features include:
 preserving gRPC BadStatus codes
 * Server and client execution timings in responses
 
-gruf currently has active support for gRPC 1.3.x. gruf is compatible and tested with with Ruby 2.2, 2.3, and 2.4. gruf 
+gruf currently has active support for gRPC 1.4.x. gruf is compatible and tested with with Ruby 2.2, 2.3, and 2.4. gruf 
 is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any Ruby framework (such as 
 [Grape](https://github.com/ruby-grape/grape), for instance).
 
