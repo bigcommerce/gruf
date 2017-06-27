@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 1.0.0
+
+- Bump gRPC to 1.4 
+
 h3. 0.14.2
 
 - Added rubocop style-guide checks
