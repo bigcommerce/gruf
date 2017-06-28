@@ -1,6 +1,6 @@
 # gruf - gRPC Ruby Framework
 
-[![Build Status](https://travis-ci.com/bigcommerce/gruf.svg?token=D3Cc4LCF9BgpUx4dpPpv&branch=master)](https://travis-ci.com/bigcommerce/gruf) [![Gem Version](https://badge.fury.io/rb/gruf.svg)](https://badge.fury.io/rb/gruf)
+[![Build Status](https://travis-ci.com/bigcommerce/gruf.svg?token=D3Cc4LCF9BgpUx4dpPpv&branch=master)](https://travis-ci.com/bigcommerce/gruf) [![Gem Version](https://badge.fury.io/rb/gruf.svg)](https://badge.fury.io/rb/gruf) [![Documentation](https://inch-ci.org/github/bigcommerce/gruf.svg?branch=master)](https://inch-ci.org/github/bigcommerce/gruf.svg?branch=master)
 
 gruf is a Ruby framework that wraps the [gRPC Ruby library](https://github.com/grpc/grpc/tree/master/src/ruby) to
 provide a more streamlined integration into Ruby and Ruby on Rails applications.
