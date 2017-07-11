@@ -46,8 +46,9 @@ describe Gruf::Client do
   describe '.call' do
     let(:metadata) { { foo: 'bar' } }
     let(:params) { { id: 1 } }
+    let(:opts) { {} }
     let(:op) { build_operation(metadata: metadata) }
-    subject { client.call(method_name, params, metadata) }
+    subject { client.call(method_name, params, metadata, opts) }
 
     context 'if the call is successful' do
       let(:req) { Rpc::GetThingRequest.new(params) }
@@ -56,6 +57,16 @@ describe Gruf::Client do
       it 'should call the appropriate method with the right signature' do
         expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata).and_return(op)
         expect(subject).to be_truthy
+      end
+
+      context 'with a deadline' do
+        let(:deadline) { Time.now + 42 }
+        let(:opts) { { deadline: deadline } }
+
+        it 'should pass the deadline into the call' do
+          expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata, deadline: deadline).and_return(op)
+          expect(subject).to be_truthy
+        end
       end
     end
 
