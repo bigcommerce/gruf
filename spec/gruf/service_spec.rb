@@ -15,6 +15,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 require 'spec_helper'
+require 'securerandom'
 
 describe Gruf::Service do
   let(:endpoint) { ThingService.new }
@@ -55,15 +56,17 @@ describe Gruf::Service do
 
     context 'on an uncaught exception' do
       subject { endpoint.get_uncaught_exception(req, active_call) }
-      let(:error) { Gruf::Error.new(code: :internal, app_code: :unknown, message: 'epic fail') }
+      let(:base_error_message) { Gruf.internal_error_message }
+      let(:error_message) { 'epic fail' }
+      let(:error) { Gruf::Error.new(code: :internal, app_code: :unknown, message: error_message) }
 
-      it 'should raise a GRPC::Internal error' do
+      it 'by default should raise a GRPC::Internal error using the exception message' do
         expect do
           subject
         end.to raise_error do |err|
           expect(err).to be_a(GRPC::Internal)
           expect(err.code).to eq 13
-          expect(err.message).to eq '13:epic fail'
+          expect(err.message).to eq "13:#{error_message}"
           expect(err.metadata).to eq(:'error-internal-bin' => error.serialize)
         end
       end
@@ -73,9 +76,48 @@ describe Gruf::Service do
         expect do
           subject
         end.to raise_error do |err|
-          error = JSON.parse(err.metadata[:'error-internal-bin'])
-          expect(error['debug_info']).to_not be_empty
-          expect(error['debug_info']['stack_trace']).to_not be_empty
+          parsed_error = JSON.parse(err.metadata[:'error-internal-bin'])
+          expect(parsed_error['debug_info']).to_not be_empty
+          expect(parsed_error['debug_info']['stack_trace']).to_not be_empty
+        end
+      end
+
+      context 'when we override the base exception message' do
+        let(:message) { SecureRandom.hex }
+
+        before do
+          Gruf.configure do |c|
+            c.use_exception_message = false
+            c.internal_error_message = message
+          end
+        end
+
+        it 'should raise a GRPC::Internal error with the correct message' do
+          expect do
+            subject
+          end.to raise_error do |err|
+            expect(err).to be_a(GRPC::Internal)
+            expect(err.code).to eq 13
+            expect(err.message).to eq "13:#{message}"
+          end
+        end
+      end
+
+      context 'when we enable the internal exception message config' do
+        before do
+          Gruf.configure do |c|
+            c.use_exception_message = false
+          end
+        end
+
+        it 'should raise a GRPC::Internal error and use e.message' do
+          expect do
+            subject
+          end.to raise_error do |err|
+            expect(err).to be_a(GRPC::Internal)
+            expect(err.code).to eq 13
+            expect(err.message).to eq "13:#{Gruf.internal_error_message}"
+          end
         end
       end
     end

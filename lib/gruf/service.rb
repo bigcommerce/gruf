@@ -228,7 +228,8 @@ module Gruf
     rescue => e
       raise e if e.is_a?(GRPC::BadStatus)
       set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
-      fail!(req, call, :internal, :unknown, e.message)
+      error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
+      fail!(req, call, :internal, :unknown, error_message)
     end
 
     ##
