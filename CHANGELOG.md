@@ -1,5 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
+h3. 1.1.0
+
+- Add the ability for call options to the client, which enables deadline setting 
+
 h3. 1.0.0
 
 - Bump gRPC to 1.4 

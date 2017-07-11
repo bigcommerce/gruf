@@ -47,14 +47,14 @@ module Gruf
     ##
     # Call the client's method with given params
     #
-    def call(request_method, params = {}, metadata = {})
+    def call(request_method, params = {}, metadata = {}, opts = {})
       req = request_object(request_method, params)
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
 
       raise NotImplementedError, "The method #{request_method} has not been implemented in this service." unless call_sig
 
-      execute(call_sig, req, md)
+      execute(call_sig, req, md, opts)
     rescue GRPC::BadStatus => e
       emk = Gruf.error_metadata_key.to_s
       raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize if e.respond_to?(:metadata) && e.metadata.key?(emk)
@@ -68,9 +68,11 @@ module Gruf
     # @param [Object] req
     # @param [Hash] md
     #
-    def execute(call_sig, req, md)
+    def execute(call_sig, req, md, opts)
       timed = Timer.time do
-        send(call_sig, req, return_op: true, metadata: md)
+        opts[:return_op] = true
+        opts[:metadata] = md
+        send(call_sig, req, opts)
       end
       Gruf::Response.new(timed.result, timed.time)
     end
