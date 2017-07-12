@@ -38,7 +38,9 @@ module Gruf
       authorization_metadata_key: 'authorization',
       append_server_errors_to_trailing_metadata: true,
       use_default_hooks: true,
-      backtrace_on_error: false
+      backtrace_on_error: false,
+      use_exception_message: true,
+      internal_error_message: 'Internal Server Error'
     }.freeze
 
     attr_accessor *VALID_CONFIG_KEYS.keys
