@@ -42,7 +42,7 @@ require 'gruf'
 id = args[:id].to_i.presence || 1
 
 begin
-  client = ::Gruf::Client.new(service: MyPackage::MyService)
+  client = ::Gruf::Client.new(service: ::Demo::ThingService)
   response = client.call(:GetMyThing, id: id)
   puts response.message.inspect
 rescue Gruf::Client::Error => e
@@ -72,40 +72,40 @@ syntax = "proto3";
 
 package demo;
 
-service Thing {
-    rpc GetThing(GetThingReq) returns (GetSslCertificateResp) { }
+service Jobs {
+    rpc GetJob(GetJobReq) returns (GetJobResp) { }
 }
 
-message ThingReq {
+message GetJobReq {
     uint64 id = 1;
 }
 
-message ThingResp {
+message GetJobResp {
     uint64 id = 1;
     string name = 2;
 }
 ```
 
-You'd have this handler in `/app/rpc/demo/thing_server.rb`
+You'd have this handler in `/app/rpc/demo/job_server.rb`
 
 ```ruby
 module Demo
-  class ThingServer < ::Demo::ThingService::Service
+  class JobServer < ::Demo::Jobs::Service
     include Gruf::Service
   
     ##
-    # @param [Demo::GetThingReq] req
-    # @param [GRPC::ActiveCall] call
-    # @return [Demo::GetThingResp]
+    # @param [Demo::GetJobReq] req The incoming gRPC request object
+    # @param [GRPC::ActiveCall] call The gRPC active call instance
+    # @return [Demo::GetJobResp] The job response
     #
-    def get_thing(req, call)
-      ssl = Thing.find(req.id)
+    def get_job(req, call)
+      thing = Job.find(req.id)
       
-      Demo::Things::GetThingResp.new(
-        id: ssl.id
+      Demo::GetJobResp.new(
+        id: thing.id
       )
     rescue
-      fail!(req, call, :not_found, :thing_not_found, "Failed to find Thing with ID: #{req.id}")
+      fail!(req, call, :not_found, :job_not_found, "Failed to find Job with ID: #{req.id}")
     end
   end
 end
