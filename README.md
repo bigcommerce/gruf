@@ -294,6 +294,18 @@ This will measure counts and timings for each endpoint.
 Similar to hooks, simply extend the `Gruf::Instrumentation::Base` class, and implement the `call` method. See the StatsD 
 instrumentor for an example.
 
+## Plugins
+
+You can build your own hooks and middleware for gruf; here's a list of known open source gems for
+gruf that you can use today:
+ 
+* [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
+integration for gruf
+* [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Provides circuit breaker
+support for gruf services
+* [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage 
+reports for gruf services
+
 ## License
 
 Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved 
