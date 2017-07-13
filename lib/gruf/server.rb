@@ -26,6 +26,8 @@ module Gruf
     attr_accessor :services
 
     ##
+    # Initialize the server and load and setup the services
+    #
     # @param [Array<Class>] services The services that this server should handle
     #
     def initialize(services: [])

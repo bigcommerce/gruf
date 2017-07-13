@@ -20,15 +20,19 @@ module Gruf
     # Provides a modifiable repository of strategies for authentication
     #
     class Strategies
+      ##
+      # Error class that represents when a strategy does not extend the base class
+      #
       class StrategyDescendantError < StandardError; end
 
       class << self
         ##
         # Add an authentication strategy, either through a class or a block
         #
-        # @param [String] name
-        # @param [Class|NilClass] strategy
-        # @return [Class]
+        # @param [String] name The vanity name of the strategy being loaded
+        # @param [Class|NilClass] strategy (Optional) The class that represents the strategy
+        # @param [Proc] &block If given, will attempt to build a strategy class from the base class with this block
+        # @return [Class] The loaded strategy
         #
         def add(name, strategy = nil, &block)
           base = Gruf::Authentication::Base
@@ -46,12 +50,15 @@ module Gruf
         ##
         # Return a strategy via a hash accessor syntax
         #
+        # @param [Symbol] label The name of the strategy
+        # @return [Gruf::Authentication::Base] The requested strategy
+        #
         def [](label)
           _strategies[label.to_sym]
         end
 
         ##
-        # Iterate over each
+        # Iterate over each strategy and yield it to the caller
         #
         def each
           _strategies.each do |s|
@@ -60,21 +67,27 @@ module Gruf
         end
 
         ##
-        # @return [Hash<Class>]
+        # Return the loaded strategies as a hash
+        #
+        # @return [Hash<Class>] A name/strategy pair of loaded strategies
         #
         def to_h
           _strategies
         end
 
         ##
-        # @return [Boolean]
+        # Return if there are any loaded strategies
+        #
+        # @return [Boolean] True if there are loaded strategies
         #
         def any?
           to_h.keys.count > 0
         end
 
         ##
-        # @return [Hash]
+        # Clear all given strategies
+        #
+        # @return [Hash] The newly empty hash
         #
         def clear
           @strategies = {}

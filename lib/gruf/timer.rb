@@ -15,6 +15,11 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 module Gruf
+  ##
+  # Times a given block and returns the result and the elapsed time as a Float
+  #
+  #   result = Timer.time { do_my_thing }
+  #
   class Timer
     ##
     # Represents a timer result that contains both the elapsed time and the result of the block
@@ -24,7 +29,9 @@ module Gruf
     #   result.result # => 'my_thing_is_done'
     #
     class Result
+      # @return [Object] result The result of the block that was called
       attr_reader :result
+      # @return [Float] time The time, in ms, of the block execution
       attr_reader :time
 
       ##
@@ -39,6 +46,8 @@ module Gruf
       end
 
       ##
+      # Was this result a successful result?
+      #
       # @return [Boolean] Whether or not this result was a success
       #
       def success?

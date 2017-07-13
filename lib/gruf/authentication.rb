@@ -20,11 +20,19 @@ require_relative 'authentication/basic'
 require_relative 'authentication/none'
 
 module Gruf
+  ##
+  # Handles authentication for gruf services
+  #
   module Authentication
+    ##
+    # Custom error class for handling unauthorized requests
+    #
     class UnauthorizedError < StandardError; end
 
     ##
-    # @param [GRPC::ActiveCall] call
+    # Verify a given gruf request
+    #
+    # @param [GRPC::ActiveCall] call The gRPC active call with marshalled data that is being executed
     # @param [Symbol] strategy The authentication strategy to use
     # @return [Boolean]
     #

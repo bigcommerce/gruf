@@ -53,11 +53,18 @@ module Gruf
       end
     end
 
-    attr_reader :base_klass, :service_klass, :opts
+    # @return [Class] The base, friendly name of the service being requested
+    attr_reader :base_klass
+    # @return [Class] The class name of the gRPC service being requested
+    attr_reader :service_klass
+    # @return [Hash] A hash of options for the client
+    attr_reader :opts
 
     ##
+    # Initialize the client and setup the stub
+    #
     # @param [Module] service The namespace of the client Stub that is desired to load
-    # @param [Hash] options
+    # @param [Hash] options A hash of options for the client
     # @option options [String] :password The password for basic authentication for the service.
     # @option options [String] :hostname The hostname of the service. Defaults to linkerd.
     #
@@ -99,6 +106,8 @@ module Gruf
     private
 
     ##
+    # Execute the given request to the service
+    #
     # @param [Symbol] call_sig The call signature being executed
     # @param [Object] req (Optional) The protobuf request message to send
     # @param [Hash] md (Optional) A hash of metadata key/values that are transported with the client request
