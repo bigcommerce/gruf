@@ -21,8 +21,8 @@ module Gruf
     #
     class None < Base
       ##
-      # @param [GRPC::ActiveCall] _call
-      # @return [TrueClass]
+      # @param [GRPC::ActiveCall] _call The gRPC active call for the given operation
+      # @return [TrueClass] Always true for this passthrough strategy.
       #
       def valid?(_call)
         true

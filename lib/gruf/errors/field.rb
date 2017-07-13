@@ -20,12 +20,17 @@ module Gruf
     # Represents a field-specific error
     #
     class Field
-      attr_reader :field_name, :error_code, :message
+      # @return [Symbol] The name of the field as a Symbol
+      attr_reader :field_name
+      # @return [Symbol] The application error code for the field, e.g. :job_not_found
+      attr_reader :error_code
+      # @return [String] The error message for the field, e.g. "Job with ID 123 not found"
+      attr_reader :message
 
       ##
-      # @param [Symbol] field_name
-      # @param [Symbol] error_code
-      # @param [String] message
+      # @param [Symbol] field_name The name of the field as a Symbol
+      # @param [Symbol] error_code The application error code for the field, e.g. :job_not_found
+      # @param [String] message (Optional) The error message for the field, e.g. "Job with ID 123 not found"
       #
       def initialize(field_name, error_code, message = '')
         @field_name = field_name
@@ -34,7 +39,9 @@ module Gruf
       end
 
       ##
-      # @return [Hash]
+      # Return the field error represented as a hash
+      #
+      # @return [Hash] The error represented as a hash
       #
       def to_h
         {

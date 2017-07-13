@@ -17,16 +17,21 @@
 module Gruf
   module Authentication
     ##
-    # Base interface for Authentication strategies
+    # Base interface for Authentication strategies. All derived strategies must define the `valid?` method.
     #
     class Base
       include Gruf::Loggable
 
-      attr_reader :credentials, :options
+      # @return [String] The credentials sent in the request
+      attr_reader :credentials
+      # @return [Hash] A hash of authentication options
+      attr_reader :options
 
       ##
+      # Initialize the authentication middleware
       #
-      # @param [String] credentials
+      # @param [String] credentials The credentials sent in the request
+      # @param [Hash] options A hash of authentication options
       #
       def initialize(credentials, options = {})
         opts = Gruf.authentication_options || {}
@@ -37,17 +42,20 @@ module Gruf
       ##
       # Verify the credentials. Helper class method.
       #
-      # @param [GRPC::ActiveCall] call
-      # @param [String] credentials
-      # @param [Hash] options
+      # @param [GRPC::ActiveCall] call The gRPC active call for the given operation
+      # @param [String] credentials The credentials sent in the request
+      # @param [Hash] options A hash of authentication options
       #
       def self.verify(call, credentials = '', options = {})
         new(credentials, options).valid?(call)
       end
 
       ##
-      # @param [GRPC::ActiveCall] _call
-      # @return [Boolean]
+      # Abstract method that is required to be implemented in every derivative class.
+      # Return true if the call is authenticated, false if a permission denied error is to be sent.
+      #
+      # @param [GRPC::ActiveCall] _call The gRPC active call for the given operation
+      # @return [Boolean] True if the call was authenticated
       #
       def valid?(_call)
         raise NotImplementedError

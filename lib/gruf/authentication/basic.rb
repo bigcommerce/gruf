@@ -23,8 +23,8 @@ module Gruf
     #
     class Basic < Base
       ##
-      # @param [GRPC::ActiveCall] _call
-      # @return [Boolean]
+      # @param [GRPC::ActiveCall] _call The gRPC active call for the given operation
+      # @return [Boolean] True if the basic authentication was valid
       #
       def valid?(_call)
         server_credentials.any? do |cred|
@@ -41,21 +41,21 @@ module Gruf
       private
 
       ##
-      # @return [Array<Hash>]
+      # @return [Array<Hash>] An array of valid server credentials for this service
       #
       def server_credentials
         options.fetch(:credentials, [])
       end
 
       ##
-      # @return [String]
+      # @return [String] The decoded request credentials
       #
       def request_credentials
         Base64.decode64(credentials.to_s.gsub('Basic ', '').strip)
       end
 
       ##
-      # @return [String]
+      # @return [String] The decoded request username
       # @deprecated
       # :nocov:
       def request_username
@@ -64,7 +64,7 @@ module Gruf
       # :nocov:
 
       ##
-      # @return [String]
+      # @return [String] The decoded request password
       #
       def request_password
         @request_password ||= request_credentials.split(':').last
