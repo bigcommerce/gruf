@@ -55,8 +55,8 @@ module Gruf
     ##
     # Yield self for ruby-style initialization
     #
-    # @yields [Gruf::Configuration]
-    # @return [Gruf::Configuration]
+    # @yields [Gruf::Configuration] The configuration object for gruf
+    # @return [Gruf::Configuration] The configuration object for gruf
     #
     def configure
       yield self
@@ -65,7 +65,7 @@ module Gruf
     ##
     # Return the current configuration options as a Hash
     #
-    # @return [Hash]
+    # @return [Hash] The configuration for gruf, represented as a Hash
     #
     def options
       opts = {}
@@ -113,7 +113,7 @@ module Gruf
     ##
     # Automatically determine environment
     #
-    # @return [String]
+    # @return [String] The current Ruby environment
     #
     def environment
       if defined?(Rails)

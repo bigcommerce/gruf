@@ -16,7 +16,10 @@
 #
 module Gruf
   ##
-  # Module for gRPC endpoints
+  # Module for gRPC endpoints. Include this in any gRPC service you wish Gruf to serve. It will automatically mount
+  # it to the given gruf server and can be run via the command:
+  #
+  #  bundle exec gruf
   #
   module Service
     extend ActiveSupport::Concern
@@ -187,7 +190,6 @@ module Gruf
     # @param [Symbol] app_code The application-specific code for the error
     # @param [String] message (Optional) A detail message about the error
     # @param [Hash] metadata (Optional) Any metadata to inject into the trailing metadata for the response
-    # @return [RPC::Error]
     #
     def fail!(_req, call, error_code, app_code = nil, message = '', metadata = {})
       error.code = error_code.to_sym
@@ -235,9 +237,9 @@ module Gruf
     ##
     # Add a field error to this endpoint
     #
-    # @param [Symbol] field_name
-    # @param [Symbol] error_code
-    # @param [String] message
+    # @param [Symbol] field_name The name of the field
+    # @param [Symbol] error_code The application error code for the field
+    # @param [String] message A given error message for the field
     #
     def add_field_error(field_name, error_code, message = '')
       error.add_field_error(field_name, error_code, message)
@@ -246,7 +248,7 @@ module Gruf
     ##
     # Return true if there are any present field errors
     #
-    # @return [Boolean]
+    # @return [Boolean] True if the service has any field errors
     #
     def has_field_errors?
       error.field_errors.any?
@@ -263,7 +265,7 @@ module Gruf
     end
 
     ##
-    # @return [Gruf::Error]
+    # @return [Gruf::Error] The generated gruf error object
     #
     def error
       @error ||= Gruf::Error.new

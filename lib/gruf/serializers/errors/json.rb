@@ -19,6 +19,9 @@ require 'json'
 module Gruf
   module Serializers
     module Errors
+      ##
+      # Serializes the error via JSON for transport
+      #
       class Json < Base
         ##
         # @return [String] The serialized JSON string

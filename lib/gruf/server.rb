@@ -22,8 +22,12 @@ module Gruf
   class Server
     include Gruf::Loggable
 
+    # @return [Array<Class>] The services this server is handling
     attr_accessor :services
 
+    ##
+    # @param [Array<Class>] services The services that this server should handle
+    #
     def initialize(services: [])
       setup!
       load_services(services)
@@ -50,8 +54,8 @@ module Gruf
     ##
     # Return all loaded gRPC services
     #
-    # @param [Array<Class>] svcs
-    # @return [Array<Class>]
+    # @param [Array<Class>] svcs An array of service classes that will be handled by this server
+    # @return [Array<Class>] The given services that were added
     #
     def load_services(svcs)
       unless @services
@@ -74,6 +78,8 @@ module Gruf
     # :nocov:
 
     ##
+    # Load the SSL/TLS credentials for this server
+    #
     # @return [GRPC::Core::ServerCredentials|Symbol]
     #
     # :nocov:

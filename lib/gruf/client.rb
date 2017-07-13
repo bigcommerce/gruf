@@ -15,12 +15,39 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 module Gruf
+  ##
+  # Abstracts out the calling interface for interacting with gRPC clients. Streamlines calling and provides
+  # instrumented response objects that also can contain deserialized error messages via serialized objects transported
+  # via the service's trailing metadata.
+  #
+  #   begin
+  #     client = ::Gruf::Client.new(service: ::Demo::ThingService)
+  #     response = client.call(:GetMyThing, id: 123)
+  #     puts response.message.inspect
+  #   rescue Gruf::Client::Error => e
+  #     puts e.error.inspect
+  #   end
+  #
+  # Utilizes SimpleDelegator to wrap the given service that the client is connecting to, which allows a clean interface
+  # to the underlying RPC descriptors and methods.
+  #
   class Client < SimpleDelegator
     include Gruf::Loggable
 
+    ##
+    # Represents an error that was returned from the server's trailing metadata. Used as a custom exception object
+    # that is instead raised in the case of the service returning serialized error data, as opposed to the normal
+    # GRPC::BadStatus error
+    #
     class Error < StandardError
+      # @return [Object] error The deserialized error
       attr_reader :error
 
+      ##
+      # Initialize the client error
+      #
+      # @param [Object] error The deserialized error
+      #
       def initialize(error)
         @error = error
       end
@@ -47,6 +74,14 @@ module Gruf
     ##
     # Call the client's method with given params
     #
+    # @param [String|Symbol] request_method The method that is being requested on the service
+    # @param [Hash] params (Optional) A hash of parameters that will be inserted into the gRPC request message that is required
+    # for the given above call
+    # @param [Hash] metadata (Optional) A hash of metadata key/values that are transported with the client request
+    # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
+    # @return [Gruf::Response] The response from the server
+    # @raise [Gruf::Client::Error|GRPC::BadStatus] If an error occurs, an exception will be raised according to the
+    # error type that was returned
     def call(request_method, params = {}, metadata = {}, opts = {})
       req = request_object(request_method, params)
       md = build_metadata(metadata)
@@ -65,10 +100,11 @@ module Gruf
 
     ##
     # @param [Symbol] call_sig The call signature being executed
-    # @param [Object] req
-    # @param [Hash] md
+    # @param [Object] req (Optional) The protobuf request message to send
+    # @param [Hash] md (Optional) A hash of metadata key/values that are transported with the client request
+    # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
     #
-    def execute(call_sig, req, md, opts)
+    def execute(call_sig, req, md, opts = {})
       timed = Timer.time do
         opts[:return_op] = true
         opts[:metadata] = md
@@ -78,14 +114,21 @@ module Gruf
     end
 
     ##
-    # @return [Struct<GRPC::RpcDesc>]
+    # Get the appropriate RPC descriptor given the method on the service being called
+    #
+    # @param [Symbol] request_method The method name being called on the remote service
+    # @return [Struct<GRPC::RpcDesc>] Return the given RPC descriptor given the method on the service being called
     #
     def rpc_desc(request_method)
       service_klass.rpc_descs[request_method.to_sym]
     end
 
     ##
-    # @return [Class] The request object
+    # Get the appropriate protobuf request message for the given request method on the service being called
+    #
+    # @param [Symbol] request_method The method name being called on the remote service
+    # @param [Hash] params (Optional) A hash of parameters that will populate the request object
+    # @return [Class] The request object that corresponds to the method being called
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
@@ -93,6 +136,8 @@ module Gruf
     end
 
     ##
+    # Properly find the appropriate call signature for the GRPC::GenericService given the request method name
+    #
     # @return [Symbol]
     #
     def call_signature(request_method)
@@ -101,7 +146,10 @@ module Gruf
     end
 
     ##
-    # @return [Hash]
+    # Build a sanitized, authenticated metadata hash for the given request
+    #
+    # @param [Hash] metadata A base metadata hash to build from
+    # @return [Hash] The compiled metadata hash that is ready to be transported over the wire
     #
     def build_metadata(metadata = {})
       unless opts[:password].empty?
@@ -114,7 +162,9 @@ module Gruf
     end
 
     ##
-    # @return [Symbol|GRPC::Core::ChannelCredentials]
+    # Build the SSL/TLS credentials for the outbound gRPC request
+    #
+    # @return [Symbol|GRPC::Core::ChannelCredentials] The generated SSL credentials for the outbound gRPC request
     #
     # :nocov:
     def build_ssl_credentials
@@ -130,7 +180,9 @@ module Gruf
     # :nocov:
 
     ##
-    # @return [Class]
+    # Return the specified error deserializer class by the configuration
+    #
+    # @return [Class] The proper error deserializer class. Defaults to JSON.
     #
     def error_deserializer_class
       if Gruf.error_serializer

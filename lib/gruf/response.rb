@@ -19,11 +19,24 @@ module Gruf
   # Wraps the active call operation to provide metadata and timing around the request
   #
   class Response
-    attr_reader :operation, :metadata, :trailing_metadata, :deadline, :cancelled, :execution_time
+    # @return [GRPC::ActiveCall::Operation] The operation that was executed for the given request
+    attr_reader :operation
+    # @return [Hash] The metadata that was attached to the operation
+    attr_reader :metadata
+    # @return [Hash] The trailing metadata that the service returned
+    attr_reader :trailing_metadata
+    # @return [Time] The set deadline on the call
+    attr_reader :deadline
+    # @return [Boolean] Whether or not the operation was cancelled
+    attr_reader :cancelled
+    # @return [Float] The time that the request took to execute
+    attr_reader :execution_time
 
     ##
-    # @param [GRPC::ActiveCall::Operation] op
-    # @param [Float] execution_time
+    # Initialize a response object with the given gRPC operation
+    #
+    # @param [GRPC::ActiveCall::Operation] op The given operation for the current call
+    # @param [Float] execution_time The amount of time that the response took to occur
     #
     def initialize(op, execution_time = nil)
       @operation = op
@@ -38,6 +51,8 @@ module Gruf
     ##
     # Return the message returned by the request
     #
+    # @return [Object] The protobuf response message
+    #
     def message
       @message ||= op.execute
     end
@@ -45,7 +60,7 @@ module Gruf
     ##
     # Return execution time of the call internally on the server in ms
     #
-    # @return [Integer]
+    # @return [Float] The execution time of the response
     #
     def internal_execution_time
       key = Gruf.instrumentation_options.fetch(:output_metadata_timer, {}).fetch(:metadata_key, 'timer')

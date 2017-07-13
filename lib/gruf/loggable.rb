@@ -15,9 +15,12 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 module Gruf
+  ##
+  # Mixin that allows any Gruf class to have easy access to the Gruf logger
+  #
   module Loggable
     ##
-    # @return [Logger]
+    # @return [Logger] The set logger for Gruf
     #
     def logger
       Gruf.logger

@@ -69,7 +69,7 @@ module Gruf
       ##
       # Was this call a success? If a response is a GRPC::BadStatus object, we assume that it was unsuccessful
       #
-      # @return [Boolean]
+      # @return [Boolean] True if was a successful call
       #
       def success?
         !response.is_a?(GRPC::BadStatus)

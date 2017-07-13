@@ -35,7 +35,7 @@ module Gruf
         # Must be implemented in a derived class. This method should serialize the error into a transportable String
         # that can be pushed into GRPC metadata across the wire.
         #
-        # @return [String]
+        # @return [String] The serialized error
         #
         def serialize
           raise NotImplementedError
@@ -45,7 +45,7 @@ module Gruf
         # Must be implemented in a derived class. This method should deserialize the error object that is transported
         # over the gRPC trailing metadata payload.
         #
-        # @return [Object|Hash]
+        # @return [Object|Hash] The deserialized error object
         #
         def deserialize
           raise NotImplementedError
