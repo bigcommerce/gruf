@@ -23,6 +23,8 @@ module Gruf
       ##
       # Handle the instrumented response. Note: this will only instrument timings of _successful_ responses.
       #
+      # @return [Hash] The resulting output metadata with the timer attached
+      #
       def call
         active_call.output_metadata.update(metadata_key => execution_time.to_s)
       end
@@ -30,7 +32,7 @@ module Gruf
       private
 
       ##
-      # @return [Symbol]
+      # @return [Symbol] The metadata key that the time result should be set to
       #
       def metadata_key
         options.fetch(:output_metadata_timer, {}).fetch(:metadata_key, :timer).to_sym

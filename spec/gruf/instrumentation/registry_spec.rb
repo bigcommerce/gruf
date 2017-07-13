@@ -39,7 +39,7 @@ describe Gruf::Instrumentation::Registry do
       context 'when the hook does not extend Gruf::Instrumentation::Base' do
         let(:hook_class) { TestInvalidInheritanceInstrumentationHook }
         it 'should raise a HookDescendantError' do
-          expect { subject }.to raise_error(Gruf::Instrumentation::Registry::HookDescendantError)
+          expect { subject }.to raise_error(Gruf::Instrumentation::Registry::StrategyDescendantError)
         end
       end
     end

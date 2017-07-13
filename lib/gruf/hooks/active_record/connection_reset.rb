@@ -21,12 +21,26 @@ module Gruf
       # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
       #
       class ConnectionReset < Gruf::Hooks::Base
-        def after(_success, _response, _call_signature, _req, _call)
+        ##
+        # Reset any ActiveRecord connections after a gRPC service is called. Because of the way gRPC manages its
+        # connection pool, we need to ensure that this is done to properly
+        #
+        # @param [Boolean] _success Whether or not the call was successful
+        # @param [Object] _response The protobuf response object
+        # @param [Symbol] _call_signature The gRPC method on the service that was called
+        # @param [Object] _request The protobuf request object
+        # @param [GRPC::ActiveCall] _call the gRPC core active call object, which represents marshalled data for
+        # the call itself
+        #
+        def after(_success, _response, _call_signature, _request, _call)
           ::ActiveRecord::Base.clear_active_connections! if enabled?
         end
 
         private
 
+        ##
+        # @return [Boolean] If AR is loaded, we can enable this hook safely
+        #
         def enabled?
           defined?(::ActiveRecord::Base)
         end

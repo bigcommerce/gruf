@@ -18,8 +18,8 @@ source 'https://rubygems.org'
 
 gemspec
 
-group :development do
-  gem 'rubocop', '~> 0.48'
+group :development, :test do
+  gem 'rubocop', '~> 0.49.1'
 end
 
 group :test do

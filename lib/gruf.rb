@@ -33,6 +33,9 @@ require_relative 'gruf/error'
 require_relative 'gruf/client'
 require_relative 'gruf/server'
 
+##
+# Initializes configuration of gruf core module
+#
 module Gruf
   extend Configuration
 end

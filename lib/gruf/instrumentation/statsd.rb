@@ -35,21 +35,21 @@ module Gruf
       private
 
       ##
-      # @return [String]
+      # @return [String] Return a composed route key that is used in the statsd metric
       #
       def route_key
         "#{key_prefix}#{service_key}.#{call_signature}"
       end
 
       ##
-      # @return [String]
+      # @return [String] Return the sanitized gRPC service name
       #
       def service_key
         service.class.name.underscore.tr('/', '.')
       end
 
       ##
-      # @return [String]
+      # @return [String] Return the sanitized key prefix for the statsd metric key
       #
       def key_prefix
         prefix = options.fetch(:prefix, '').to_s
@@ -57,14 +57,14 @@ module Gruf
       end
 
       ##
-      # @return [::Statsd]
+      # @return [::Statsd] Return the given StatsD client
       #
       def client
         @client ||= options.fetch(:client, nil)
       end
 
       ##
-      # @return [Hash]
+      # @return [Hash] Return a hash of options for this hook
       #
       def options
         @options.fetch(:statsd, {})

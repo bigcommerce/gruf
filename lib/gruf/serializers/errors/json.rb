@@ -21,14 +21,14 @@ module Gruf
     module Errors
       class Json < Base
         ##
-        # @return [String]
+        # @return [String] The serialized JSON string
         #
         def serialize
           @error.to_h.to_json
         end
 
         ##
-        # @return [Object|Hash]
+        # @return [Hash] A hash deserialized from the inputted JSON
         #
         def deserialize
           JSON.parse(@error)

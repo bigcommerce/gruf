@@ -24,28 +24,36 @@ module Gruf
     # Registry of all hooks added
     #
     class Registry
-      class HookDescendantError < StandardError; end
+      ##
+      # Error class that represents when a instrumentation strategy does not extend the base class
+      #
+      class StrategyDescendantError < StandardError; end
 
       class << self
         ##
         # Add an authentication strategy, either through a class or a block
         #
-        # @param [String] name
-        # @param [Gruf::Hooks::Base|NilClass] hook
-        # @return [Class]
+        #   Gruf::Instrumentation::Registry.add(:my_instrumentor, MyInstrumentor)
         #
-        def add(name, hook = nil, &block)
+        # @param [String] name The name to represent the strategy as
+        # @param [Gruf::Hooks::Base|NilClass] strategy (Optional) The strategy class to add. If nil, will expect
+        # a block that can be built as a strategy instead
+        # @return [Class] The strategy that was added
+        #
+        def add(name, strategy = nil, &block)
           base = Gruf::Instrumentation::Base
-          hook ||= Class.new(base)
-          hook.class_eval(&block) if block_given?
+          strategy ||= Class.new(base)
+          strategy.class_eval(&block) if block_given?
 
-          raise HookDescendantError, "Hooks must descend from #{base}" unless hook.ancestors.include?(base)
+          raise StrategyDescendantError, "Hooks must descend from #{base}" unless strategy.ancestors.include?(base)
 
-          _registry[name.to_sym] = hook
+          _registry[name.to_sym] = strategy
         end
 
         ##
         # Return a strategy type registry via a hash accessor syntax
+        #
+        # @return [Gruf::Instrumentation::Base|NilClass] The requested strategy, if exists
         #
         def [](name)
           _registry[name.to_sym]
@@ -61,21 +69,21 @@ module Gruf
         end
 
         ##
-        # @return [Hash<Class>]
+        # @return [Hash<Class>] Return the registry represented as a Hash object
         #
         def to_h
           _registry
         end
 
         ##
-        # @return [Boolean]
+        # @return [Boolean] Return true if there are any registered instrumentation strategies
         #
         def any?
           to_h.keys.count > 0
         end
 
         ##
-        # @return [Hash]
+        # @return [Hash] Clear all existing strategies from the registry
         #
         def clear
           @_registry = {}
@@ -84,7 +92,7 @@ module Gruf
         private
 
         ##
-        # @return [Hash<Class>]
+        # @return [Hash<Class>] Return the current registry
         #
         def _registry
           @_registry ||= {}

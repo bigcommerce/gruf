@@ -16,14 +16,22 @@
 #
 module Gruf
   class Timer
-
+    ##
+    # Represents a timer result that contains both the elapsed time and the result of the block
+    #
+    #   result = Timer.time { do_my_thing }
+    #   result.time # => 1.10123
+    #   result.result # => 'my_thing_is_done'
+    #
     class Result
       attr_reader :result
       attr_reader :time
 
       ##
-      # @param [Object] result
-      # @param [Float] time
+      # Initialize the result object
+      #
+      # @param [Object] result The result of the block that was called
+      # @param [Float] time The time, in ms, of the block execution
       #
       def initialize(result, time)
         @result = result
@@ -31,7 +39,7 @@ module Gruf
       end
 
       ##
-      # @return [Boolean]
+      # @return [Boolean] Whether or not this result was a success
       #
       def success?
         !result.is_a?(GRPC::BadStatus)
@@ -39,7 +47,11 @@ module Gruf
     end
 
     ##
-    # @return [Timer::Result]
+    # Times a given block by recording start and end times
+    #
+    #  result = Timer.time { do_my_thing }
+    #
+    # @return [Timer::Result] Returns the timed result of the block
     #
     def self.time
       start_time = Time.now

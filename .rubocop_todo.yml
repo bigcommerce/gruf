@@ -59,14 +59,14 @@ Style/BlockDelimiters:
 
 # Configuration parameters: IndentWhenRelativeTo, SupportedStyles, IndentOneStep, IndentationWidth.
 # SupportedStyles: case, end
-Style/CaseIndentation:
+Layout/CaseIndentation:
   Enabled: false
 
 Style/ColonMethodCall:
   Exclude:
     - 'db/seeds.rb'
 
-Style/EmptyLineAfterMagicComment:
+Layout/EmptyLineAfterMagicComment:
   Enabled: false
 
 Style/Documentation:
@@ -74,16 +74,16 @@ Style/Documentation:
 
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: leading, trailing
-Style/DotPosition:
+Layout/DotPosition:
   Enabled: false
 
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: empty_lines, no_empty_lines
-Style/EmptyLinesAroundClassBody:
+Layout/EmptyLinesAroundClassBody:
   Enabled: false
 
 # Configuration parameters: AllowForAlignment, ForceEqualSignAlignment.
-Style/ExtraSpacing:
+Layout/ExtraSpacing:
   Exclude:
     - 'config.ru'
     - 'config/routes.rb'
@@ -95,10 +95,10 @@ Style/GlobalVars:
 
 # Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
 # SupportedStyles: special_inside_parentheses, consistent, align_braces
-Style/IndentHash:
+Layout/IndentHash:
   Enabled: false
 
-Style/LeadingCommentSpace:
+Layout/LeadingCommentSpace:
   Exclude:
     - 'Capfile'
 
@@ -109,12 +109,12 @@ Style/MethodName:
 
 # Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
 # SupportedStyles: aligned, indented
-Style/MultilineMethodCallIndentation:
+Layout/MultilineMethodCallIndentation:
   Enabled: false
 
 # Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
 # SupportedStyles: aligned, indented
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   Enabled: false
 
 # Configuration parameters: NamePrefix, NamePrefixBlacklist, NameWhitelist.

@@ -17,13 +17,37 @@
 module Gruf
   module Instrumentation
     ##
-    # Base class for a hook. Define before, around, or after methods to utilize functionality.
+    # Base class for an instrumentation strategy. Define a call method to utilize functionality.
     #
     class Base
       include Gruf::Loggable
 
-      attr_reader :options, :service, :response, :request, :execution_time, :call_signature, :active_call
+      # @return [Gruf::Service] service The service to instrument
+      attr_reader :service
+      # @return [Object] request The protobuf request object
+      attr_reader :request
+      # @return [Object] response The protobuf response object
+      attr_reader :response
+      # @return [Time] execution_time The execution time, in ms, of the request
+      attr_reader :execution_time
+      # @return [Symbol] call_signature The gRPC method on the service that was called
+      attr_reader :call_signature
+      # @return [GRPC::ActiveCall] active_call The gRPC core active call object, which represents marshalled data for
+      # the call itself
+      attr_reader :active_call
+      # @return [Hash] options Options to use when instrumenting the call
+      attr_reader :options
 
+      ##
+      # @param [Gruf::Service] service The service to instrument
+      # @param [Object] request The protobuf request object
+      # @param [Object] response The protobuf response object
+      # @param [Time] execution_time The execution time, in ms, of the request
+      # @param [Symbol] call_signature The gRPC method on the service that was called
+      # @param [GRPC::ActiveCall] active_call the gRPC core active call object, which represents marshalled data for
+      # the call itself
+      # @param [Hash] options (Optional) Options to use when instrumenting the call
+      #
       def initialize(service, request, response, execution_time, call_signature, active_call, options = {})
         @service = service
         @request = request
@@ -43,6 +67,8 @@ module Gruf
       end
 
       ##
+      # Was this call a success? If a response is a GRPC::BadStatus object, we assume that it was unsuccessful
+      #
       # @return [Boolean]
       #
       def success?
@@ -50,6 +76,9 @@ module Gruf
       end
 
       ##
+      # Abstract method that is required for implementing an instrumentation strategy.
+      #
+      # @abstract
       #
       def call
         raise NotImplementedError

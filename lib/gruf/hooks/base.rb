@@ -17,16 +17,21 @@
 module Gruf
   module Hooks
     ##
-    # Base class for a hook. Define before, around, or after methods to utilize functionality.
+    # Base class for a hook. Define before, around, outer_around, or after methods to utilize functionality.
     #
     class Base
       include Gruf::Loggable
 
-      attr_reader :options, :service
+      # @return [Gruf::Service] service The service to perform the hook against
+      attr_reader :service
+      # @return [Hash] options Options to use for the hook
+      attr_reader :options
 
       ##
-      # @param [Gruf::Service] service
-      # @param [Hash] options
+      # Initialize the hook and run setup
+      #
+      # @param [Gruf::Service] service The gruf service that the hook will perform against
+      # @param [Hash] options (Optional) A hash of options for this hook
       #
       def initialize(service, options = {})
         @service = service
@@ -36,6 +41,7 @@ module Gruf
 
       ##
       # Method that can be used to setup the hook prior to running it
+      #
       def setup
         # noop
       end

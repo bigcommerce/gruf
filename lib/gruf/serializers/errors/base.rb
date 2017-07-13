@@ -21,16 +21,20 @@ module Gruf
       # Base class for serialization of errors for transport across the grpc protocol
       #
       class Base
+        # @return [Gruf::Error|String] The error being serialized
         attr_reader :error
 
         ##
-        # @param [Gruf::Error|String] err
+        # @param [Gruf::Error|String] err The error to serialize
         #
         def initialize(err)
           @error = err
         end
 
         ##
+        # Must be implemented in a derived class. This method should serialize the error into a transportable String
+        # that can be pushed into GRPC metadata across the wire.
+        #
         # @return [String]
         #
         def serialize
@@ -38,6 +42,9 @@ module Gruf
         end
 
         ##
+        # Must be implemented in a derived class. This method should deserialize the error object that is transported
+        # over the gRPC trailing metadata payload.
+        #
         # @return [Object|Hash]
         #
         def deserialize

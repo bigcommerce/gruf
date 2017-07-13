@@ -23,15 +23,19 @@ module Gruf
     # Registry of all hooks added
     #
     class Registry
+      ##
+      # Error class that represents when a gruf hook does not extend the base class
+      #
       class HookDescendantError < StandardError; end
 
       class << self
         ##
         # Add an authentication strategy, either through a class or a block
         #
-        # @param [String] name
-        # @param [Gruf::Hooks::Base|NilClass] hook
-        # @return [Class]
+        # @param [String] name The name to represent the hook as
+        # @param [Gruf::Hooks::Base|NilClass] hook The strategy class to add. If nil, will expect
+        # a block that can be built as a hook instead
+        # @return [Class] The hook that was added
         #
         def add(name, hook = nil, &block)
           base = Gruf::Hooks::Base
@@ -47,7 +51,9 @@ module Gruf
         end
 
         ##
-        # Return a strategy type registry via a hash accessor syntax
+        # Return a hook via a hash accessor syntax
+        #
+        # @return [Gruf::Instrumentation::Base|NilClass] The requested hook, if exists
         #
         def [](name)
           _registry[name.to_sym]
@@ -63,28 +69,28 @@ module Gruf
         end
 
         ##
-        # @return [Hash<Class>]
+        # @return [Hash<Class>] Return the registry represented as a Hash object
         #
         def to_h
           _registry
         end
 
         ##
-        # @return [Boolean]
+        # @return [Boolean] Return true if there are any registered hooks
         #
         def any?
           count > 0
         end
 
         ##
-        # @return [Integer]
+        # @return [Integer] Return the number of registered hooks
         #
         def count
           to_h.keys.count
         end
 
         ##
-        # @return [Hash]
+        # @return [Hash] Clear all existing hooks from the registry
         #
         def clear
           @_registry = {}
@@ -93,7 +99,7 @@ module Gruf
         private
 
         ##
-        # @return [Hash<Class>]
+        # @return [Hash<Class>] Return the current registry
         #
         def _registry
           @_registry ||= {}
