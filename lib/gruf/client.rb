@@ -90,6 +90,7 @@ module Gruf
     # @raise [Gruf::Client::Error|GRPC::BadStatus] If an error occurs, an exception will be raised according to the
     # error type that was returned
     def call(request_method, params = {}, metadata = {}, opts = {})
+      request_method = request_method.to_sym
       req = request_object(request_method, params)
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
@@ -129,7 +130,7 @@ module Gruf
     # @return [Struct<GRPC::RpcDesc>] Return the given RPC descriptor given the method on the service being called
     #
     def rpc_desc(request_method)
-      service_klass.rpc_descs[request_method.to_sym]
+      service_klass.rpc_descs[request_method]
     end
 
     ##

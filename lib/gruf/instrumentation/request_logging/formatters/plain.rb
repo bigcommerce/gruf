@@ -14,28 +14,32 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'spec_helper'
+module Gruf
+  module Instrumentation
+    module RequestLogging
+      module Formatters
+        ##
+        # Formats the request into plaintext logging
+        #
+        class Plain < Base
+          ##
+          # Format the request by only outputting the message body and params (if set to log params)
+          #
+          # @param [Hash] payload The incoming request payload
+          # @return [String] The formatted string
+          #
+          def format(payload)
+            time = payload.fetch(:duration, 0)
+            grpc_status = payload.fetch(:grpc_status, 'GRPC::Ok')
+            route_key = payload.fetch(:method, 'unknown')
+            body = payload.fetch(:message, '')
 
-describe Gruf::Instrumentation::OutputMetadataTimer do
-  let(:service) { ThingService.new }
-  let(:id) { rand(1..1000) }
-  let(:request) { Rpc::GetThingRequest.new(id: id) }
-  let(:response) { Rpc::GetThingResponse.new(id: id) }
-  let(:execution_time) { rand(0.001..10.000).to_f }
-  let(:call_signature) { :get_thing_without_intercept }
-  let(:active_call) { Rpc::Test::Call.new }
-
-  let(:options) { { output_metadata_timer: output_metadata_timer_options } }
-  let(:output_metadata_timer_options) { { metadata_key: :timer } }
-
-  let(:hook) { described_class.new(service, options) }
-
-  describe '.call' do
-    subject { hook.outer_around(call_signature, request, active_call) { true } }
-
-    it 'should set the execution time to the output metadata' do
-      expect { subject }.to_not raise_error
-      expect(active_call.output_metadata[:timer]).to_not be_nil
+            msg = "[#{grpc_status}] (#{route_key}) [#{time}ms] #{body}".strip
+            msg += " Parameters: #{payload[:params].to_h}" if payload.key?(:params)
+            msg.strip
+          end
+        end
+      end
     end
   end
 end

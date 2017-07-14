@@ -277,17 +277,52 @@ The StatsD support is not enabled by default. To enable it, you'll want to do:
 
 ```ruby
 Gruf.configure do |c|
-  c.instrumentation_options = {
-    statsd: {
-      client: ::Statsd.new('my.statsd.host', 8125),
-      prefix: 'my_application_prefix.rpc'
-    }
+  c.instrumentation_options[:statsd] = {
+    client: ::Statsd.new('my.statsd.host', 8125),
+    prefix: 'my_application_prefix.rpc'
   }
 end
 Gruf::Instrumentation::Registry.add(:statsd, Gruf::Instrumentation::Statsd)
 ```
 
-This will measure counts and timings for each endpoint.
+This will measure counts and timings for each endpoint. Note: instrumentation hooks happen in LIFO order; they also
+run similarly to an outer_around hook, executing _before_ authorization happens. Note: It's important that in your 
+instrumentors, you pass-through exceptions (such as `GRPC::BadStatus`); catching them in instrumentors will cause errors 
+upstream.
+
+### Request Logging
+
+Gruf 1.2+ comes built with request logging out of the box; you'll get Rails-style logs with your gRPC calls:
+
+```
+# plain
+I, [2017-07-14T09:50:54.200506 #70571]  INFO -- : [GRPC::Ok] (thing_service.get_thing) [0.348ms]
+# logstash
+I, [2017-07-14T09:51:03.299050 #70595]  INFO -- : {"message":"[GRPC::Ok] (thing_service.get_thing) [0.372ms]","service":"thing_service","method":"thing_service.get_thing","grpc_status":"GRPC::Ok"}
+ ```
+
+It supports formatters (including custom ones) that you can use to specify the formatting of the logging:
+ 
+```ruby
+Gruf.configure do |c|
+  c.instrumentation_options[:request_logging] = {
+    formatter: :logstash
+  }
+end
+```
+
+It comes with a few more options as well:
+
+| Option | Description | Default |
+| ------ | ----------- | ------- |
+| formatter | The formatter to use. By default `:plain` and `:logstash` are supported. | `:plain` |
+| log_parameters | If set to true, will log parameters in the response | `false` |
+| blacklist | An array of parameter key names to redact from logging | `[]` |
+| redacted_string | The string to use for redacted parameters. | `REDACTED` |
+
+It's important to maintain a safe blacklist should you decide to log parameters; gruf does no 
+parameter sanitization on its own. We also recommend blacklisting parameters that may contain 
+very large values (such as binary or json data).
 
 ### Custom Instrumentors
 

@@ -16,26 +16,15 @@
 #
 require 'spec_helper'
 
-describe Gruf::Instrumentation::OutputMetadataTimer do
-  let(:service) { ThingService.new }
-  let(:id) { rand(1..1000) }
-  let(:request) { Rpc::GetThingRequest.new(id: id) }
-  let(:response) { Rpc::GetThingResponse.new(id: id) }
-  let(:execution_time) { rand(0.001..10.000).to_f }
-  let(:call_signature) { :get_thing_without_intercept }
-  let(:active_call) { Rpc::Test::Call.new }
+describe Gruf::Instrumentation::RequestLogging::Formatters::Base do
+  let(:formatter) { described_class.new }
+  let(:payload) { {} }
 
-  let(:options) { { output_metadata_timer: output_metadata_timer_options } }
-  let(:output_metadata_timer_options) { { metadata_key: :timer } }
+  describe '.format' do
+    subject { formatter.format(payload) }
 
-  let(:hook) { described_class.new(service, options) }
-
-  describe '.call' do
-    subject { hook.outer_around(call_signature, request, active_call) { true } }
-
-    it 'should set the execution time to the output metadata' do
-      expect { subject }.to_not raise_error
-      expect(active_call.output_metadata[:timer]).to_not be_nil
+    it 'should raise a NotImplementedError' do
+      expect { subject }.to raise_error(NotImplementedError)
     end
   end
 end

@@ -82,7 +82,7 @@ module Gruf
     #
     def reset
       VALID_CONFIG_KEYS.each do |k, v|
-        send((k.to_s + '=').to_sym, v)
+        send((k.to_s + '='), v)
       end
       if defined?(Rails) && Rails.logger
         self.root_path = Rails.root
@@ -104,6 +104,7 @@ module Gruf
       if use_default_hooks
         Gruf::Hooks::Registry.add(:ar_connection_reset, Gruf::Hooks::ActiveRecord::ConnectionReset)
         Gruf::Instrumentation::Registry.add(:output_metadata_timer, Gruf::Instrumentation::OutputMetadataTimer)
+        Gruf::Instrumentation::Registry.add(:request_logging, Gruf::Instrumentation::RequestLogging::Hook)
       end
       options
     end

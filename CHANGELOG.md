@@ -2,9 +2,17 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Instrumentation hooks now execute similarly to outer_around hooks; they can
+  now instrument failures
+- Instrumentation hooks now pass a `RequestContext` object that contains information
+  about the incoming request, instead of relying on instance variables 
+- StatsD hook now sends success/failure metrics for endpoints
 - Add ability to turn off sending exception message on uncaught exception.
 - Add configuration to set the error message when an uncaught exception is
   handled by gruf.
+- Add a request logging hook for Rails-style request logging, with optional 
+  parameter logging, blacklists, and formatter support 
+- Optimizations around Symbol casting within service calls
 
 ### 1.1.0
 

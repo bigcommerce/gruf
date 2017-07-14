@@ -21,24 +21,25 @@ describe Gruf::Instrumentation::Statsd do
   let(:id) { rand(1..1000) }
   let(:request) { Rpc::GetThingRequest.new(id: id) }
   let(:response) { Rpc::GetThingResponse.new(id: id) }
-  let(:execution_time) { rand(0.001..10.000).to_f }
-  let(:call_signature) { :get_thing_without_intercept }
+  let(:call_signature) { :get_thing }
   let(:active_call) { Rpc::Test::Call.new }
   let(:options) { { statsd: statsd_options } }
   let(:statsd_options) { { client: client, prefix: prefix } }
   let(:client) { double(:statsd, increment: true, timing: true )}
   let(:prefix) { 'app.rpc' }
-  let(:obj) { described_class.new(service, request, response, execution_time, call_signature, active_call, options) }
+  let(:obj) { described_class.new(service, options) }
 
   let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}thing_service.get_thing" }
 
+  let(:call) { obj.outer_around(call_signature, request, active_call) { true } }
+
   describe '.call' do
-    subject { obj.call }
+    subject { call }
 
     context 'with a valid client' do
       it 'should send the metrics to statsd' do
         expect(client).to receive(:increment).with(expected_route_key).once
-        expect(client).to receive(:timing).with(expected_route_key, execution_time).once
+        expect(client).to receive(:timing).with(expected_route_key, kind_of(Float)).once
         subject
       end
     end
@@ -71,18 +72,10 @@ describe Gruf::Instrumentation::Statsd do
   end
 
   describe '.route_key' do
-    subject { obj.send(:route_key) }
+    subject { obj.send(:route_key, call_signature) }
 
     it 'should build the proper route key based on the prefix, service, and call signature' do
       expect(subject).to eq expected_route_key
-    end
-  end
-
-  describe '.service_key' do
-    subject { obj.send(:service_key) }
-
-    it 'should return the proper service key' do
-      expect(subject).to eq 'thing_service'
     end
   end
 

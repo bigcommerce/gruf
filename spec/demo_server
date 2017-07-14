@@ -35,9 +35,29 @@ Gruf.configure do |c|
     }]
   }
   c.error_serializer = Serializers::Proto
+  c.instrumentation_options[:request_logging] = {
+    formatter: :logstash,
+    log_parameters: true
+  }
 end
 Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
 Gruf.logger = Logger.new(STDOUT)
+
+class FakeStats
+  def increment(k)
+    Gruf.logger.info "statsd.increment: #{k}"
+  end
+  def timing(k, t)
+    Gruf.logger.info "statsd.timing: #{k} -> #{t}"
+  end
+end
+Gruf.configure do |c|
+  c.instrumentation_options[:statsd] = {
+    client: FakeStats.new,
+    prefix: 'demo.rpc'
+  }
+end
+Gruf::Instrumentation::Registry.add(:statsd, Gruf::Instrumentation::Statsd)
 
 begin
   server = Gruf::Server.new

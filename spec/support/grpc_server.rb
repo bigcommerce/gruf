@@ -23,6 +23,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message 'rpc.things.GetThingResponse' do
     optional :id, :int64, 1
+    optional :name, :string, 2
   end
   add_message 'rpc.things.GetFailRequest' do
     optional :id, :int64, 1
@@ -87,7 +88,7 @@ class ThingService < Rpc::ThingService::Service
 
   def get_thing(req, _call)
     Math.sqrt(4) # used for testing
-    ::Rpc::GetThingResponse.new(id: req.id)
+    ::Rpc::GetThingResponse.new(id: req.id, name: 'Foo')
   end
 
   def get_fail(req, c)

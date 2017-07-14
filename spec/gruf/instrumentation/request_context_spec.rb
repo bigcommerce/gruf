@@ -16,7 +16,7 @@
 #
 require 'spec_helper'
 
-describe Gruf::Instrumentation::Base do
+describe Gruf::Instrumentation::RequestContext do
   let(:service) { ThingService.new }
   let(:id) { rand(1..1000) }
   let(:request) { Rpc::GetThingRequest.new(id: id) }
@@ -24,37 +24,23 @@ describe Gruf::Instrumentation::Base do
   let(:execution_time) { rand(0.001..10.000).to_f }
   let(:call_signature) { :get_thing }
   let(:active_call) { Rpc::Test::Call.new }
-  let(:options) { {} }
-  let(:obj) { TestInstrumentationHook.new(service, options) }
-  let(:call) { obj.outer_around(call_signature, request, active_call) { response } }
 
-  describe 'successful responses' do
-    context 'when is a normal response' do
-      it 'should return true' do
-        expect { call }.to_not raise_error
-      end
-    end
-
-    context 'when is a GRPC::BadStatus' do
-      let(:call) do
-        obj.outer_around(call_signature, request, active_call) do |_cs, req, ac|
-          service.fail!(req, ac, :not_found, :thing_not_found, 'thing not found')
-        end
-      end
-
-      it 'should return false' do
-        expect { call }.to raise_error(GRPC::BadStatus) do |e|
-          expect(e.details).to eq 'thing not found'
-        end
-      end
-    end
+  let(:rc) do
+    described_class.new(
+      service: service,
+      request: request,
+      response: response,
+      call_signature: call_signature,
+      active_call: active_call,
+      execution_time: execution_time
+    )
   end
 
   describe '.success?' do
-    subject { obj.success?(response) }
+    subject { rc.success? }
 
-    context 'when the response is a success' do
-      it 'should return truthy' do
+    context 'when the response is successful' do
+      it 'should return true' do
         expect(subject).to be_truthy
       end
     end
@@ -62,33 +48,34 @@ describe Gruf::Instrumentation::Base do
     context 'when the response is a failure' do
       let(:response) { GRPC::Internal.new }
 
-      it 'should return falsey' do
+      it 'should return false' do
         expect(subject).to be_falsey
       end
     end
   end
 
-  describe '.service_key' do
-    subject { obj.service_key }
-
-    it 'should return the proper service key' do
-      expect(subject).to eq 'thing_service'
+  describe '.response_class_name' do
+    subject { rc.response_class_name }
+  
+    it 'should return the response class as a string' do
+      expect(subject).to eq 'Rpc::GetThingResponse'
     end
   end
 
-  describe '.method_key' do
-    let(:delimiter) { '.' }
-    subject { obj.method_key(call_signature, delimiter: delimiter) }
+  describe '.execution_time_rounded' do
+    let(:precision) { 2 }
+    let(:execution_time) { 1.12345 }
+    subject { rc.execution_time_rounded(precision: precision) }
 
-    it 'should return a proper key delimited' do
-      expect(subject).to eq "#{service.class.name.underscore}#{delimiter}#{call_signature}"
+    it 'should return the execution time rounded to 2 decimal places' do
+      expect(subject).to eq 1.12
     end
 
-    context 'with a custom delimiter' do
-      let(:delimiter) { '/' }
+    context 'when a precision is specified' do
+      let(:precision) { 4 }
 
-      it 'should return the key with the specified delimiter' do
-        expect(subject).to eq "#{service.class.name.underscore}#{delimiter}#{call_signature}"
+      it 'should return the execution time rounded to X decimal places' do
+        expect(subject).to eq 1.1235
       end
     end
   end
