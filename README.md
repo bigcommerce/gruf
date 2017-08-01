@@ -32,6 +32,9 @@ Then in an initializer or before use:
 require 'gruf'
 ```
 
+Make sure to review [UPGRADING.md](https://github.com/bigcommerce/gruf/blob/master/UPGRADING.md) 
+if you are upgrading gruf between minor or major versions.
+
 ### Client
 
 From there, you can instantiate a client given a stub service (say on an SslCertificates proto with a GetSslCertificate call):
