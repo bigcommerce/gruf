@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+
+
+### 1.2.0
+
 - Instrumentation hooks now execute similarly to outer_around hooks; they can
   now instrument failures
 - Instrumentation hooks now pass a `RequestContext` object that contains information
