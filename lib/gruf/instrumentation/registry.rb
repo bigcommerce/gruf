@@ -17,6 +17,7 @@
 require_relative 'base'
 require_relative 'statsd'
 require_relative 'output_metadata_timer'
+require_relative 'request_logging/hook'
 
 module Gruf
   module Instrumentation

@@ -16,26 +16,30 @@
 #
 require 'spec_helper'
 
-describe Gruf::Instrumentation::OutputMetadataTimer do
-  let(:service) { ThingService.new }
-  let(:id) { rand(1..1000) }
-  let(:request) { Rpc::GetThingRequest.new(id: id) }
-  let(:response) { Rpc::GetThingResponse.new(id: id) }
-  let(:execution_time) { rand(0.001..10.000).to_f }
-  let(:call_signature) { :get_thing_without_intercept }
-  let(:active_call) { Rpc::Test::Call.new }
+describe Gruf::Instrumentation::RequestLogging::Formatters::Plain do
+  let(:formatter) { described_class.new }
+  let(:status) { 'GRPC::Ok' }
+  let(:route_key) { 'thing_service.get_thing' }
+  let(:execution_time) { 0.001 }
+  let(:message) { 'foo' }
+  let(:params) { { id: 1 } }
+  let(:payload) { { message: message, status: status, method: route_key, duration: execution_time, params: params } }
 
-  let(:options) { { output_metadata_timer: output_metadata_timer_options } }
-  let(:output_metadata_timer_options) { { metadata_key: :timer } }
+  describe '.format' do
+    subject { formatter.format(payload) }
 
-  let(:hook) { described_class.new(service, options) }
+    context 'when params are sent to the formatter' do
+      it 'should return the message, without params' do
+        expect(subject).to eq "[#{status}] (#{route_key}) [#{execution_time}ms] #{message} Parameters: #{params.to_h}".strip
+      end
+    end
 
-  describe '.call' do
-    subject { hook.outer_around(call_signature, request, active_call) { true } }
+    context 'when params are not sent to the formatter' do
+      let(:payload) { super().except(:params) }
 
-    it 'should set the execution time to the output metadata' do
-      expect { subject }.to_not raise_error
-      expect(active_call.output_metadata[:timer]).to_not be_nil
+      it 'should return the message' do
+        expect(subject).to eq "[#{status}] (#{route_key}) [#{execution_time}ms] #{message}".strip
+      end
     end
   end
 end

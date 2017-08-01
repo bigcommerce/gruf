@@ -14,6 +14,8 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require_relative 'request_context'
+
 module Gruf
   module Instrumentation
     ##
@@ -24,37 +26,15 @@ module Gruf
 
       # @return [Gruf::Service] service The service to instrument
       attr_reader :service
-      # @return [Object] request The protobuf request object
-      attr_reader :request
-      # @return [Object] response The protobuf response object
-      attr_reader :response
-      # @return [Time] execution_time The execution time, in ms, of the request
-      attr_reader :execution_time
-      # @return [Symbol] call_signature The gRPC method on the service that was called
-      attr_reader :call_signature
-      # @return [GRPC::ActiveCall] active_call The gRPC core active call object, which represents marshalled data for
-      # the call itself
-      attr_reader :active_call
       # @return [Hash] options Options to use when instrumenting the call
       attr_reader :options
 
       ##
       # @param [Gruf::Service] service The service to instrument
-      # @param [Object] request The protobuf request object
-      # @param [Object] response The protobuf response object
-      # @param [Time] execution_time The execution time, in ms, of the request
-      # @param [Symbol] call_signature The gRPC method on the service that was called
-      # @param [GRPC::ActiveCall] active_call the gRPC core active call object, which represents marshalled data for
-      # the call itself
       # @param [Hash] options (Optional) Options to use when instrumenting the call
       #
-      def initialize(service, request, response, execution_time, call_signature, active_call, options = {})
+      def initialize(service, options = {})
         @service = service
-        @request = request
-        @response = response
-        @execution_time = execution_time
-        @call_signature = call_signature.to_s.gsub('_without_intercept', '').to_sym
-        @active_call = active_call
         @options = options
         setup
       end
@@ -69,9 +49,10 @@ module Gruf
       ##
       # Was this call a success? If a response is a GRPC::BadStatus object, we assume that it was unsuccessful
       #
+      # @param [Object] response The gRPC response object
       # @return [Boolean] True if was a successful call
       #
-      def success?
+      def success?(response)
         !response.is_a?(GRPC::BadStatus)
       end
 
@@ -79,9 +60,54 @@ module Gruf
       # Abstract method that is required for implementing an instrumentation strategy.
       #
       # @abstract
+      # @param [Gruf::Instrumentation::RequestContext] _rc The current request context for the call
       #
-      def call
+      def call(_rc)
         raise NotImplementedError
+      end
+
+      ##
+      # Hook into the outer_around call to time the request, and pass that to the call method
+      #
+      # @param [Symbol] call_signature The method being called
+      # @param [Object] request The request object
+      # @param [GRPC::ActiveCall] active_call The gRPC active call object
+      # @param [Proc] &_block The execution block for the call
+      # @return [Object] result The result of the block that was called
+      #
+      def outer_around(call_signature, request, active_call, &_block)
+        timed = Timer.time do
+          yield
+        end
+        rc = RequestContext.new(
+          service: service,
+          request: request,
+          response: timed.result,
+          execution_time: timed.time,
+          call_signature: call_signature,
+          active_call: active_call
+        )
+        call(rc)
+        raise rc.response unless rc.success?
+        rc.response
+      end
+
+      ##
+      # @return [String] Returns the service name as a translated name separated by periods
+      #
+      def service_key
+        service.class.name.underscore.tr('/', '.')
+      end
+
+      ##
+      # Parse the method signature into a service.method name format
+      #
+      # @param [Symbol] call_signature The method call signature
+      # @param [String] delimiter The delimiter to separate service and method keys
+      # @return [String] The parsed service method name
+      #
+      def method_key(call_signature, delimiter: '.')
+        "#{service_key}#{delimiter}#{call_signature}"
       end
     end
   end

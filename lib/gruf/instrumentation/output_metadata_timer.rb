@@ -23,10 +23,11 @@ module Gruf
       ##
       # Handle the instrumented response. Note: this will only instrument timings of _successful_ responses.
       #
+      # @param [Gruf::Instrumentation::RequestContext] rc The current request context for the call
       # @return [Hash] The resulting output metadata with the timer attached
       #
-      def call
-        active_call.output_metadata.update(metadata_key => execution_time.to_s)
+      def call(rc)
+        rc.active_call.output_metadata.update(metadata_key => rc.execution_time.to_s)
       end
 
       private

@@ -23,10 +23,14 @@ module Gruf
       ##
       # Push data to StatsD, only doing so if a client is set
       #
-      def call
+      # @param [Gruf::Instrumentation::RequestContext] rc The current request context for the call
+      #
+      def call(rc)
         if client
-          client.increment(route_key)
-          client.timing(route_key, execution_time)
+          rk = route_key(rc.call_signature)
+          client.increment(rk)
+          client.increment("#{rk}.#{postfix(rc.success?)}")
+          client.timing(rk, rc.execution_time)
         else
           Gruf.logger.error 'Statsd module loaded, but no client configured!'
         end
@@ -35,17 +39,19 @@ module Gruf
       private
 
       ##
-      # @return [String] Return a composed route key that is used in the statsd metric
+      # @param [Boolean] successful Whether or not the request was successful
+      # @return [String] The appropriate postfix for the key dependent on response status
       #
-      def route_key
-        "#{key_prefix}#{service_key}.#{call_signature}"
+      def postfix(successful)
+        successful ? 'success' : 'failure'
       end
 
       ##
-      # @return [String] Return the sanitized gRPC service name
+      # @param [Symbol] call_signature The method call signature for the handler
+      # @return [String] Return a composed route key that is used in the statsd metric
       #
-      def service_key
-        service.class.name.underscore.tr('/', '.')
+      def route_key(call_signature)
+        "#{key_prefix}#{method_key(call_signature)}"
       end
 
       ##
@@ -67,7 +73,7 @@ module Gruf
       # @return [Hash] Return a hash of options for this hook
       #
       def options
-        @options.fetch(:statsd, {})
+        super().fetch(:statsd, {})
       end
     end
   end

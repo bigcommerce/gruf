@@ -45,6 +45,22 @@ module Gruf
       def setup
         # noop
       end
+
+      ##
+      # @return [String] Returns the service name as a translated name separated by periods
+      #
+      def service_key
+        service.class.name.underscore.tr('/', '.')
+      end
+
+      ##
+      # Parse the method signature into a service.method name format
+      #
+      # @return [String] The parsed service method name
+      #
+      def method_key(call_signature)
+        "#{service_key}.#{call_signature.to_s.gsub('_without_intercept', '')}"
+      end
     end
   end
 end

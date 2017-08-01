@@ -21,7 +21,7 @@ class TestInstrumentationHook < Gruf::Instrumentation::Base
     true
   end
 
-  def call
+  def call(_rc)
     true
   end
 end
@@ -39,7 +39,7 @@ class TestInvalidInheritanceInstrumentationHook < StandardError
     true
   end
 
-  def call
+  def call(_rc)
     true
   end
 end

@@ -74,7 +74,7 @@ module Gruf
     #
     def initialize(args = {})
       args.each do |k, v|
-        send("#{k.to_sym}=", v) if respond_to?(k.to_sym)
+        send("#{k}=", v) if respond_to?(k)
       end
       @field_errors = []
     end

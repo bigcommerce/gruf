@@ -40,7 +40,7 @@ module Gruf
         without = :"#{method_name}_without_intercept"
         @__last_methods_added = [method_name, with, without]
         define_method with do |*args, &block|
-          call_chain(without, args[0], args[1], &block)
+          call_chain(method_name, args[0], args[1], &block)
         end
         alias_method without, method_name
         alias_method method_name, with
@@ -125,6 +125,12 @@ module Gruf
     #
     def outer_around_call(call_signature, req, call, &block)
       outer_around_hooks = []
+
+      # run instrumentation hooks as outer_around calls
+      Gruf::Instrumentation::Registry.each do |_name, h|
+        outer_around_hooks << h.new(self, Gruf.instrumentation_options)
+      end
+
       Gruf::Hooks::Registry.each do |_name, h|
         outer_around_hooks << h.new(self, Gruf.hook_options) if h.instance_methods.include?(:outer_around)
       end
@@ -204,31 +210,32 @@ module Gruf
     ##
     # Encapsulate the call chain to provide before/around/after hooks
     #
-    # @param [Symbol] original_call_sig The original call signature for the service
+    # @param [String] original_call_sig The original call signature for the service
     # @param [Object] req The request object
     # @param [GRPC::ActiveCall] call The ActiveCall object being executed
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
       outer_around_call(original_call_sig, req, call) do
-        before_call(original_call_sig, req, call)
-        timed = Timer.time do
-          around_call(original_call_sig, req, call) do
-            send(original_call_sig, req, call, &block) # send the actual request to gRPC
+        begin
+          before_call(original_call_sig, req, call)
+
+          result = around_call(original_call_sig, req, call) do
+            send("#{original_call_sig}_without_intercept", req, call, &block) # send the actual request to gRPC
           end
+        rescue GRPC::BadStatus => e
+          result = e
         end
-        after_call(timed.success?, timed.result, original_call_sig, req, call)
+        success = !result.is_a?(GRPC::BadStatus)
+        after_call(success, result, original_call_sig, req, call)
 
-        Gruf::Instrumentation::Registry.each do |_name, h|
-          h.new(self, req, timed.result, timed.time, original_call_sig, call, Gruf.instrumentation_options).call
-        end
+        raise result unless success
 
-        raise timed.result unless timed.success?
-
-        timed.result
+        result
       end
+    rescue GRPC::BadStatus
+      raise
     rescue => e
-      raise e if e.is_a?(GRPC::BadStatus)
       set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
       error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
       fail!(req, call, :internal, :unknown, error_message)
