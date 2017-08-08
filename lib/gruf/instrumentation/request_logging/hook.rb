@@ -124,11 +124,13 @@ module Gruf
         # @return [Hash] The sanitized params in hash form
         #
         def sanitize(params = {})
-          blacklist = options.fetch(:blacklist, []).map(&:to_s)
+          blacklists = options.fetch(:blacklist, []).map(&:to_s)
           redacted_string = options.fetch(:redacted_string, 'REDACTED')
-          params.each do |param, _value|
-            params[param] = redacted_string if blacklist.include?(param.to_s)
+          blacklists.each do |blacklist|
+            parts = blacklist.split('.').map(&:to_sym)
+            redact!(parts, 0, params, redacted_string)
           end
+          params
         end
 
         ##
@@ -138,6 +140,45 @@ module Gruf
         #
         def options
           super().fetch(:request_logging, {})
+        end
+
+        ##
+        # Helper method to recursively redact based on the black list
+        #
+        # @param [Array] The blacklist. ex. 'data.schema' -> [:data, :schema]
+        # @param [Integer] The current index of the blacklist
+        # @param [Hash] The hash of parameters to sanitize
+        # @param [String] The custom redact string
+        # @return [Nil]
+        #
+        def redact!(parts, i, params, redacted_string)
+          return if i >= parts.size || !params.key?(parts[i])
+          if i == parts.size - 1
+            if params[parts[i]].is_a? Hash
+              hash_deep_redact!(params[parts[i]], redacted_string)
+            else
+              params[parts[i]] = redacted_string
+            end
+            return
+          end
+          redact!(parts, i + 1, params[parts[i]], redacted_string)
+        end
+
+        ##
+        # Helper method to recursively redact the value of all hash keys
+        #
+        # @param [Hash] Part of the hash of parameters to sanitize
+        # @param [String] The custom redact string
+        # @return [Nil]
+        #
+        def hash_deep_redact!(hash, redacted_string)
+          hash.keys.each do |key|
+            if hash[key].is_a? Hash
+              hash_deep_redact!(hash[key], redacted_string)
+            else
+              hash[key] = redacted_string
+            end
+          end
         end
       end
     end
