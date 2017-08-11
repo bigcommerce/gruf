@@ -344,6 +344,11 @@ support for gruf services
 * [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage 
 reports for gruf services
 
+## Demo Rails App
+
+There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can view and clone
+that shows how to integrate Gruf into an existing Rails application. 
+
 ## License
 
 Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved 
