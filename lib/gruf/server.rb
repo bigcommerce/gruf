@@ -41,7 +41,7 @@ module Gruf
     # :nocov:
     def start!
       logger.info { 'Booting gRPC Server...' }
-      server = GRPC::RpcServer.new
+      server = GRPC::RpcServer.new(Gruf.server_options)
       server.add_http2_port Gruf.server_binding_url, ssl_credentials
       services.each do |s|
         server.handle(s)
