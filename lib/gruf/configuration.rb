@@ -22,6 +22,7 @@ module Gruf
     VALID_CONFIG_KEYS = {
       root_path: '',
       server_binding_url: '0.0.0.0:9001',
+      server_options: {},
       authentication_options: {},
       instrumentation_options: {},
       hook_options: {},

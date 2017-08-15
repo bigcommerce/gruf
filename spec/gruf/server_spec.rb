@@ -78,4 +78,40 @@ describe Gruf::Server do
       end
     end
   end
+
+  describe '#start!' do
+    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run_till_terminated: nil) }
+
+    context 'when server_options passed' do
+      let(:configuration) { { pool_size: 5 } }
+
+      before do
+        Gruf.configure do |c|
+          c.server_options = configuration
+          c.services = []
+        end
+      end
+
+      it 'runs server with given configuration' do
+        expect(GRPC::RpcServer).to receive(:new).with(configuration).and_return(server_mock)
+
+        gruf_server.start!
+      end
+    end
+
+    context 'when no server_options passed' do
+      before do
+        Gruf.configure do |c|
+          c.server_options = {}
+          c.services = []
+        end
+      end
+
+      it 'runs server with empty configuration' do
+        expect(GRPC::RpcServer).to receive(:new).with({}).and_return(server_mock)
+
+        gruf_server.start!
+      end
+    end
+  end
 end
