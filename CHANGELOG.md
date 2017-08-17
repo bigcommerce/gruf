@@ -2,7 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 1.2.1
 
+- Added ability to pass in server options via new `server_options` configuration
+  attribute.
 
 ### 1.2.0
 
