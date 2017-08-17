@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 1.2.2
+
+- Pin Google Protobuf to 3.3.x due to failures in protobuf in Ruby at 3.4.x
+
 ### 1.2.1
 
 - Added ability to pass in server options via new `server_options` configuration
