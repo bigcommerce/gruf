@@ -38,6 +38,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'grpc', '~> 1.4'
   spec.add_runtime_dependency 'grpc-tools', '~> 1.4'
-  spec.add_runtime_dependency 'google-protobuf', '~> 3.4'
   spec.add_runtime_dependency 'activesupport'
 end
