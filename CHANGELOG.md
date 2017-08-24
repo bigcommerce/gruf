@@ -4,7 +4,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 1.2.4
 
-- Remove explicit Protobuf dependency now that 3.4.0.2 is released
+- Loosen explicit Protobuf dependency now that 3.4.0.2 is released
 
 ### 1.2.3
 
