@@ -63,7 +63,7 @@ describe Gruf::Instrumentation::RequestLogging::Hook do
   end
 
   describe '.sanitize' do
-    let(:params) { { foo: 'bar', one: 'two' } }
+    let(:params) { { foo: 'bar', one: 'two', data: { hello: 'world', array: [] }, hello: { one: 'one', two: 'two' } } }
     subject { hook.send(:sanitize, params) }
 
     context 'vanilla' do
@@ -89,6 +89,20 @@ describe Gruf::Instrumentation::RequestLogging::Hook do
         it 'should return all params that are not filtered by the blacklist' do
           expected = params.dup
           expected[:foo] = str
+          expect(subject).to eq expected
+        end
+      end
+
+      context 'with nested blacklist' do
+        let(:blacklist) { ['data.array', 'hello'] }
+        let(:options) { { blacklist: blacklist } }
+
+        it 'should support nested filtering' do
+          expected = Marshal.load(Marshal.dump(params))
+          expected[:data][:array] = 'REDACTED'
+          expected[:hello].each do |key, _val|
+            expected[:hello][key] = 'REDACTED'
+          end
           expect(subject).to eq expected
         end
       end
