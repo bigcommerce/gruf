@@ -5,6 +5,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 ### 1.2.4
 
 - Loosen explicit Protobuf dependency now that 3.4.0.2 is released
+- Guard against nil params in logger blacklist
 
 ### 1.2.3
 

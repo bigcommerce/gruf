@@ -106,6 +106,13 @@ describe Gruf::Instrumentation::RequestLogging::Hook do
           expect(subject).to eq expected
         end
       end
+
+      context 'when params is nil' do
+        let(:params) { nil }
+        it 'should return normally' do
+          expect { subject }.to_not raise_error
+        end
+      end
     end
   end
 

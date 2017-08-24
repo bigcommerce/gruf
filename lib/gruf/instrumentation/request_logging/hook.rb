@@ -145,31 +145,30 @@ module Gruf
         ##
         # Helper method to recursively redact based on the black list
         #
-        # @param [Array] The blacklist. ex. 'data.schema' -> [:data, :schema]
-        # @param [Integer] The current index of the blacklist
-        # @param [Hash] The hash of parameters to sanitize
-        # @param [String] The custom redact string
-        # @return [Nil]
+        # @param [Array] parts The blacklist. ex. 'data.schema' -> [:data, :schema]
+        # @param [Integer] idx The current index of the blacklist
+        # @param [Hash] params The hash of parameters to sanitize
+        # @param [String] redacted_string The custom redact string
         #
-        def redact!(parts, i, params, redacted_string)
-          return if i >= parts.size || !params.key?(parts[i])
-          if i == parts.size - 1
-            if params[parts[i]].is_a? Hash
-              hash_deep_redact!(params[parts[i]], redacted_string)
+        def redact!(parts = [], idx = 0, params = {}, redacted_string = 'REDACTED')
+          return unless parts.is_a?(Array) && params.is_a?(Hash)
+          return if idx >= parts.size || !params.key?(parts[idx])
+          if idx == parts.size - 1
+            if params[parts[idx]].is_a? Hash
+              hash_deep_redact!(params[parts[idx]], redacted_string)
             else
-              params[parts[i]] = redacted_string
+              params[parts[idx]] = redacted_string
             end
             return
           end
-          redact!(parts, i + 1, params[parts[i]], redacted_string)
+          redact!(parts, idx + 1, params[parts[idx]], redacted_string)
         end
 
         ##
         # Helper method to recursively redact the value of all hash keys
         #
-        # @param [Hash] Part of the hash of parameters to sanitize
-        # @param [String] The custom redact string
-        # @return [Nil]
+        # @param [Hash] hash Part of the hash of parameters to sanitize
+        # @param [String] redacted_string The custom redact string
         #
         def hash_deep_redact!(hash, redacted_string)
           hash.keys.each do |key|

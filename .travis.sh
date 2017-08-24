@@ -5,7 +5,7 @@ if [ "$TEST_GROUP" == "prereq" ]
 then
   bundle exec bundle-audit update
   bundle exec bundle-audit check -v
-  bundle exec rubocop
+  bundle exec rubocop -P
 
 elif [ "$TEST_GROUP"  == "1" ]
 then

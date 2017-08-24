@@ -89,6 +89,9 @@ Layout/ExtraSpacing:
     - 'config/routes.rb'
     - 'bin/rails'
 
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
 # Because $stats is valid
 Style/GlobalVars:
   Enabled: false
