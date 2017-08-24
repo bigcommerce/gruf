@@ -320,7 +320,7 @@ It comes with a few more options as well:
 | ------ | ----------- | ------- |
 | formatter | The formatter to use. By default `:plain` and `:logstash` are supported. | `:plain` |
 | log_parameters | If set to true, will log parameters in the response | `false` |
-| blacklist | An array of parameter key names to redact from logging | `[]` |
+| blacklist | An array of parameter key names to redact from logging, in path.to.key format | `[]` |
 | redacted_string | The string to use for redacted parameters. | `REDACTED` |
 
 It's important to maintain a safe blacklist should you decide to log parameters; gruf does no 
