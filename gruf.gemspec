@@ -21,15 +21,16 @@ Gem::Specification.new do |spec|
   spec.name          = 'gruf'
   spec.version       = Gruf::VERSION
   spec.authors       = ['Shaun McCormick']
-  spec.email         = ['shaun.mccormick@bigcommerce.com']
+  spec.email         = ['splittingred@gmail.com']
+  spec.licenses      = ['MIT']
 
-  spec.summary       = %q{gRPC Ruby Framework}
+  spec.summary       = 'gRPC Ruby Framework'
   spec.description   = spec.summary
   spec.homepage      = 'https://github.com/bigcommerce/gruf'
 
   spec.files         = Dir['README.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'lib/**/*', 'gruf.gemspec']
   spec.executables   << 'gruf'
-  spec.require_paths = ["lib"]
+  spec.require_paths = ['lib']
 
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'rake', '~> 10.0'
@@ -37,6 +38,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'grpc', '~> 1.4'
   spec.add_runtime_dependency 'grpc-tools', '~> 1.4'
-  spec.add_runtime_dependency 'google-protobuf', '~> 3.3.0'
   spec.add_runtime_dependency 'activesupport'
 end
