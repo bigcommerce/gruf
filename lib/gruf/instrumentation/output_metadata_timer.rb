@@ -27,6 +27,8 @@ module Gruf
       # @return [Hash] The resulting output metadata with the timer attached
       #
       def call(rc)
+        return unless rc.active_call && rc.active_call.respond_to?(:output_metadata)
+
         rc.active_call.output_metadata.update(metadata_key => rc.execution_time.to_s)
       end
 

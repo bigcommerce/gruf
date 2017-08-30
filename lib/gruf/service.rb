@@ -216,12 +216,27 @@ module Gruf
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
+      # this is a workaround until the gRPC core Ruby client implements interceptors
+      # due to the signatures being different for the different types of requests. After
+      # interceptors are added to gRPC core, we will need to release gruf 2.0 and redo
+      # the interceptor signatures for gruf
+      streamed_request = call.nil?
+      if streamed_request
+        call = req
+        req = nil
+      end
+
       outer_around_call(original_call_sig, req, call) do
         begin
           before_call(original_call_sig, req, call)
 
           result = around_call(original_call_sig, req, call) do
-            send("#{original_call_sig}_without_intercept", req, call, &block) # send the actual request to gRPC
+            # send the actual request to gRPC
+            if streamed_request
+              send("#{original_call_sig}_without_intercept", call, &block)
+            else
+              send("#{original_call_sig}_without_intercept", req, call, &block)
+            end
           end
         rescue GRPC::BadStatus => e
           result = e

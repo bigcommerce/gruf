@@ -91,7 +91,7 @@ module Gruf
     # error type that was returned
     def call(request_method, params = {}, metadata = {}, opts = {})
       request_method = request_method.to_sym
-      req = request_object(request_method, params)
+      req = streaming_request?(request_method) ? params : request_object(request_method, params)
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
 
@@ -105,6 +105,15 @@ module Gruf
     end
 
     private
+
+    ##
+    # @param [Symbol] request_method
+    # @return [Boolean]
+    #
+    def streaming_request?(request_method)
+      desc = rpc_desc(request_method)
+      desc.client_streamer? || desc.bidi_streamer?
+    end
 
     ##
     # Execute the given request to the service
