@@ -112,7 +112,7 @@ module Gruf
     #
     def streaming_request?(request_method)
       desc = rpc_desc(request_method)
-      desc.client_streamer? || desc.bidi_streamer?
+      desc && (desc.client_streamer? || desc.bidi_streamer?)
     end
 
     ##
