@@ -28,13 +28,60 @@ describe Gruf::Service do
 
   describe 'functional test' do
     let(:client) { TestClient.new }
-    let(:id) { 1 }
-    subject { client.get_thing(id: id) }
 
-    it 'should return the thing' do
-      expect(subject).to be_a(Rpc::GetThingResponse)
-      expect(subject.id).to eq id
+    context 'for a request/response call' do
+      let(:id) { 1 }
+      subject { client.get_thing(id: id) }
+
+      it 'should return the thing', run_thing_server: true do
+        client = build_client
+        resp = client.call(:GetThing, id: 1)
+        expect(resp.message).to be_a(Rpc::GetThingResponse)
+        expect(resp.message.thing).to be_a(Rpc::Thing)
+        expect(resp.message.thing.id).to eq id
+      end
     end
+    #
+    context 'for a server streaming call' do
+      it 'should return the things in a stream from the server', run_thing_server: true do
+        client = build_client
+        resp = client.call(:GetThings)
+        resp.message.each do |r|
+          expect(r).to be_a(Rpc::Thing)
+        end
+      end
+    end
+
+    # context 'for a client streaming call' do
+    #   it 'should return the things from the server', run_thing_server: true do
+    #     things = []
+    #     5.times do
+    #       things << Rpc::Thing.new(
+    #         id: rand(1..1000).to_i,
+    #         name: FFaker::Lorem.word.to_s
+    #       )
+    #     end
+    #     client = build_client
+    #     resp = client.call(:CreateThings, things)
+    #     expect(resp.message).to be_a(Rpc::CreateThingsResponse)
+    #     expect(resp.message.things.first).to be_a(Rpc::Thing)
+    #   end
+    # end
+    # context 'for a bidi streaming call' do
+    #   it 'should return the things from the server', run_thing_server: true do
+    #     things = []
+    #     5.times do
+    #       things << Rpc::Thing.new(
+    #         id: rand(1..1000).to_i,
+    #         name: FFaker::Lorem.word.to_s
+    #       )
+    #     end
+    #     client = build_client
+    #     client.call(:CreateThingsInStream, things) do |r|
+    #       puts "Received response: #{r.inspect}"
+    #     end
+    #   end
+    # end
   end
 
   describe 'exceptions' do

@@ -15,6 +15,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../pb', __FILE__)
 require_relative 'simplecov_helper'
 require 'gruf'
 require 'ffaker'
@@ -36,6 +37,12 @@ RSpec.configure do |config|
   config.before do
     Gruf::Authentication::Strategies.clear
     Gruf::Hooks::Registry.clear
+  end
+
+  config.around(:example, run_thing_server: true) do |t|
+    run_server do
+      t.run
+    end
   end
 
   include Gruf::Helpers

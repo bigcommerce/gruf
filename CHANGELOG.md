@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 1.2.6
+
+- Fix issues with arity and bidirectional streaming
+
 ### 1.2.5
 
 - Fix reference issue for client and bidirectional streaming calls

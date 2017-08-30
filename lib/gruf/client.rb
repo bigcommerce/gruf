@@ -89,7 +89,7 @@ module Gruf
     # @return [Gruf::Response] The response from the server
     # @raise [Gruf::Client::Error|GRPC::BadStatus] If an error occurs, an exception will be raised according to the
     # error type that was returned
-    def call(request_method, params = {}, metadata = {}, opts = {})
+    def call(request_method, params = {}, metadata = {}, opts = {}, &block)
       request_method = request_method.to_sym
       req = streaming_request?(request_method) ? params : request_object(request_method, params)
       md = build_metadata(metadata)
@@ -97,11 +97,16 @@ module Gruf
 
       raise NotImplementedError, "The method #{request_method} has not been implemented in this service." unless call_sig
 
-      execute(call_sig, req, md, opts)
+      resp = execute(call_sig, req, md, opts, &block)
+
+      Gruf::Response.new(resp.result, resp.time)
     rescue GRPC::BadStatus => e
       emk = Gruf.error_metadata_key.to_s
       raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize if e.respond_to?(:metadata) && e.metadata.key?(emk)
       raise # passthrough
+    rescue => e
+      Gruf.logger.error e.message
+      raise
     end
 
     private
@@ -123,13 +128,12 @@ module Gruf
     # @param [Hash] md (Optional) A hash of metadata key/values that are transported with the client request
     # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
     #
-    def execute(call_sig, req, md, opts = {})
-      timed = Timer.time do
+    def execute(call_sig, req, md, opts = {}, &block)
+      Timer.time do
         opts[:return_op] = true
         opts[:metadata] = md
-        send(call_sig, req, opts)
+        send(call_sig, req, opts, &block)
       end
-      Gruf::Response.new(timed.result, timed.time)
     end
 
     ##

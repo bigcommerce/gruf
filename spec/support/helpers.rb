@@ -16,6 +16,10 @@
 #
 module Gruf
   module Helpers
+    HOST = ENV.fetch('GRPC_HOSTNAME', 'localhost:9002').freeze
+    USERNAME = ENV.fetch('GRPC_USERNAME', 'gruf').freeze
+    PASSWORD = ENV.fetch('GRPC_PASSWORD', 'furg').freeze
+
     ##
     # Build a gRPC operation stub for testing
     #
@@ -24,10 +28,52 @@ module Gruf
         execute: true,
         metadata: {},
         trailing_metadata: {},
-        deadline: Time.now.to_i + 3600,
+        deadline: Time.now.to_i + 600,
         cancelled?: false,
         execution_time: rand(1_000..10_000)
        }.merge(options))
+    end
+
+    ##
+    # Runs a server
+    #
+    def run_server
+      Gruf.configure do |c|
+        c.server_binding_url = Gruf::Helpers::HOST
+        c.default_client_host = Gruf::Helpers::HOST
+        c.server_options = { poll_period: 1 }
+        c.grpc_logger = ::Logger.new('/dev/null') unless ENV['GRPC_DEBUG']
+        c.authentication_options[:credentials] = {
+          username: Gruf::Helpers::USERNAME,
+          password: Gruf::Helpers::PASSWORD
+        }
+        c.services = [ThingService]
+      end
+      Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
+
+      server = Gruf::Server.new
+      grpc_server = server.server
+
+      t = Thread.new do
+        grpc_server.run
+      end
+      grpc_server.wait_till_running
+
+      yield
+
+      grpc_server.stop
+      t.join
+    end
+
+    ##
+    # Builds a client
+    #
+    def build_client
+      Gruf::Client.new(service: ::Rpc::ThingService, options: {
+        hostname: HOST,
+        username: USERNAME,
+        password: PASSWORD
+      })
     end
   end
 end

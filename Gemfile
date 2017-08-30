@@ -19,12 +19,13 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
+  gem 'pry-byebug'
+  gem 'ffaker'
   gem 'rubocop', '~> 0.49.1'
 end
 
 group :test do
   gem 'bundler-audit'
-  gem 'ffaker'
-  gem 'rspec', '~> 3.5'
+  gem 'rspec', '~> 3.6'
   gem 'simplecov', require: false
 end

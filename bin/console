@@ -19,7 +19,8 @@ require 'bundler/setup'
 require 'gruf'
 
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require File.realpath("#{File.dirname(File.dirname(__FILE__))}/spec/support/grpc_server.rb")
+$LOAD_PATH.unshift File.expand_path('../../spec/pb', __FILE__)
+require File.realpath("#{File.dirname(File.dirname(__FILE__))}/spec/support/grpc.rb")
 
 require 'irb'
 IRB.start

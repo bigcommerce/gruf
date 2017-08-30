@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package rpc;
+
+// Demonstration service
+service ThingService {
+
+    // Request calls
+    // For testing a request/response call
+    rpc GetThing(GetThingRequest) returns (GetThingResponse) {}
+    // For testing a server streaming call
+    rpc GetThings(GetThingsRequest) returns (stream Thing) {}
+    // For testing a client streaming call
+    rpc CreateThings(stream Thing) returns (CreateThingsResponse) {}
+    // For testing a bidirectional streaming call
+    rpc CreateThingsInStream(stream Thing) returns (stream Thing) {}
+
+    // Error calls
+    // For testing a generic failure
+    rpc GetFail(GetThingRequest) returns (GetThingResponse) {}
+    // For testing a field error
+    rpc GetFieldErrorFail(GetThingRequest) returns (GetThingResponse) {}
+    // For testing an exception
+    rpc GetException(GetThingRequest) returns (GetThingResponse) {}
+    // For testing an uncaught exception
+    rpc GetUncaughtException(GetThingRequest) returns (GetThingResponse) {}
+}
+
+// Represents a generic thing
+message Thing {
+    uint32 id = 1;
+    string name = 2;
+}
+
+// Requests
+
+// Request for geting a single thing
+message GetThingRequest {
+    uint32 id = 1;
+}
+
+// Response for getting a single thing
+message GetThingResponse {
+    Thing thing = 1;
+}
+
+// Request for getting multiple things
+message GetThingsRequest {
+    string search = 1;
+    uint32 limit = 2;
+}
+
+// Response for creating multiple things
+message CreateThingsResponse {
+    repeated Thing things = 1;
+}

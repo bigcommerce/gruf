@@ -20,7 +20,7 @@ describe Gruf::Instrumentation::Base do
   let(:service) { ThingService.new }
   let(:id) { rand(1..1000) }
   let(:request) { Rpc::GetThingRequest.new(id: id) }
-  let(:response) { Rpc::GetThingResponse.new(id: id) }
+  let(:response) { Rpc::GetThingResponse.new(thing: Rpc::Thing.new(id: id)) }
   let(:execution_time) { rand(0.001..10.000).to_f }
   let(:call_signature) { :get_thing }
   let(:active_call) { Rpc::Test::Call.new }

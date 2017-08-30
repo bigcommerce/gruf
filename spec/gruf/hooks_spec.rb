@@ -20,7 +20,7 @@ describe Gruf::Service do
   let(:endpoint) { ThingService.new }
   let(:id) { 1 }
   let(:req) { ::Rpc::GetThingRequest.new(id: id) }
-  let(:resp) { ::Rpc::GetThingResponse.new(id: id) }
+  let(:resp) { ::Rpc::GetThingResponse.new(thing: Rpc::Thing.new(id: 1)) }
   let(:call_signature) { :get_thing }
   let(:active_call) { double(:active_call, output_metadata: {}, metadata: {})}
 

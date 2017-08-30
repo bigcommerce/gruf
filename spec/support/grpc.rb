@@ -14,6 +14,36 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  VERSION = '1.2.6'.freeze
+require 'grpc'
+require 'thing_service'
+
+module Rpc
+  module Test
+    class Call
+      attr_reader :metadata
+
+      def initialize(md = nil)
+        @metadata = md || { 'authorization' => "Basic #{Base64.encode64('grpc:magic')}" }
+      end
+
+      def output_metadata
+        @output_metadata ||= {}
+      end
+    end
+  end
+end
+
+class TestClient
+  def get_thing(id: 1)
+    request = ::Rpc::GetThingRequest.new(id: id)
+    rpc_client = ::ThingService.new
+
+    c = Rpc::Test::Call.new('authorization' => "Basic #{Base64.encode64('grpc:magic')}")
+    begin
+      thing = rpc_client.get_thing(request, c)
+    rescue Gruf::Client::Error => e
+      puts e.error.inspect
+    end
+    thing
+  end
 end

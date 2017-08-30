@@ -25,6 +25,8 @@ module Gruf
     # @return [Array<Class>] The services this server is handling
     attr_accessor :services
 
+    attr_reader :server
+
     ##
     # Initialize the server and load and setup the services
     #
@@ -36,16 +38,25 @@ module Gruf
     end
 
     ##
+    # @return [GRPC::RpcServer] The GRPC server running
+    #
+    def server
+      unless @server
+        @server = GRPC::RpcServer.new(Gruf.server_options)
+        @server.add_http2_port(Gruf.server_binding_url, ssl_credentials)
+        services.each do |s|
+          @server.handle(s)
+        end
+      end
+      @server
+    end
+
+    ##
     # Start the gRPC server
     #
     # :nocov:
     def start!
       logger.info { 'Booting gRPC Server...' }
-      server = GRPC::RpcServer.new(Gruf.server_options)
-      server.add_http2_port Gruf.server_binding_url, ssl_credentials
-      services.each do |s|
-        server.handle(s)
-      end
       server.run_till_terminated
       logger.info { 'Shutting down gRPC server...' }
     end

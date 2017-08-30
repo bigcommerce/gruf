@@ -36,12 +36,37 @@ module Gruf
         return if @__last_methods_added && @__last_methods_added.include?(method_name)
         return unless rpc_handler_names.include?(method_name)
 
+        rpc_desc = rpc_descs[method_name.to_s.camelcase.to_sym]
+
         with = :"#{method_name}_with_intercept"
         without = :"#{method_name}_without_intercept"
         @__last_methods_added = [method_name, with, without]
-        define_method with do |*args, &block|
-          call_chain(method_name, args[0], args[1], &block)
+
+        if rpc_desc
+          if rpc_desc.request_response?
+            define_method(with) do |request, call|
+              call_chain(method_name, request, call)
+            end
+          elsif rpc_desc.client_streamer?
+            define_method(with) do |call|
+              call_chain(method_name, nil, call)
+            end
+          elsif rpc_desc.server_streamer?
+            define_method(with) do |request, call, &block|
+              call_chain(method_name, request, call, &block)
+            end
+          else # bidi
+            define_method(with) do |requests, call, &block|
+              call_chain(method_name, requests, call, &block)
+            end
+          end
+        else
+          # fallback to the catch-all
+          define_method with do |*args, &block|
+            call_chain(method_name, *args, &block)
+          end
         end
+
         alias_method without, method_name
         alias_method method_name, with
         @__last_methods_added = nil
@@ -216,23 +241,13 @@ module Gruf
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
-      # this is a workaround until the gRPC core Ruby client implements interceptors
-      # due to the signatures being different for the different types of requests. After
-      # interceptors are added to gRPC core, we will need to release gruf 2.0 and redo
-      # the interceptor signatures for gruf
-      streamed_request = call.nil?
-      if streamed_request
-        call = req
-        req = nil
-      end
-
       outer_around_call(original_call_sig, req, call) do
         begin
           before_call(original_call_sig, req, call)
 
           result = around_call(original_call_sig, req, call) do
             # send the actual request to gRPC
-            if streamed_request
+            if req.nil?
               send("#{original_call_sig}_without_intercept", call, &block)
             else
               send("#{original_call_sig}_without_intercept", req, call, &block)
@@ -254,6 +269,15 @@ module Gruf
       set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
       error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
       fail!(req, call, :internal, :unknown, error_message)
+    end
+
+    ##
+    # Return the appropriate RPC descriptor for a given call signature on this service
+    #
+    # @return [GRPC::RpcDesc]
+    #
+    def rpc_desc(call_signature)
+      self.class.rpc_descs[call_signature.to_s.camelcase.to_sym]
     end
 
     ##

@@ -23,7 +23,8 @@ Bundler.setup
 require 'active_support/all'
 require 'gruf'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-require File.realpath("#{File.dirname(__FILE__)}/support/grpc_server.rb")
+$LOAD_PATH.unshift File.expand_path('../pb', __FILE__)
+require File.realpath("#{File.dirname(__FILE__)}/support/grpc.rb")
 require File.realpath("#{File.dirname(__FILE__)}/support/error.rb")
 require File.realpath("#{File.dirname(__FILE__)}/support/serializers/proto.rb")
 
