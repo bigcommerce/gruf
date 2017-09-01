@@ -19,8 +19,8 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
-  gem 'pry-byebug'
   gem 'ffaker'
+  gem 'pry-byebug'
   gem 'rubocop', '~> 0.49.1'
 end
 

@@ -131,3 +131,6 @@ Style/PredicateName:
 # SupportedStyles: slashes, percent_r, mixed
 Style/RegexpLiteral:
   Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
