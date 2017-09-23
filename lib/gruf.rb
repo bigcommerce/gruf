@@ -31,6 +31,7 @@ require_relative 'gruf/timer'
 require_relative 'gruf/response'
 require_relative 'gruf/error'
 require_relative 'gruf/client'
+require_relative 'gruf/service_loader'
 require_relative 'gruf/server'
 
 ##

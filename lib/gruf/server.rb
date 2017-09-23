@@ -22,10 +22,9 @@ module Gruf
   class Server
     include Gruf::Loggable
 
-    # @return [Array<Class>] The services this server is handling
-    attr_accessor :services
+    delegate :services, to: :service_loader
 
-    attr_reader :server
+    attr_reader :server, :service_loader
 
     ##
     # Initialize the server and load and setup the services
@@ -33,8 +32,8 @@ module Gruf
     # @param [Array<Class>] services The services that this server should handle
     #
     def initialize(services: [])
+      @service_loader = ServiceLoader.new(services: services)
       setup!
-      load_services(services)
     end
 
     ##
@@ -65,28 +64,11 @@ module Gruf
     private
 
     ##
-    # Return all loaded gRPC services
-    #
-    # @param [Array<Class>] svcs An array of service classes that will be handled by this server
-    # @return [Array<Class>] The given services that were added
-    #
-    def load_services(svcs)
-      unless @services
-        @services = Gruf.services.concat(svcs)
-        @services.uniq!
-      end
-      @services
-    end
-
-    ##
     # Auto-load all gRPC handlers
     #
     # :nocov:
     def setup!
-      Dir["#{Gruf.servers_path}/**/*.rb"].each do |f|
-        logger.info "- Loading gRPC service file: #{f}"
-        require f
-      end
+      service_loader.require_services
     end
     # :nocov:
 
