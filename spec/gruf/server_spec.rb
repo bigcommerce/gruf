@@ -21,60 +21,22 @@ describe Gruf::Server do
   let(:gruf_server) { described_class.new(services: services) }
   subject { gruf_server }
 
-  describe '.load_services' do
-    context 'when passed no services' do
-      context 'but some are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services << ThingService
-            c.services << ThingService
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq [ThingService]
-        end
-      end
-
-      context 'and none are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services = []
-          end
-        end
-
-        it 'should return an empty array' do
-          expect(subject.services).to eq []
-        end
-      end
-    end
-
-    context 'when passed a service' do
+  describe '.new' do
+    describe 'services' do
       let(:services) { [ThingService] }
+      let(:service_loader) { instance_double(Gruf::ServiceLoader, require_services: nil) }
 
-      context 'and some are configured in an initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services << ThingService
-            c.services << ThingService
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq [ThingService]
+      before do
+        # Ensure the ServiceLoader can be initialized with the provided arguments while returning a test double.
+        allow(Gruf::ServiceLoader).to receive(:new).and_wrap_original do |m, *args|
+          m.call(*args)
+          service_loader
         end
       end
 
-      context 'and none are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services = []
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq services
-        end
+      it 'registers services on initialization' do
+        subject
+        expect(service_loader).to have_received(:require_services)
       end
     end
   end
