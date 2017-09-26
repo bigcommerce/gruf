@@ -24,8 +24,10 @@ module Gruf
 
     # @return [Array<Class>] The services this server is handling
     attr_accessor :services
-
+    # @return [GRPC::RpcServer] The underlying GRPC server instance
     attr_reader :server
+    # @return [Integer] The port the server is bound to
+    attr_reader :port
 
     ##
     # Initialize the server and load and setup the services
@@ -43,7 +45,7 @@ module Gruf
     def server
       unless @server
         @server = GRPC::RpcServer.new(Gruf.server_options)
-        @server.add_http2_port(Gruf.server_binding_url, ssl_credentials)
+        @port = @server.add_http2_port(Gruf.server_binding_url, ssl_credentials)
         services.each do |s|
           @server.handle(s)
         end

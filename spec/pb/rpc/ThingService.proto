@@ -36,6 +36,8 @@ service ThingService {
     rpc GetFail(GetThingRequest) returns (GetThingResponse) {}
     // For testing a field error
     rpc GetFieldErrorFail(GetThingRequest) returns (GetThingResponse) {}
+    // For testing field errors that _may_ happen
+    rpc GetContextualFieldErrorFail(GetThingRequest) returns (GetThingResponse) {}
     // For testing an exception
     rpc GetException(GetThingRequest) returns (GetThingResponse) {}
     // For testing an uncaught exception

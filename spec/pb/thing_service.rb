@@ -60,6 +60,12 @@ class ThingService < ::Rpc::ThingService::Service
     fail!(req, c, :invalid_argument, :no_thing_name, 'Please correct your errors.', my: :sharona)
   end
 
+  def get_contextual_field_error_fail(req, c)
+    add_field_error(:name, :triggered, 'Triggered field error.') if req.id == 1
+    fail!(req, c, :invalid_argument, :invalid, 'Please correct your errors.') if has_field_errors?
+    Rpc::GetThingResponse.new(thing: Rpc::Thing.new(id: req.id, name: 'Foo'))
+  end
+
   def get_exception(req, c)
     raise 'oh noes'
   rescue => e
@@ -67,7 +73,7 @@ class ThingService < ::Rpc::ThingService::Service
     fail!(req, c, :internal, :oh_noes, 'We done failed', oops: :man)
   end
 
-  def get_uncaught_exception(req, c)
+  def get_uncaught_exception(_, _)
     raise 'epic fail'
   end
 

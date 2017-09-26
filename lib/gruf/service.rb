@@ -223,11 +223,14 @@ module Gruf
     # @param [Hash] metadata (Optional) Any metadata to inject into the trailing metadata for the response
     #
     def fail!(_req, call, error_code, app_code = nil, message = '', metadata = {})
-      error.code = error_code.to_sym
-      error.app_code = app_code ? app_code.to_sym : error.code
-      error.message = message.to_s
-      error.metadata = metadata
-      error.fail!(call)
+      e = error
+      e.code = error_code.to_sym
+      e.app_code = app_code ? app_code.to_sym : error.code
+      e.message = message.to_s
+      e.metadata = metadata
+
+      cleanup!
+      e.fail!(call)
     end
 
     private
@@ -241,7 +244,7 @@ module Gruf
     # @return [Object] The response object
     #
     def call_chain(original_call_sig, req, call, &block)
-      outer_around_call(original_call_sig, req, call) do
+      outer_result = outer_around_call(original_call_sig, req, call) do
         begin
           before_call(original_call_sig, req, call)
 
@@ -263,7 +266,10 @@ module Gruf
 
         result
       end
+      cleanup!
+      outer_result
     rescue GRPC::BadStatus
+      cleanup!
       raise
     rescue => e
       set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
@@ -315,6 +321,13 @@ module Gruf
     #
     def error
       @error ||= Gruf::Error.new
+    end
+
+    ##
+    # Cleanup after a service call
+    #
+    def cleanup!
+      remove_instance_variable(:@error) if instance_variable_defined?(:@error)
     end
   end
 end
