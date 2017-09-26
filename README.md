@@ -349,6 +349,15 @@ reports for gruf services
 There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can view and clone
 that shows how to integrate Gruf into an existing Rails application. 
 
+## Roadmap
+
+### Gruf 2.0
+
+* Utilize the new core Ruby interceptors in gRPC 1.7
+* Change configuration to an injectable object to ensure thread safety on chained server/client interactions
+* Move all references to `Gruf.` configuration into injectable parameters
+* Redo server configuration to be fully injectable
+
 ## License
 
 Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved 
