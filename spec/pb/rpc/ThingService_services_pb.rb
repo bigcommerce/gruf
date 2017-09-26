@@ -46,6 +46,8 @@ module Rpc
       rpc :GetFail, GetThingRequest, GetThingResponse
       # For testing a field error
       rpc :GetFieldErrorFail, GetThingRequest, GetThingResponse
+      # For testing field errors that _may_ happen
+      rpc :GetContextualFieldErrorFail, GetThingRequest, GetThingResponse
       # For testing an exception
       rpc :GetException, GetThingRequest, GetThingResponse
       # For testing an uncaught exception

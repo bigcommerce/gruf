@@ -34,7 +34,7 @@ describe Gruf::Error do
           app_code: app_code,
           message: message,
           field_errors: [],
-          debug_info: {},
+          debug_info: {}
         }.to_json
         expect(subject).to be_a(String)
         expect(subject).to eq expected_json
@@ -56,7 +56,7 @@ describe Gruf::Error do
       context 'with metadata on the error' do
         let(:metadata) { { foo: :bar } }
         it 'should attach the proto metadata and custom metadata, and strings for values' do
-          expect(call.output_metadata).to receive(:update).with({ foo: 'bar' }.merge(:'error-internal-bin' => error.serialize))
+          expect(call.output_metadata).to receive(:update).with({ foo: 'bar' }.merge('error-internal-bin': error.serialize))
           expect(subject).to be_a(described_class)
         end
       end
@@ -110,11 +110,11 @@ describe Gruf::Error do
       expect(errors.last.field_name).to eq field_name
       expect(errors.last.error_code).to eq error_code
       expect(errors.last.message).to eq message
-      expect(errors.last.to_h).to eq({
+      expect(errors.last.to_h).to eq(
         field_name: field_name,
         error_code: error_code,
         message: message
-      })
+      )
     end
   end
 
@@ -123,6 +123,86 @@ describe Gruf::Error do
 
     it 'should fail with the proper grpc error code' do
       expect { subject }.to raise_error(GRPC::NotFound)
+    end
+  end
+
+  describe 'functional test' do
+    let(:id) { 1 }
+
+    context 'with a call that returns a field error' do
+      it 'should raise a Gruf::Client::Error and return the unserialized error object', run_thing_server: true do
+        client = build_client
+        expect do
+          resp = client.call(:GetContextualFieldErrorFail, id: 1)
+          expect(resp.error).to be_a(Gruf::ErrorHeader)
+          expect(resp.error_code).to eq :invalid
+          expect(resp.field_errors).to_not be_empty
+
+          fe = resp.field_errors.first
+          expect(fe).to_not be_a(Gruf::FieldError)
+          expect(fe).to_not be_a(Gruf::FieldError)
+        end.to raise_error(Gruf::Client::Error)
+      end
+    end
+
+    context 'with multiple calls, where the first returns a field error, the second does not' do
+      it 'should not raise a Gruf::Client::Error the second time', run_thing_server: true do
+        client = build_client
+        expect do
+          client.call(:GetContextualFieldErrorFail, id: 1)
+        end.to raise_error(Gruf::Client::Error)
+
+        expect do
+          resp = client.call(:GetContextualFieldErrorFail, id: 2)
+          expect(resp.message).to be_a(Rpc::GetThingResponse)
+        end.to_not raise_error
+      end
+    end
+
+    context 'with multiple calls, with multiple having field errors' do
+      it 'should not aggregate errors across calls', run_thing_server: true do
+
+        ts = []
+        10.times do
+          ts << Thread.new do
+            sleep(rand(0.001..1))
+            client = build_client
+            expect do
+              resp = client.call(:GetContextualFieldErrorFail, id: 1)
+              expect(resp.error).to be_a(Gruf::ErrorHeader)
+              expect(resp.field_errors.count).to eq(1)
+            end.to raise_error(Gruf::Client::Error)
+          end
+        end
+        ts.map(&:join)
+
+        expect do
+          client = build_client
+          resp = client.call(:GetContextualFieldErrorFail, id: 2)
+          expect(resp.message).to be_a(Rpc::GetThingResponse)
+        end.to_not raise_error
+      end
+    end
+
+    context 'with a call that returns no errors' do
+      it 'should raise no errors', run_thing_server: true do
+        client = build_client
+        expect do
+          resp = client.call(:GetThing, id: 1)
+          expect(resp.message).to be_a(Rpc::GetThingResponse)
+        end.to_not raise_error
+      end
+    end
+  end
+
+  context 'with a call that raises an exception' do
+    it 'should fail with an internal error message', run_thing_server: true do
+      client = build_client
+      expect do
+        resp = client.call(:GetException, id: 1)
+        expect(resp.error).to be_a(Gruf::ErrorHeader)
+        expect(resp.error_code).to eq :internal
+      end.to raise_error(Gruf::Client::Error)
     end
   end
 end

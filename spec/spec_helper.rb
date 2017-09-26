@@ -40,10 +40,13 @@ RSpec.configure do |config|
   end
 
   config.around(:example, run_thing_server: true) do |t|
-    run_server do
+    @server = build_server
+    run_server(@server) do
       t.run
     end
   end
 
   include Gruf::Helpers
 end
+
+Thread.abort_on_exception = true
