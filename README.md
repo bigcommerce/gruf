@@ -357,6 +357,8 @@ that shows how to integrate Gruf into an existing Rails application.
 * Change configuration to an injectable object to ensure thread safety on chained server/client interactions
 * Move all references to `Gruf.` configuration into injectable parameters
 * Redo server configuration to be fully injectable
+* Redo error handling to not share error as an instance variable
+* Redo fail! to take in an error object instead of individual parameters
 
 ## License
 
