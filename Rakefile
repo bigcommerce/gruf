@@ -24,7 +24,6 @@ def gruf_rake_configure_rpc!
   require 'gruf'
   $LOAD_PATH.unshift File.expand_path('../spec/pb', __FILE__)
   require File.realpath("#{File.dirname(__FILE__)}/spec/support/grpc.rb")
-  require File.realpath("#{File.dirname(__FILE__)}/spec/support/error.rb")
   require File.realpath("#{File.dirname(__FILE__)}/spec/support/serializers/proto.rb")
 
   Gruf.configure do |c|
@@ -129,7 +128,7 @@ namespace :gruf do
     task :get_unauthorized do
       gruf_rake_configure_rpc!
       begin
-        rpc_client = gruf_demo_build_client
+        rpc_client = gruf_demo_build_client(password: 'no')
         op = rpc_client.call(:GetThing, id: rand(100_000))
         puts op.message.inspect
       rescue Gruf::Client::Error => e
@@ -137,14 +136,14 @@ namespace :gruf do
       end
     end
 
-    def gruf_demo_build_client
+    def gruf_demo_build_client(options = {})
       Gruf::Client.new(
         service: Rpc::ThingService,
         options: {
           hostname: ENV.fetch('HOST', '0.0.0.0:9001'),
           username: ENV.fetch('USERNAME', 'grpc'),
           password: ENV.fetch('PASSWORD', 'magic')
-        }
+        }.merge(options)
       )
     end
   end

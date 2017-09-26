@@ -19,6 +19,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
+  gem 'factory_girl'
   gem 'ffaker'
   gem 'pry-byebug'
   gem 'rubocop', '~> 0.49.1'
@@ -26,6 +27,7 @@ end
 
 group :test do
   gem 'bundler-audit'
+  gem 'null-logger'
   gem 'rspec', '~> 3.6'
   gem 'simplecov', require: false
 end

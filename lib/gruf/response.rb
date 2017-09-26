@@ -63,8 +63,7 @@ module Gruf
     # @return [Float] The execution time of the response
     #
     def internal_execution_time
-      key = Gruf.instrumentation_options.fetch(:output_metadata_timer, {}).fetch(:metadata_key, 'timer')
-      trailing_metadata[key].to_f
+      trailing_metadata['timer'].to_f
     end
   end
 end

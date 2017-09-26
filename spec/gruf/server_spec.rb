@@ -17,101 +17,64 @@
 require 'spec_helper'
 
 describe Gruf::Server do
-  let(:services) { [] }
-  let(:gruf_server) { described_class.new(services: services) }
+  let(:options) { {} }
+  let(:gruf_server) { described_class.new(options) }
   subject { gruf_server }
-
-  describe '.load_services' do
-    context 'when passed no services' do
-      context 'but some are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services << ThingService
-            c.services << ThingService
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq [ThingService]
-        end
-      end
-
-      context 'and none are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services = []
-          end
-        end
-
-        it 'should return an empty array' do
-          expect(subject.services).to eq []
-        end
-      end
-    end
-
-    context 'when passed a service' do
-      let(:services) { [ThingService] }
-
-      context 'and some are configured in an initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services << ThingService
-            c.services << ThingService
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq [ThingService]
-        end
-      end
-
-      context 'and none are configured in initializer' do
-        before do
-          Gruf.configure do |c|
-            c.services = []
-          end
-        end
-
-        it 'should return all services loaded in configuration uniquely' do
-          expect(subject.services).to eq services
-        end
-      end
-    end
-  end
 
   describe '#start!' do
     let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run_till_terminated: nil) }
 
-    context 'when server_options passed' do
-      let(:configuration) { { pool_size: 5 } }
-
-      before do
-        Gruf.configure do |c|
-          c.server_options = configuration
-          c.services = []
-        end
-      end
+    context 'when options passed' do
+      let(:options) { { pool_size: 1 } }
 
       it 'runs server with given configuration' do
-        expect(GRPC::RpcServer).to receive(:new).with(configuration).and_return(server_mock)
-
+        expect(GRPC::RpcServer).to receive(:new).with(options).and_return(server_mock)
         gruf_server.start!
       end
     end
 
-    context 'when no server_options passed' do
-      before do
-        Gruf.configure do |c|
-          c.server_options = {}
-          c.services = []
-        end
-      end
-
+    context 'when no options passed' do
       it 'runs server with empty configuration' do
         expect(GRPC::RpcServer).to receive(:new).with({}).and_return(server_mock)
-
         gruf_server.start!
       end
+    end
+  end
+
+  describe '.add_service' do
+    let(:service) { Rpc::ThingService }
+    subject { gruf_server.add_service(service) }
+
+    context 'if the service is not yet in the registry' do
+      it 'should add a service to the registry' do
+        expect { subject }.to(change { gruf_server.instance_variable_get('@services').count }.by(1))
+        expect(gruf_server.instance_variable_get('@services')).to eq [service]
+      end
+    end
+
+    context 'if the service is already in the registry' do
+      it 'should not add the service' do
+        gruf_server.add_service(service)
+        expect { subject }.to_not(change { gruf_server.instance_variable_get('@services').count })
+      end
+    end
+  end
+
+  describe '.add_interceptor' do
+    let(:interceptor_class) { TestServerInterceptor }
+    let(:options) { { foo: 'bar' } }
+    subject { gruf_server.add_interceptor(interceptor_class, options) }
+
+    before do
+      Gruf.interceptors.clear
+    end
+
+    it 'should add the interceptor to the registry' do
+      expect { subject }.to(change { gruf_server.instance_variable_get('@interceptors').count }.by(1))
+      is = gruf_server.instance_variable_get('@interceptors').prepare(nil, nil)
+      i = is.first
+      expect(i).to be_a(interceptor_class)
+      expect(i.options).to eq options
     end
   end
 end

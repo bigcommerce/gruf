@@ -17,13 +17,19 @@
 #
 require 'rubygems'
 require 'bundler/setup'
-require 'gruf'
 require 'rails' rescue nil
 load 'config/environment.rb' if defined?(Rails)
+require 'gruf'
 
 begin
-  server = Gruf::Server.new
+  server = Gruf::Server.new(Gruf.server_options)
+  Gruf.services.each { |s| server.add_service(s) }
   server.start!
 rescue => e
-  Gruf.logger.fatal "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
+  msg = "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
+  if Gruf.logger
+    Gruf.logger.fatal msg
+  else
+    Logger.new(STDOUT).fatal msg
+  end
 end

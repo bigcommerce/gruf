@@ -8,17 +8,18 @@ provide a more streamlined integration into Ruby and Ruby on Rails applications.
 It provides an abstracted server and client for gRPC services, along with other tools to help get gRPC services in Ruby
 up fast and efficiently at scale. Some of its features include:
 
-* Abstracted server endpoints with before, around, outer around, and after hooks during an endpoint call
+* Abstracted controllers with request context support 
+* Full interceptors with timing and unified request context support 
 * Robust client error handling and metadata transport abilities
-* Server authentication strategy support, with basic auth with multiple key support built in
+* Server authentication via interceptors, with basic auth with multiple key support built in
 * TLS support for client-server auth, though we recommend using [linkerd](https://linkerd.io/) instead
-* Error data serialization in output metadata to allow fine-grained error handling in the transport while still 
-preserving gRPC BadStatus codes
+* Error data serialization in output metadata to allow fine-grained error handling in the transport while 
+  still preserving gRPC BadStatus codes
 * Server and client execution timings in responses
 
-gruf currently has active support for gRPC 1.4.x. gruf is compatible and tested with with Ruby 2.2, 2.3, and 2.4. gruf 
-is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any Ruby framework (such as 
-[Grape](https://github.com/ruby-grape/grape), for instance).
+gruf currently has active support for gRPC 1.4.x-1.6.x. gruf is compatible and tested with Ruby 2.2, 
+2.3, and 2.4. gruf is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any 
+Ruby framework (such as [Grape](https://github.com/ruby-grape/grape), for instance).
 
 ## Installation
 
@@ -89,26 +90,22 @@ message GetJobResp {
 }
 ```
 
-You'd have this handler in `/app/rpc/demo/job_server.rb`
+You'd have this handler in `/app/rpc/demo/job_controller.rb`
 
 ```ruby
 module Demo
-  class JobServer < ::Demo::Jobs::Service
-    include Gruf::Service
+  class JobController < ::Gruf::Controllers::Base
+    bind ::Demo::Jobs::Service
   
     ##
-    # @param [Demo::GetJobReq] req The incoming gRPC request object
-    # @param [GRPC::ActiveCall] call The gRPC active call instance
     # @return [Demo::GetJobResp] The job response
     #
-    def get_job(req, call)
-      thing = Job.find(req.id)
+    def get_job
+      thing = Job.find(request.message.id)
       
-      Demo::GetJobResp.new(
-        id: thing.id
-      )
+      Demo::GetJobResp.new(id: thing.id)
     rescue
-      fail!(req, call, :not_found, :job_not_found, "Failed to find Job with ID: #{req.id}")
+      fail!(:not_found, :job_not_found, "Failed to find Job with ID: #{request.message.id}")
     end
   end
 end
@@ -118,35 +115,15 @@ Finally, you can start the server by running:
 
     bundle exec gruf
 
-### Authentication
+### Basic Authentication
 
-Authentication is done via a strategy pattern and are injectable via middleware. If any of the strategies return `true`,
-it will proceed the request as successful. For example, to add basic auth, you can do:
-
-```ruby
-Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
-```
-
-Options to the middleware libraries can be passed through the `authentication_options` configuration option.
-
-To add a custom authentication pattern, your class must extend the `Gruf::Authentication::Base` class, and implement
-the `valid?(call)` method. For example, this class allows everyone in:
-
-```
-class NoAuth < Gruf::Authentication::Base
-  def valid?(_call)
-    true
-  end
-end
-```
-
-#### Basic Auth
-
-gruf supports simple basic authentication with an array of accepted credentials:
+Gruf comes packaged in with a Basic Authentication interceptor. It takes in an array of supported 
+username and password pairs (or password-only credentials).
 
 ```ruby
-Gruf.configure do |c|  
-  c.authentication_options = {
+Gruf.configure do |c|
+  c.interceptors.use(
+    Gruf::Instrumentation::Authentication::Basic,
     credentials: [{
       username: 'my-username-here',
       password: 'my-password-here',    
@@ -156,12 +133,12 @@ Gruf.configure do |c|
     },{
       password: 'a-password-only'
     }]
-  }
+  )
 end
 ```
 
-Supporting an array of credentials allow for unique credentials per service, or for easy credential rotation with
-zero downtime.
+Supporting an array of credentials allow for unique credentials per service, or for easy credential 
+rotation with zero downtime.
 
 ### SSL Configuration
 
@@ -189,90 +166,88 @@ Gruf.configure do |c|
 end
 ```
 
-## Hooks
+## Server Interceptors
 
-gruf supports hooks that act as interceptors around the grpc server calls, allowing you to perform actions before, 
-after, and even around your server endpoints. This can be used to add tracing data, connection resets in the grpc thread 
-pool, further instrumentation, and other things.
+gruf supports interceptors around the grpc server calls, allowing you to perform actions around your service
+method calls. This can be used to add tracing data, connection resets in the grpc thread pool, further 
+instrumentation, and other things.
 
-Adding a hook is as simple as creating a class that extends `Gruf::Hooks::Base`, and implementing it via the registry.
-
-### Before
-
-A before hook passes in the method call signature, request object, and `GRPC::ActiveCall` object:
-```ruby
-class MyBeforeHook < Gruf::Hooks::Base
-  def before(call_signature, request, active_call)
-    # do my thing before the call. Calling `fail!` here will prevent the call from happening.
-  end
-end
-Gruf::Hooks::Registry.add(:my_before_hook, MyBeforeHook)
-```
-
-### After
-
-An after hook passes in the response object, method call signature, request object, and `GRPC::ActiveCall` object:
-```ruby
-class MyAfterHook < Gruf::Hooks::Base
-  def after(success, response, call_signature, request, active_call)
-    # You can modify the response object
-  end
-end
-Gruf::Hooks::Registry.add(:my_after_hook, MyAfterHook)
-```
-
-### Around
-
-An around hook passes in the method call signature, request object, `GRPC::ActiveCall` object, and the block 
-being executed:
-```ruby
-class MyAroundHook < Gruf::Hooks::Base
-  def around(call_signature, request, active_call, &block)
-    # do my thing here 
-    resp = yield
-    # do my thing there
-    resp
-  end
-end
-Gruf::Hooks::Registry.add(:my_around_hook, MyAroundHook)
-```
-
-Around hooks are a special case - because each needs to wrap the call, they are run recursively within each other.
-This means that if you have three hooks - `Hook1`, `Hook2`, and `Hook3` - they will run in LIFO (last in, first out) 
-order. `Hook3` will run, calling `Hook2`, which will then call `Hook1`, ending the chain.  
-
-### Outer Around
-
-And finally, an "outer" around hook passes in the method call signature, request object, `GRPC::ActiveCall` 
-object, and the block being executed, and executes around the _entire_ call chain (before, around, request, after):
+Adding a hook is as simple as creating a class that extends `Gruf::Interceptor::ServerInterceptor`, 
+and a `call` method that yields control to get the method result:
 
 ```ruby
-class MyOuterAroundHook < Gruf::Hooks::Base
-  def outer_around(call_signature, request, active_call, &block)
-    # do my thing here 
-    resp = yield
-    # do my thing there
-    resp
+class MyInterceptor < ::Gruf::Interceptors::ServerInterceptor
+  def call
+    yield
   end
 end
-Gruf::Hooks::Registry.add(:my_outer_around_hook, MyOuterAroundHook)
 ```
 
-Outer around hooks behave similarly in execution order to around hooks.
+Interceptors have access to the `request` object, which is the `Gruf::Controller::Request` object
+described above.
 
-Note: It's important to note that the authentication step happens immediately before the first _before_ hook is called,
-so don't perform any actions that you want behind authentication in outer around hooks, as they are not called with
-authentication.
+### Failing in an Interceptor
+
+Interceptors can fail requests with the same method calls as a controller:
+
+```ruby
+class MyFailingInterceptor < ::Gruf::Interceptors::ServerInterceptor
+  def call
+    result = yield # this returns the protobuf message
+    unless result.dont_hijack
+      # we'll assume this "dont_hijack" attribute exists on the message for this example
+      fail!(:internal, :hijacked, 'Hijack all the things!')
+    end 
+    result
+  end
+end
+```
+
+Similarly, you can raise `GRPC::BadStatus` calls to trigger similar errors without accompanying metadata.
+
+### Configuring Interceptors
+
+From there, the interceptor can be added to the server manually (if not executing via `bundle exec gruf`):
+
+```ruby
+server = Gruf::Server.new
+server.add_interceptor(MyInterceptor, option_foo: 'value 123')
+```
+
+Or, alternatively, the more common method of passing them into the `interceptors` configuration hash:
+
+```ruby
+Gruf.configure do |c|
+  c.interceptors.use(MyInterceptor, option_foo: 'value 123')
+end
+```
+
+Interceptors each wrap the call and are run recursively within each other. This means that if you have 
+three interceptors - `Interceptor1`, `Interceptor2`, and `Interceptor3` - they will run in FIFO 
+(first in, first out) order. `Interceptor1` will run, yielding to `Interceptor2`, 
+which will then yield to `Interceptor3`, which will then yield to your service method call, 
+ending the chain.
+
+You can utilize the `insert_before` and `insert_after` methods to maintain order:
+
+```ruby
+Gruf.configure do |c|
+  c.interceptors.use(Interceptor1)
+  c.interceptors.use(Interceptor2)
+  c.interceptors.insert_before(Interceptor2, Interceptor3) # 3 will now happen before 2
+  c.interceptors.insert_after(Interceptor1, Interceptor4) # 4 will now happen after 1
+end
+```
 
 ## Instrumentation
 
-gruf comes out of the box with a couple of instrumentors packed in: output metadata timings, and StatsD
-support. 
+gruf comes out of the box with a couple of instrumentation interceptors packed in: 
+output metadata timings and StatsD support. 
 
 ### Output Metadata Timing
 
-Enabled by default, this will push timings for _successful responses_ through the response output metadata back to the 
-client.
+Enabled by default, this will push timings for _successful responses_ through the response output 
+metadata back to the client.
 
 ### StatsD
 
@@ -280,22 +255,20 @@ The StatsD support is not enabled by default. To enable it, you'll want to do:
 
 ```ruby
 Gruf.configure do |c|
-  c.instrumentation_options[:statsd] = {
+  c.interceptors.use(
+    Gruf::Interceptors::Instrumentation::Statsd,
     client: ::Statsd.new('my.statsd.host', 8125),
     prefix: 'my_application_prefix.rpc'
-  }
+  )
 end
-Gruf::Instrumentation::Registry.add(:statsd, Gruf::Instrumentation::Statsd)
 ```
 
-This will measure counts and timings for each endpoint. Note: instrumentation hooks happen in LIFO order; they also
-run similarly to an outer_around hook, executing _before_ authorization happens. Note: It's important that in your 
-instrumentors, you pass-through exceptions (such as `GRPC::BadStatus`); catching them in instrumentors will cause errors 
-upstream.
+This will measure counts and timings for each endpoint.
 
 ### Request Logging
 
-Gruf 1.2+ comes built with request logging out of the box; you'll get Rails-style logs with your gRPC calls:
+Gruf 1.2+ comes built with request logging out of the box; you'll get Rails-style logs with your 
+gRPC calls:
 
 ```
 # plain
@@ -308,9 +281,10 @@ It supports formatters (including custom ones) that you can use to specify the f
  
 ```ruby
 Gruf.configure do |c|
-  c.instrumentation_options[:request_logging] = {
+  c.interceptors.use(
+    Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor,
     formatter: :logstash
-  }
+  )
 end
 ```
 
@@ -318,7 +292,7 @@ It comes with a few more options as well:
 
 | Option | Description | Default |
 | ------ | ----------- | ------- |
-| formatter | The formatter to use. By default `:plain` and `:logstash` are supported. | `:plain` |
+| formatter | The formatter to use. By default `:plain` and `:logstash` are supported. | `:logstash` |
 | log_parameters | If set to true, will log parameters in the response | `false` |
 | blacklist | An array of parameter key names to redact from logging, in path.to.key format | `[]` |
 | redacted_string | The string to use for redacted parameters. | `REDACTED` |
@@ -326,11 +300,6 @@ It comes with a few more options as well:
 It's important to maintain a safe blacklist should you decide to log parameters; gruf does no 
 parameter sanitization on its own. We also recommend blacklisting parameters that may contain 
 very large values (such as binary or json data).
-
-### Custom Instrumentors
-
-Similar to hooks, simply extend the `Gruf::Instrumentation::Base` class, and implement the `call` method. See the StatsD 
-instrumentor for an example.
 
 ## Plugins
 
@@ -346,19 +315,18 @@ reports for gruf services
 
 ## Demo Rails App
 
-There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can view and clone
-that shows how to integrate Gruf into an existing Rails application. 
+There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can 
+view and clone that shows how to integrate Gruf into an existing Rails application. 
 
 ## Roadmap
 
-### Gruf 2.0
+### Gruf 3.0
 
 * Utilize the new core Ruby interceptors in gRPC 1.7
 * Change configuration to an injectable object to ensure thread safety on chained server/client interactions
 * Move all references to `Gruf.` configuration into injectable parameters
 * Redo server configuration to be fully injectable
-* Redo error handling to not share error as an instance variable
-* Redo fail! to take in an error object instead of individual parameters
+* Move client calls to their native method implementation
 
 ## License
 
