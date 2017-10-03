@@ -20,6 +20,7 @@ require_relative 'simplecov_helper'
 require 'gruf'
 require 'ffaker'
 require 'pry'
+require 'null_logger'
 
 Dir["#{File.join(File.dirname(__FILE__), 'support')}/**/*.rb"].each {|f| require f }
 
@@ -35,10 +36,9 @@ RSpec.configure do |config|
   config.color = true
 
   config.before do
-    Gruf::Authentication::Strategies.clear
-    Gruf::Hooks::Registry.clear
+    Gruf.logger = NullLogger.new unless ENV.fetch('GRUF_DEBUG', false)
+    Gruf.grpc_logger = NullLogger.new unless ENV.fetch('GRPC_DEBUG', false)
   end
-
   config.around(:example, run_thing_server: true) do |t|
     @server = build_server
     run_server(@server) do

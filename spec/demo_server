@@ -25,24 +25,7 @@ require 'gruf'
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift File.expand_path('../pb', __FILE__)
 require File.realpath("#{File.dirname(__FILE__)}/support/grpc.rb")
-require File.realpath("#{File.dirname(__FILE__)}/support/error.rb")
 require File.realpath("#{File.dirname(__FILE__)}/support/serializers/proto.rb")
-
-Gruf.configure do |c|
-  c.authentication_options = {
-    credentials: [{
-      username: ENV.fetch('AUTH_USERNAME', 'grpc'),
-      password: ENV.fetch('AUTH_PASSWORD', 'magic')
-    }]
-  }
-  c.error_serializer = Serializers::Proto
-  c.instrumentation_options[:request_logging] = {
-    formatter: :logstash,
-    log_parameters: true
-  }
-end
-Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
-Gruf.logger = Logger.new(STDOUT)
 
 class FakeStats
   def increment(k)
@@ -52,16 +35,34 @@ class FakeStats
     Gruf.logger.info "statsd.timing: #{k} -> #{t}"
   end
 end
+
 Gruf.configure do |c|
-  c.instrumentation_options[:statsd] = {
+  c.error_serializer = Serializers::Proto
+  c.backtrace_on_error = true
+  c.interceptors.use(
+    Gruf::Interceptors::Instrumentation::Statsd,
     client: FakeStats.new,
-    prefix: 'demo.rpc'
-  }
+    prefix: 'demo'
+  )
+  c.interceptors.use(
+    Gruf::Interceptors::Authentication::Basic,
+    credentials: [{
+      username: ENV.fetch('AUTH_USERNAME', 'grpc'),
+      password: ENV.fetch('AUTH_PASSWORD', 'magic')
+    }]
+  )
+  c.interceptors.use(
+    Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor,
+    formatter: :plain,
+    log_parameters: true
+  )
+  c.interceptors.use(Gruf::Interceptors::ActiveRecord::ConnectionReset)
 end
-Gruf::Instrumentation::Registry.add(:statsd, Gruf::Instrumentation::Statsd)
+Gruf.logger = Logger.new(STDOUT)
 
 begin
   server = Gruf::Server.new
+  server.add_service(::Rpc::ThingService::Service)
   server.start!
 rescue => e
   puts e.message

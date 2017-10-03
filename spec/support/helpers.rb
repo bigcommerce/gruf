@@ -38,20 +38,22 @@ module Gruf
     # @return [Gruf::Server]
     #
     def build_server
+      is = respond_to?(:interceptors) ? interceptors : {}
+
+      Gruf.interceptors.clear
       Gruf.configure do |c|
         c.server_binding_url = HOST
         c.default_client_host = HOST
-        c.server_options = {
-          poll_period: 1
-        }
-        c.grpc_logger = ::Logger.new('/dev/null') unless ENV['GRPC_DEBUG']
-        c.authentication_options[:credentials] = {
-          username: USERNAME,
-          password: PASSWORD
-        }
+        c.use_default_interceptors = false
+        c.logger = NullLogger.new unless ENV.fetch('GRUF_DEBUG', false)
+        c.grpc_logger = NullLogger.new unless ENV.fetch('GRPC_DEBUG', false)
       end
-      Gruf::Authentication::Strategies.add(:basic, Gruf::Authentication::Basic)
-      Gruf::Server.new(services: [ThingService])
+      s = Gruf::Server.new(poll_period: 1)
+      is.each do |k, opts|
+        s.add_interceptor(k, opts)
+      end
+      s.add_service(::Rpc::ThingService::Service)
+      s
     end
 
     ##
@@ -75,12 +77,15 @@ module Gruf
     ##
     # Builds a client
     #
-    def build_client(hostname = nil)
-      Gruf::Client.new(service: ::Rpc::ThingService, options: {
-        hostname: hostname || "0.0.0.0:#{@server.port}",
-        username: USERNAME,
-        password: PASSWORD
-      })
+    def build_client(options = {})
+      Gruf::Client.new(
+        service: ::Rpc::ThingService,
+        options: {
+          hostname: "0.0.0.0:#{@server.port}",
+          username: USERNAME,
+          password: PASSWORD
+        }.merge(options)
+      )
     end
   end
 end

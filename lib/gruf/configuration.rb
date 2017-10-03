@@ -23,22 +23,19 @@ module Gruf
       root_path: '',
       server_binding_url: '0.0.0.0:9001',
       server_options: {},
-      authentication_options: {},
-      instrumentation_options: {},
-      hook_options: {},
+      interceptors: nil,
       default_client_host: '',
       use_ssl: false,
       ssl_crt_file: '',
       ssl_key_file: '',
-      servers_path: '',
+      controllers_path: '',
       services: [],
       logger: nil,
       grpc_logger: nil,
       error_metadata_key: :'error-internal-bin',
       error_serializer: nil,
-      authorization_metadata_key: 'authorization',
       append_server_errors_to_trailing_metadata: true,
-      use_default_hooks: true,
+      use_default_interceptors: true,
       backtrace_on_error: false,
       use_exception_message: true,
       internal_error_message: 'Internal Server Error'
@@ -85,27 +82,21 @@ module Gruf
       VALID_CONFIG_KEYS.each do |k, v|
         send((k.to_s + '='), v)
       end
+      self.interceptors = Gruf::Interceptors::Registry.new
+      self.root_path = Rails.root.to_s.chomp('/') if defined?(Rails)
       if defined?(Rails) && Rails.logger
-        self.root_path = Rails.root
         self.logger = Rails.logger
       else
         require 'logger'
         self.logger = ::Logger.new(STDOUT)
       end
       self.grpc_logger = logger if grpc_logger.nil?
-      self.ssl_crt_file = "#{root_path}/config/ssl/#{environment}.crt"
-      self.ssl_key_file = "#{root_path}/config/ssl/#{environment}.key"
-      self.servers_path = "#{root_path}/app/rpc"
-      self.authentication_options = {
-        credentials: [{
-          username: 'grpc',
-          password: 'magic'
-        }]
-      }
-      if use_default_hooks
-        Gruf::Hooks::Registry.add(:ar_connection_reset, Gruf::Hooks::ActiveRecord::ConnectionReset)
-        Gruf::Instrumentation::Registry.add(:output_metadata_timer, Gruf::Instrumentation::OutputMetadataTimer)
-        Gruf::Instrumentation::Registry.add(:request_logging, Gruf::Instrumentation::RequestLogging::Hook)
+      self.ssl_crt_file = "#{root_path}config/ssl/#{environment}.crt"
+      self.ssl_key_file = "#{root_path}config/ssl/#{environment}.key"
+      self.controllers_path = root_path.to_s.empty? ? 'app/rpc' : "#{root_path}/app/rpc"
+      if use_default_interceptors
+        interceptors.use(Gruf::Interceptors::ActiveRecord::ConnectionReset)
+        interceptors.use(Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
       end
       options
     end

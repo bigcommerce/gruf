@@ -22,21 +22,24 @@ module Gruf
   class Server
     include Gruf::Loggable
 
-    # @return [Array<Class>] The services this server is handling
-    attr_accessor :services
     # @return [GRPC::RpcServer] The underlying GRPC server instance
     attr_reader :server
     # @return [Integer] The port the server is bound to
     attr_reader :port
+    # @return [Hash] Hash of options passed into the server
+    attr_reader :options
 
     ##
     # Initialize the server and load and setup the services
     #
-    # @param [Array<Class>] services The services that this server should handle
+    # @param [Hash] options
     #
-    def initialize(services: [])
+    def initialize(options = {})
+      @options = options || {}
+      @interceptors = options.fetch(:interceptor_registry, Gruf.interceptors)
+      @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
+      @services = []
       setup!
-      load_services(services)
     end
 
     ##
@@ -44,11 +47,9 @@ module Gruf
     #
     def server
       unless @server
-        @server = GRPC::RpcServer.new(Gruf.server_options)
-        @port = @server.add_http2_port(Gruf.server_binding_url, ssl_credentials)
-        services.each do |s|
-          @server.handle(s)
-        end
+        @server = GRPC::RpcServer.new(options)
+        @port = @server.add_http2_port(options.fetch(:hostname, Gruf.server_binding_url), ssl_credentials)
+        @services.each { |s| @server.handle(s) }
       end
       @server
     end
@@ -64,33 +65,47 @@ module Gruf
     end
     # :nocov:
 
-    private
+    ##
+    # @param [Class] klass
+    #
+    def add_service(klass)
+      @services << klass unless @services.include?(klass)
+    end
 
     ##
-    # Return all loaded gRPC services
+    # Add an interceptor to the server
     #
-    # @param [Array<Class>] svcs An array of service classes that will be handled by this server
-    # @return [Array<Class>] The given services that were added
+    # @param [Gruf::Interceptors::Base]
+    # @param [Hash]
     #
-    def load_services(svcs)
-      unless @services
-        @services = Gruf.services.concat(svcs)
-        @services.uniq!
-      end
-      @services
+    def add_interceptor(klass, opts = {})
+      @interceptors.use(klass, opts)
     end
+
+    private
 
     ##
     # Auto-load all gRPC handlers
     #
     # :nocov:
     def setup!
-      Dir["#{Gruf.servers_path}/**/*.rb"].each do |f|
+      return unless File.directory?(controllers_path)
+      path = File.realpath(controllers_path)
+      $LOAD_PATH.unshift(path)
+      Dir["#{path}/**/*.rb"].each do |f|
+        next if f.include?('_pb') # exclude if people include proto generated files in app/rpc
         logger.info "- Loading gRPC service file: #{f}"
-        require f
+        load File.realpath(f)
       end
     end
     # :nocov:
+
+    ##
+    # @param [String]
+    #
+    def controllers_path
+      options.fetch(:controllers_path, Gruf.controllers_path)
+    end
 
     ##
     # Load the SSL/TLS credentials for this server
@@ -99,9 +114,9 @@ module Gruf
     #
     # :nocov:
     def ssl_credentials
-      if Gruf.use_ssl
-        private_key = File.read Gruf.ssl_key_file
-        cert_chain = File.read Gruf.ssl_crt_file
+      if options.fetch(:use_ssl, Gruf.use_ssl)
+        private_key = File.read(options.fetch(:ssl_key_file, Gruf.ssl_key_file))
+        cert_chain = File.read(options.fetch(:ssl_crt_file, Gruf.ssl_crt_file))
         certs = [nil, [{ private_key: private_key, cert_chain: cert_chain }], false]
         GRPC::Core::ServerCredentials.new(*certs)
       else

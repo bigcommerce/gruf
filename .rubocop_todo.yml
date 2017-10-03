@@ -134,3 +134,6 @@ Style/RegexpLiteral:
 
 Metrics/BlockLength:
   Enabled: false
+
+Style/EmptyCaseCondition:
+  Enabled: false
