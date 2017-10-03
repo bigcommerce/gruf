@@ -2,6 +2,17 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.0.0
+
+Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for details.
+
+- New thread-safe controller-based model
+- New controller request object
+- Hooks deprecated in favor of interceptors
+- New interceptor timer utility class
+- Default logging to logstash formatter
+- Various Gruf::Server improvements
+
 ### 1.2.7
 
 - Fix issues where field errors were persisted in between separate calls
