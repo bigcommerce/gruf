@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -14,35 +13,32 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Interceptors
-    module ActiveRecord
-      ##
-      # Resets the ActiveRecord connection to maintain accurate connected state in the thread pool
-      #
-      class ConnectionReset < ::Gruf::Interceptors::ServerInterceptor
-        ##
-        # Reset any ActiveRecord connections after a gRPC service is called. Because of the way gRPC manages its
-        # connection pool, we need to ensure that this is done to properly
-        #
-        def call
-          if enabled? && !::ActiveRecord::Base.connection.active?
-            ::ActiveRecord::Base.establish_connection
-          end
-          yield
-        ensure
-          ::ActiveRecord::Base.clear_active_connections! if enabled?
-        end
+module ActiveRecord
+  class Base
+    def self.connection
+      ActiveRecord::Connection.new
+    end
 
-        private
+    def self.establish_connection
+      true
+    end
 
-        ##
-        # @return [Boolean] If AR is loaded, we can enable this hook safely
-        #
-        def enabled?
-          defined?(::ActiveRecord::Base)
-        end
-      end
+    def self.clear_active_connections!
+      true
+    end
+
+    def self.connected?
+      true
+    end
+  end
+
+  class Connection
+    def disconnect!
+      true
+    end
+
+    def active?
+      false
     end
   end
 end

@@ -16,12 +16,6 @@
 #
 require 'spec_helper'
 
-module ActiveRecord
-  class Base
-    def self.clear_active_connections!; end
-  end
-end
-
 describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
   let(:request) { build :controller_request }
   let(:errors) { build :error }
@@ -35,7 +29,8 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
     end
 
     it 'should try to clear any active connections' do
-      expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
+      expect(::ActiveRecord::Base).to receive(:establish_connection).and_call_original
+      expect(::ActiveRecord::Base).to receive(:clear_active_connections!).and_call_original
       subject
     end
   end
@@ -46,6 +41,7 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
     end
 
     it 'should not try to clear any active connections' do
+      expect(::ActiveRecord::Base).to_not receive(:establish_connection)
       expect(::ActiveRecord::Base).to_not receive(:clear_active_connections!)
       subject
     end
