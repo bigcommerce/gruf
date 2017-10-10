@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.0.1
+
+- Handle ActiveRecord connection management more gracefully (Fixes #30)
+
 ### 2.0.0
 
 Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for details.

@@ -123,7 +123,7 @@ username and password pairs (or password-only credentials).
 ```ruby
 Gruf.configure do |c|
   c.interceptors.use(
-    Gruf::Instrumentation::Authentication::Basic,
+    Gruf::Interceptors::Authentication::Basic,
     credentials: [{
       username: 'my-username-here',
       password: 'my-password-here',    
