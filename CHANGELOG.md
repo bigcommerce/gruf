@@ -5,6 +5,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 ### 2.0.2
 
 - Update Rubocop to 0.51
+- Fix issue [#32] where server was not handling signals (\ht @Parad0X)
 
 ### 2.0.1
 
@@ -49,7 +50,7 @@ Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for de
 ### 1.2.1
 
 - Added ability to pass in server options via new `server_options` configuration
-  attribute.
+  attribute. (\ht @kruczjak)
 
 ### 1.2.0
 
