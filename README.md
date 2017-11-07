@@ -328,6 +328,12 @@ view and clone that shows how to integrate Gruf into an existing Rails applicati
 * Redo server configuration to be fully injectable
 * Move client calls to their native method implementation
 
+## Companies Using Gruf
+
+Using gruf and want to show your support? Let us know and we'll add your name here.
+
+* [BigCommerce](https://www.bigcommerce.com/)
+
 ## License
 
 Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved 
