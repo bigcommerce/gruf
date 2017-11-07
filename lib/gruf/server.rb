@@ -55,12 +55,16 @@ module Gruf
     # Start the gRPC server
     #
     # :nocov:
+    # rubocop:disable Lint/ShadowedException
     def start!
       logger.info { 'Booting gRPC Server...' }
       server.run_till_terminated
+    rescue Interrupt, SignalException, SystemExit
       logger.info { 'Shutting down gRPC server...' }
+      server.stop
     end
     # :nocov:
+    # rubocop:enable Lint/ShadowedException
 
     ##
     # @param [Class] klass

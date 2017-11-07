@@ -39,6 +39,15 @@ describe Gruf::Server do
         gruf_server.start!
       end
     end
+
+    context 'when SignalException is raised' do
+      it 'rescues and stops gracefully' do
+        expect(GRPC::RpcServer).to receive(:new).and_return(server_mock)
+        expect(server_mock).to receive(:run_till_terminated) { raise SignalException.new(:TERM) }
+        expect(server_mock).to receive(:stop)
+        gruf_server.start!
+      end
+    end
   end
 
   describe '.add_service' do
