@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -104,7 +103,7 @@ module Gruf
       emk = Gruf.error_metadata_key.to_s
       raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize if e.respond_to?(:metadata) && e.metadata.key?(emk)
       raise # passthrough
-    rescue => e
+    rescue StandardError => e
       Gruf.logger.error e.message
       raise
     end

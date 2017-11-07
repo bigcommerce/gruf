@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -176,7 +175,7 @@ module Gruf
           # @param [String] redacted_string The custom redact string
           #
           def hash_deep_redact!(hash, redacted_string)
-            hash.keys.each do |key|
+            hash.each_key do |key|
               if hash[key].is_a? Hash
                 hash_deep_redact!(hash[key], redacted_string)
               else

@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,7 +21,7 @@ group :development, :test do
   gem 'factory_girl'
   gem 'ffaker'
   gem 'pry-byebug'
-  gem 'rubocop', '~> 0.49.1'
+  gem 'rubocop', '~> 0.51'
 end
 
 group :test do

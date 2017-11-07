@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.0.2
+
+- Update Rubocop to 0.51
+
 ### 2.0.1
 
 - Handle ActiveRecord connection management more gracefully (Fixes #30)

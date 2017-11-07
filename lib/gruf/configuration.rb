@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -67,7 +66,7 @@ module Gruf
     #
     def options
       opts = {}
-      VALID_CONFIG_KEYS.each do |k, _v|
+      VALID_CONFIG_KEYS.each_key do |k|
         opts.merge!(k => send(k))
       end
       opts

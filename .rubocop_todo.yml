@@ -107,7 +107,7 @@ Layout/LeadingCommentSpace:
 
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 # SupportedStyles: snake_case, camelCase
-Style/MethodName:
+Naming/MethodName:
   Enabled: false
 
 # Configuration parameters: EnforcedStyle, SupportedStyles, IndentationWidth.
@@ -124,7 +124,7 @@ Layout/MultilineOperationIndentation:
 # NamePrefix: is_, has_, have_
 # NamePrefixBlacklist: is_, has_, have_
 # NameWhitelist: is_a?
-Style/PredicateName:
+Naming/PredicateName:
   Enabled: false
 
 # Configuration parameters: EnforcedStyle, SupportedStyles, AllowInnerSlashes.

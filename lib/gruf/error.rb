@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -63,7 +62,7 @@ module Gruf
     # debug an given error response. This is sent by the server over the trailing metadata.
     attr_accessor :debug_info
     # @return [GRPC::BadStatus] The gRPC BadStatus error object that was generated
-    attr_accessor :grpc_error
+    attr_writer :grpc_error
     # @return [Hash] The trailing metadata that was attached to the error
     attr_reader :metadata
 

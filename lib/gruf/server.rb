@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,8 +21,6 @@ module Gruf
   class Server
     include Gruf::Loggable
 
-    # @return [GRPC::RpcServer] The underlying GRPC server instance
-    attr_reader :server
     # @return [Integer] The port the server is bound to
     attr_reader :port
     # @return [Hash] Hash of options passed into the server

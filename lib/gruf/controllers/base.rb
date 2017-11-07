@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -72,7 +71,7 @@ module Gruf
         end
       rescue GRPC::BadStatus
         raise # passthrough
-      rescue => e
+      rescue StandardError => e
         set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
         error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
         fail!(:internal, :unknown, error_message)
