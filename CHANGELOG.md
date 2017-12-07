@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.0.3
+
+- Fix regression [#35] where gruf was not able to be loaded outside of a Rails application
+
 ### 2.0.2
 
 - Update Rubocop to 0.51
