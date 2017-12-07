@@ -17,7 +17,11 @@
 #
 require 'rubygems'
 require 'bundler/setup'
-require 'rails' rescue nil
+begin
+  require 'rails'
+rescue LoadError
+  nil
+end
 load 'config/environment.rb' if defined?(Rails)
 require 'gruf'
 
