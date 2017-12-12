@@ -25,6 +25,8 @@ module Gruf
       attr_reader :active_call
       # @var [Symbol] method_key
       attr_reader :method_key
+      # @var [GRPC::RpcDesc] rpc_desc
+      attr_reader :rpc_desc
       # @var [Gruf::Controllers::Request::Type] type
       attr_reader :type
 
@@ -54,6 +56,7 @@ module Gruf
         @service = service
         @active_call = active_call
         @message = message
+        @rpc_desc = rpc_desc
         @type = Type.new(rpc_desc)
       end
 
