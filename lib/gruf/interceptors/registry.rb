@@ -28,7 +28,7 @@ module Gruf
       ##
       # Add an interceptor to the registry
       #
-      # @param [Gruf::Interceptors::Base] interceptor_class The class of the interceptor to add
+      # @param [Class] interceptor_class The class of the interceptor to add
       # @param [Hash] options A hash of options to pass into the interceptor during initialization
       #
       def use(interceptor_class, options = {})
@@ -41,11 +41,24 @@ module Gruf
       end
 
       ##
+      # Remove an interceptor from the registry
+      #
+      # @param [Class] interceptor_class The interceptor class to remove
+      # @raise [InterceptorNotFoundError] if the interceptor is not found
+      #
+      def remove(interceptor_class)
+        pos = @registry.find_index { |opts| opts.fetch(:klass, '') == interceptor_class }
+        raise InterceptorNotFoundError if pos.nil?
+        @registry.delete_at(pos)
+      end
+
+      ##
       # Insert an interceptor before another specified interceptor
       #
-      # @param [Gruf::Interceptors::Base] before_class The interceptor to insert before
-      # @param [Gruf::Interceptors::Base] interceptor_class The class of the interceptor to add
+      # @param [Class] before_class The interceptor to insert before
+      # @param [Class] interceptor_class The class of the interceptor to add
       # @param [Hash] options A hash of options to pass into the interceptor during initialization
+      # @raise [InterceptorNotFoundError] if the before interceptor is not found
       #
       def insert_before(before_class, interceptor_class, options = {})
         interceptors_mutex do
@@ -62,9 +75,10 @@ module Gruf
       ##
       # Insert an interceptor after another specified interceptor
       #
-      # @param [Gruf::Interceptors::Base] after_class The interceptor to insert after
-      # @param [Gruf::Interceptors::Base] interceptor_class The class of the interceptor to add
+      # @param [Class] after_class The interceptor to insert after
+      # @param [Class] interceptor_class The class of the interceptor to add
       # @param [Hash] options A hash of options to pass into the interceptor during initialization
+      # @raise [InterceptorNotFoundError] if the after interceptor is not found
       #
       def insert_after(after_class, interceptor_class, options = {})
         interceptors_mutex do
@@ -75,6 +89,17 @@ module Gruf
             klass: interceptor_class,
             options: options
           )
+        end
+      end
+
+      ##
+      # Return a list of the interceptor classes in the registry in their execution order
+      #
+      # @return [Array<Class>]
+      #
+      def list
+        interceptors_mutex do
+          @registry.map { |h| h[:klass] }
         end
       end
 

@@ -67,6 +67,16 @@ describe Gruf::Server do
         expect { subject }.to_not(change { gruf_server.instance_variable_get('@services').count })
       end
     end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
+    end
   end
 
   describe '.add_interceptor' do
@@ -84,6 +94,151 @@ describe Gruf::Server do
       i = is.first
       expect(i).to be_a(interceptor_class)
       expect(i.options).to eq options
+    end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
+    end
+  end
+
+  describe '.list_interceptors' do
+    let(:interceptor) { TestServerInterceptor }
+    subject { gruf_server.list_interceptors }
+
+    before do
+      Gruf.interceptors.clear
+      gruf_server.add_interceptor(interceptor)
+    end
+
+    it 'should return the current list of interceptors' do
+      expect(subject).to eq [interceptor]
+    end
+  end
+
+  describe '.insert_interceptor_before' do
+    let(:interceptor) { TestServerInterceptor }
+    let(:interceptor2) { TestServerInterceptor2 }
+
+    subject { gruf_server.insert_interceptor_before(interceptor, interceptor2) }
+
+    before do
+      Gruf.interceptors.clear
+      gruf_server.add_interceptor(interceptor)
+    end
+
+    it 'should add the new interceptor before the targeted one' do
+      expect { subject }.to_not raise_error
+      expect(gruf_server.list_interceptors).to eq [interceptor2, interceptor]
+    end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
+    end
+  end
+
+  describe '.insert_interceptor_after' do
+    let(:interceptor) { TestServerInterceptor }
+    let(:interceptor2) { TestServerInterceptor2 }
+    let(:interceptor3) { TestServerInterceptor3 }
+
+    subject { gruf_server.insert_interceptor_after(interceptor, interceptor3) }
+
+    before do
+      Gruf.interceptors.clear
+      gruf_server.add_interceptor(interceptor)
+      gruf_server.add_interceptor(interceptor2)
+    end
+
+    it 'should add the new interceptor after the targeted one' do
+      expect { subject }.to_not raise_error
+      expect(gruf_server.list_interceptors).to eq [interceptor, interceptor3, interceptor2]
+    end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
+    end
+  end
+
+  describe '.remove_interceptor' do
+    let(:interceptor) { TestServerInterceptor }
+    let(:interceptor2) { TestServerInterceptor2 }
+    let(:interceptor3) { TestServerInterceptor3 }
+    subject { gruf_server.remove_interceptor(interceptor) }
+
+    before do
+      Gruf.interceptors.clear
+      gruf_server.add_interceptor(interceptor2)
+      gruf_server.add_interceptor(interceptor3)
+    end
+
+    context 'when the interceptor is in the registry' do
+      before do
+        gruf_server.add_interceptor(interceptor)
+      end
+
+      it 'should remove the interceptor from the registry' do
+        expect { subject }.to_not raise_error
+        expect(gruf_server.list_interceptors.count).to eq 2
+      end
+    end
+
+    context 'when the interceptor is not in the registry' do
+      it 'should raise a InterceptorNotFoundError exception' do
+        expect { subject }.to raise_error(Gruf::Interceptors::Registry::InterceptorNotFoundError)
+      end
+    end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
+    end
+  end
+
+  describe '.clear_interceptors' do
+    let(:interceptor) { TestServerInterceptor }
+    subject { gruf_server.clear_interceptors }
+
+    before do
+      Gruf.interceptors.clear
+      gruf_server.add_interceptor(interceptor)
+    end
+
+    it 'should clear all interceptors from the registry' do
+      expect { subject }.to_not raise_error
+      expect(gruf_server.list_interceptors).to eq []
+    end
+
+    context 'if the server is already started' do
+      before do
+        gruf_server.instance_variable_set(:@started, true)
+      end
+
+      it 'should raise a ServerAlreadyStartedError exception' do
+        expect { subject }.to raise_error(Gruf::Server::ServerAlreadyStartedError)
+      end
     end
   end
 end

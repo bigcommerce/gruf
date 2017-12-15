@@ -97,6 +97,32 @@ describe Gruf::Interceptors::Registry do
     end
   end
 
+  describe '.remove' do
+    subject { registry.remove(interceptor_class) }
+
+    before do
+      registry.use(interceptor_class2)
+      registry.use(interceptor_class3)
+    end
+
+    context 'if the interceptor is in the registry' do
+      before do
+        registry.use(interceptor_class)
+      end
+
+      it 'should remove the interceptor from the registry' do
+        expect { subject }.not_to raise_error
+        expect(registry.count).to eq 2
+      end
+    end
+
+    context 'if the interceptor is not in the registry' do
+      it 'should raise an InterceptorNotFoundError exception' do
+        expect { subject }.to raise_error(described_class::InterceptorNotFoundError)
+      end
+    end
+  end
+
   describe '.clear' do
     subject { registry.clear }
 
