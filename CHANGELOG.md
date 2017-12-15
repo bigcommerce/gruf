@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- [#36], [#37] Adds `response_class`, `request_class`, and `service` accessors to controller request
+ 
 ### 2.0.3
 
 - Fix regression [#35] where gruf was not able to be loaded outside of a Rails application
