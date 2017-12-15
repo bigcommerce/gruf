@@ -41,11 +41,35 @@ describe ::Gruf::Controllers::Request do
     end
   end
 
+  describe '.service' do
+    subject { request.service }
+
+    it 'should return the service class name' do
+      expect(subject).to eq service
+    end
+  end
+
   describe '.method_name' do
     subject { request.method_name }
 
     it 'should return the translated service and method name' do
       expect(subject).to eq 'rpc.thing_service.get_thing'
+    end
+  end
+
+  describe '.request_class' do
+    subject { request.request_class }
+
+    it 'should return the gRPC request class' do
+      expect(subject).to eq Rpc::GetThingRequest
+    end
+  end
+
+  describe '.response_class' do
+    subject { request.response_class }
+
+    it 'should return the gRPC response class' do
+      expect(subject).to eq Rpc::GetThingResponse
     end
   end
 

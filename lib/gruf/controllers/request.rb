@@ -27,6 +27,8 @@ module Gruf
       attr_reader :method_key
       # @var [Gruf::Controllers::Request::Type] type
       attr_reader :type
+      # @var [Class] service
+      attr_reader :service
 
       delegate :metadata, to: :active_call
       delegate :messages, :client_streamer?, :server_streamer?, :bidi_streamer?, :request_response?, to: :type
@@ -54,6 +56,7 @@ module Gruf
         @service = service
         @active_call = active_call
         @message = message
+        @rpc_desc = rpc_desc
         @type = Type.new(rpc_desc)
       end
 
@@ -65,6 +68,20 @@ module Gruf
       #
       def service_key
         @service.name.underscore.tr('/', '.').gsub('.service', '')
+      end
+
+      ##
+      # @return [Class]
+      #
+      def response_class
+        @rpc_desc.output
+      end
+
+      ##
+      # @return [Class]
+      #
+      def request_class
+        @rpc_desc.input
       end
 
       ##
