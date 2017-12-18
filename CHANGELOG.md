@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.1.0
+
 - Add ability to list, clear, insert before, insert after, and remove to a server's interceptor
 registry
 - Ensure interceptors and services cannot be adjusted on the server after it starts to 
