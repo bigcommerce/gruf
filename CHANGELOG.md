@@ -2,8 +2,12 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add ability to list, clear, insert before, insert after, and remove to a server's interceptor
+registry
+- Ensure interceptors and services cannot be adjusted on the server after it starts to 
+prevent threading issues
 - [#36], [#37] Adds `response_class`, `request_class`, and `service` accessors to controller request
- 
+
 ### 2.0.3
 
 - Fix regression [#35] where gruf was not able to be loaded outside of a Rails application

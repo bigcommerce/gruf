@@ -239,6 +239,10 @@ Gruf.configure do |c|
 end
 ```
 
+By default, the ActiveRecord Connection Reset interceptor and Output Metadata Timing interceptor
+are loaded into gruf unless explicitly told not to via the `use_default_interceptors` configuration
+parameter.
+
 ## Instrumentation
 
 gruf comes out of the box with a couple of instrumentation interceptors packed in: 

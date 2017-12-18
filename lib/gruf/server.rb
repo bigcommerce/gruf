@@ -19,6 +19,8 @@ module Gruf
   # based on configuration values.
   #
   class Server
+    class ServerAlreadyStartedError < StandardError; end
+
     include Gruf::Loggable
 
     # @return [Integer] The port the server is bound to
@@ -36,6 +38,7 @@ module Gruf
       @interceptors = options.fetch(:interceptor_registry, Gruf.interceptors)
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
       @services = []
+      @started = false
       setup!
     end
 
@@ -58,9 +61,11 @@ module Gruf
     # rubocop:disable Lint/ShadowedException
     def start!
       logger.info { 'Booting gRPC Server...' }
+      @started = true
       server.run_till_terminated
     rescue Interrupt, SignalException, SystemExit
       logger.info { 'Shutting down gRPC server...' }
+      @started = false
       server.stop
     end
     # :nocov:
@@ -68,19 +73,68 @@ module Gruf
 
     ##
     # @param [Class] klass
+    # @raise [ServerAlreadyStartedError] if the server is already started
     #
     def add_service(klass)
+      raise ServerAlreadyStartedError if @started
       @services << klass unless @services.include?(klass)
     end
 
     ##
     # Add an interceptor to the server
     #
-    # @param [Gruf::Interceptors::Base]
-    # @param [Hash]
+    # @param [Class] klass The Interceptor to add to the registry
+    # @param [Hash] opts A hash of options for the interceptor
+    # @raise [ServerAlreadyStartedError] if the server is already started
     #
     def add_interceptor(klass, opts = {})
+      raise ServerAlreadyStartedError if @started
       @interceptors.use(klass, opts)
+    end
+
+    ##
+    # @param [Class] before_class The interceptor that you want to add the new interceptor before
+    # @param [Class] interceptor_class The Interceptor to add to the registry
+    # @param [Hash] options A hash of options for the interceptor
+    #
+    def insert_interceptor_before(before_class, interceptor_class, options = {})
+      raise ServerAlreadyStartedError if @started
+      @interceptors.insert_before(before_class, interceptor_class, options)
+    end
+
+    ##
+    # @param [Class] after_class The interceptor that you want to add the new interceptor after
+    # @param [Class] interceptor_class The Interceptor to add to the registry
+    # @param [Hash] options A hash of options for the interceptor
+    #
+    def insert_interceptor_after(after_class, interceptor_class, options = {})
+      raise ServerAlreadyStartedError if @started
+      @interceptors.insert_after(after_class, interceptor_class, options)
+    end
+
+    ##
+    # Return the current list of added interceptor classes
+    #
+    # @return [Array<Class>]
+    #
+    def list_interceptors
+      @interceptors.list
+    end
+
+    ##
+    # Remove an interceptor from the server
+    #
+    def remove_interceptor(klass)
+      raise ServerAlreadyStartedError if @started
+      @interceptors.remove(klass)
+    end
+
+    ##
+    # Clear the interceptor registry of interceptors
+    #
+    def clear_interceptors
+      raise ServerAlreadyStartedError if @started
+      @interceptors.clear
     end
 
     private
