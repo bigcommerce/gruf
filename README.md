@@ -8,17 +8,17 @@ provide a more streamlined integration into Ruby and Ruby on Rails applications.
 It provides an abstracted server and client for gRPC services, along with other tools to help get gRPC services in Ruby
 up fast and efficiently at scale. Some of its features include:
 
-* Abstracted controllers with request context support 
-* Full interceptors with timing and unified request context support 
+* Abstracted controllers with request context support
+* Full interceptors with timing and unified request context support
 * Robust client error handling and metadata transport abilities
 * Server authentication via interceptors, with basic auth with multiple key support built in
 * TLS support for client-server auth, though we recommend using [linkerd](https://linkerd.io/) instead
-* Error data serialization in output metadata to allow fine-grained error handling in the transport while 
+* Error data serialization in output metadata to allow fine-grained error handling in the transport while
   still preserving gRPC BadStatus codes
 * Server and client execution timings in responses
 
 gruf currently has active support for gRPC 1.4.x-1.8.x. gruf is compatible and tested with Ruby 2.2,
-2.3, and 2.4. gruf is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any 
+2.3, and 2.4. gruf is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any
 Ruby framework (such as [Grape](https://github.com/ruby-grape/grape), for instance).
 
 ## Installation
@@ -33,10 +33,26 @@ Then in an initializer or before use:
 require 'gruf'
 ```
 
-Make sure to review [UPGRADING.md](https://github.com/bigcommerce/gruf/blob/master/UPGRADING.md) 
+Make sure to review [UPGRADING.md](https://github.com/bigcommerce/gruf/blob/master/UPGRADING.md)
 if you are upgrading gruf between minor or major versions.
 
 ### Client
+
+Add an initializer:
+
+```ruby
+require 'gruf'
+
+Gruf.configure do |c|
+  c.default_client_host = 'grpc.service.com:9003'
+end
+```
+
+If you don't config `default_client_host`, you need do like this:
+
+```ruby
+client = ::Gruf::Client.new(service: ::Demo::ThingService, options: {hostname: 'grpc.service.com:9003'})
+```
 
 From there, you can instantiate a client given a stub service (say on an SslCertificates proto with a GetSslCertificate call):
 
@@ -68,7 +84,7 @@ Gruf.configure do |c|
 end
 ```
 
-Next, setup some handlers based on your proto configurations in `/app/rpc/`. For example, for the Thing service, with a 
+Next, setup some handlers based on your proto configurations in `/app/rpc/`. For example, for the Thing service, with a
 GetThingReq/GetThingResp call based on this proto:
 
 ```
@@ -96,13 +112,13 @@ You'd have this handler in `/app/rpc/demo/job_controller.rb`
 module Demo
   class JobController < ::Gruf::Controllers::Base
     bind ::Demo::Jobs::Service
-  
+
     ##
     # @return [Demo::GetJobResp] The job response
     #
     def get_job
       thing = Job.find(request.message.id)
-      
+
       Demo::GetJobResp.new(id: thing.id)
     rescue
       fail!(:not_found, :job_not_found, "Failed to find Job with ID: #{request.message.id}")
@@ -115,10 +131,13 @@ Finally, you can start the server by running:
 
     bundle exec gruf
 
+
 ### Basic Authentication
 
-Gruf comes packaged in with a Basic Authentication interceptor. It takes in an array of supported 
+Gruf comes packaged in with a Basic Authentication interceptor. It takes in an array of supported
 username and password pairs (or password-only credentials).
+
+In Server:
 
 ```ruby
 Gruf.configure do |c|
@@ -126,10 +145,10 @@ Gruf.configure do |c|
     Gruf::Interceptors::Authentication::Basic,
     credentials: [{
       username: 'my-username-here',
-      password: 'my-password-here',    
+      password: 'my-password-here',
     },{
       username: 'another-username',
-      password: 'another-password',    
+      password: 'another-password',
     },{
       password: 'a-password-only'
     }]
@@ -137,7 +156,25 @@ Gruf.configure do |c|
 end
 ```
 
-Supporting an array of credentials allow for unique credentials per service, or for easy credential 
+In Client:
+
+```ruby
+require 'gruf'
+
+id = args[:id].to_i.presence || 1
+
+options = {username: 'my-username-here', password: 'my-password-here'}
+
+begin
+  client = ::Gruf::Client.new(service: ::Demo::ThingService, options: options)
+  response = client.call(:GetMyThing, id: id)
+  puts response.message.inspect
+rescue Gruf::Client::Error => e
+  puts e.error.inspect
+end
+```
+
+Supporting an array of credentials allow for unique credentials per service, or for easy credential
 rotation with zero downtime.
 
 ### SSL Configuration
@@ -152,7 +189,7 @@ For the client, you'll need to point to the public certificate:
   service: Demo::ThingService,
   ssl_certificate: 'x509 public certificate here',
   # OR
-  ssl_certificate_file: '/path/to/my.crt' 
+  ssl_certificate_file: '/path/to/my.crt'
 )
 ```
 
@@ -169,10 +206,10 @@ end
 ## Server Interceptors
 
 gruf supports interceptors around the grpc server calls, allowing you to perform actions around your service
-method calls. This can be used to add tracing data, connection resets in the grpc thread pool, further 
+method calls. This can be used to add tracing data, connection resets in the grpc thread pool, further
 instrumentation, and other things.
 
-Adding a hook is as simple as creating a class that extends `Gruf::Interceptor::ServerInterceptor`, 
+Adding a hook is as simple as creating a class that extends `Gruf::Interceptor::ServerInterceptor`,
 and a `call` method that yields control to get the method result:
 
 ```ruby
@@ -197,7 +234,7 @@ class MyFailingInterceptor < ::Gruf::Interceptors::ServerInterceptor
     unless result.dont_hijack
       # we'll assume this "dont_hijack" attribute exists on the message for this example
       fail!(:internal, :hijacked, 'Hijack all the things!')
-    end 
+    end
     result
   end
 end
@@ -222,10 +259,10 @@ Gruf.configure do |c|
 end
 ```
 
-Interceptors each wrap the call and are run recursively within each other. This means that if you have 
-three interceptors - `Interceptor1`, `Interceptor2`, and `Interceptor3` - they will run in FIFO 
-(first in, first out) order. `Interceptor1` will run, yielding to `Interceptor2`, 
-which will then yield to `Interceptor3`, which will then yield to your service method call, 
+Interceptors each wrap the call and are run recursively within each other. This means that if you have
+three interceptors - `Interceptor1`, `Interceptor2`, and `Interceptor3` - they will run in FIFO
+(first in, first out) order. `Interceptor1` will run, yielding to `Interceptor2`,
+which will then yield to `Interceptor3`, which will then yield to your service method call,
 ending the chain.
 
 You can utilize the `insert_before` and `insert_after` methods to maintain order:
@@ -245,12 +282,12 @@ parameter.
 
 ## Instrumentation
 
-gruf comes out of the box with a couple of instrumentation interceptors packed in: 
-output metadata timings and StatsD support. 
+gruf comes out of the box with a couple of instrumentation interceptors packed in:
+output metadata timings and StatsD support.
 
 ### Output Metadata Timing
 
-Enabled by default, this will push timings for _successful responses_ through the response output 
+Enabled by default, this will push timings for _successful responses_ through the response output
 metadata back to the client.
 
 ### StatsD
@@ -271,7 +308,7 @@ This will measure counts and timings for each endpoint.
 
 ### Request Logging
 
-Gruf 1.2+ comes built with request logging out of the box; you'll get Rails-style logs with your 
+Gruf 1.2+ comes built with request logging out of the box; you'll get Rails-style logs with your
 gRPC calls:
 
 ```
@@ -282,7 +319,7 @@ I, [2017-07-14T09:51:03.299050 #70595]  INFO -- : {"message":"[GRPC::Ok] (thing_
  ```
 
 It supports formatters (including custom ones) that you can use to specify the formatting of the logging:
- 
+
 ```ruby
 Gruf.configure do |c|
   c.interceptors.use(
@@ -301,26 +338,28 @@ It comes with a few more options as well:
 | blacklist | An array of parameter key names to redact from logging, in path.to.key format | `[]` |
 | redacted_string | The string to use for redacted parameters. | `REDACTED` |
 
-It's important to maintain a safe blacklist should you decide to log parameters; gruf does no 
-parameter sanitization on its own. We also recommend blacklisting parameters that may contain 
+It's important to maintain a safe blacklist should you decide to log parameters; gruf does no
+parameter sanitization on its own. We also recommend blacklisting parameters that may contain
 very large values (such as binary or json data).
 
 ## Plugins
 
 You can build your own hooks and middleware for gruf; here's a list of known open source gems for
 gruf that you can use today:
- 
+
 * [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
 integration for gruf
 * [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Provides circuit breaker
 support for gruf services
-* [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage 
+* [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage
 reports for gruf services
 
 ## Demo Rails App
 
-There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can 
-view and clone that shows how to integrate Gruf into an existing Rails application. 
+There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can
+view and clone that shows how to integrate Gruf into an existing Rails application.
+
+And another demo [Rails_Communicate_Rails](https://github.com/pathbox/Rails_Communicate_Rails) This demo has tow Rails App, one is grpc client, another is grpc server. It is "say hello" example. It is very simple, but it make you know `gruf` quickly.
 
 ## Roadmap
 
@@ -341,17 +380,17 @@ Using gruf and want to show your support? Let us know and we'll add your name he
 
 ## License
 
-Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved 
+Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
-documentation files (the "Software"), to deal in the Software without restriction, including without limitation the 
-rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
 persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the 
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
 Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
-WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR 
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
