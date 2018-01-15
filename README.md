@@ -87,7 +87,7 @@ end
 Next, setup some handlers based on your proto configurations in `/app/rpc/`. For example, for the Thing service, with a
 GetThingReq/GetThingResp call based on this proto:
 
-```
+```proto
 syntax = "proto3";
 
 package demo;
@@ -129,8 +129,9 @@ end
 
 Finally, you can start the server by running:
 
-    bundle exec gruf
-
+```bash
+bundle exec gruf
+```
 
 ### Basic Authentication
 
@@ -351,17 +352,18 @@ You can build your own hooks and middleware for gruf; here's a list of known ope
 gruf that you can use today:
 
 * [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
-integration for gruf
-* [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Provides circuit breaker
-support for gruf services
+integration
+* [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Circuit breaker
+support for services
 * [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage
-reports for gruf services
+reports for clients and services
+* [gruf-commander](https://github.com/bigcommerce/gruf-commander) - Request/command-style validation and
+execution patterns for services
 
 ## Demo Rails App
 
 There is a [demonstration Rails application here](https://github.com/bigcommerce/gruf-demo) you can
 view and clone that shows how to integrate Gruf into an existing Rails application.
-
 
 ## Roadmap
 
