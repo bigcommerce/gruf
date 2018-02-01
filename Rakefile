@@ -136,14 +136,17 @@ namespace :gruf do
       end
     end
 
-    def gruf_demo_build_client(options = {})
+    def gruf_demo_build_client(options = {}, client_options = {})
       Gruf::Client.new(
         service: Rpc::ThingService,
         options: {
           hostname: ENV.fetch('HOST', '0.0.0.0:9001'),
           username: ENV.fetch('USERNAME', 'grpc'),
           password: ENV.fetch('PASSWORD', 'magic')
-        }.merge(options)
+        }.merge(options),
+        client_options: {
+          timeout: 5
+        }.merge(client_options)
       )
     end
   end

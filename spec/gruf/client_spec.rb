@@ -1,4 +1,3 @@
-# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -18,7 +17,8 @@ require 'spec_helper'
 
 describe Gruf::Client do
   let(:options) { {} }
-  let(:client) { described_class.new(service: Rpc::ThingService, options: options) }
+  let(:client_options) { {} }
+  let(:client) { described_class.new(service: Rpc::ThingService, options: options, client_options: client_options) }
 
   describe '#initialize' do
     subject { client }
@@ -39,6 +39,16 @@ describe Gruf::Client do
         end
         expect(subject).to be_a(Gruf::Client)
         expect(subject.opts[:hostname]).to eq 'test.dev'
+      end
+    end
+
+    context 'if client options are passed' do
+      let(:timeout) { 30 }
+      let(:client_options) { { timeout: timeout } }
+
+      it 'they should pass through to the client stub' do
+        expect(subject).to be_a(Gruf::Client)
+        expect(subject.timeout).to eq timeout
       end
     end
   end
