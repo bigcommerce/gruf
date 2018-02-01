@@ -66,14 +66,15 @@ module Gruf
     # @param [Hash] options A hash of options for the client
     # @option options [String] :password The password for basic authentication for the service.
     # @option options [String] :hostname The hostname of the service. Defaults to linkerd.
+    # @param [Hash] client_options A hash of options to pass to the gRPC client stub
     #
-    def initialize(service:, options: {})
+    def initialize(service:, options: {}, client_options: {})
       @base_klass = service
       @service_klass = "#{base_klass}::Service".constantize
       @opts = options || {}
       @opts[:password] = options.fetch(:password, '').to_s
       @opts[:hostname] = options.fetch(:hostname, Gruf.default_client_host)
-      client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials)
+      client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
       super(client)
     end
 
@@ -88,6 +89,7 @@ module Gruf
     # @return [Gruf::Response] The response from the server
     # @raise [Gruf::Client::Error|GRPC::BadStatus] If an error occurs, an exception will be raised according to the
     # error type that was returned
+    #
     def call(request_method, params = {}, metadata = {}, opts = {}, &block)
       request_method = request_method.to_sym
       req = streaming_request?(request_method) ? params : request_object(request_method, params)
@@ -106,6 +108,15 @@ module Gruf
     rescue StandardError => e
       Gruf.logger.error e.message
       raise
+    end
+
+    ##
+    # Returns the currently set timeout on the client stub
+    #
+    # @return [Integer|NilClass]
+    #
+    def timeout
+      __getobj__.instance_variable_get(:@timeout)
     end
 
     private

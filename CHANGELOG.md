@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.1.1
+
+- Add ability to pass in client stub options into Gruf::Client 
+
 ### 2.1.0
 
 - Add ability to list, clear, insert before, insert after, and remove to a server's interceptor
