@@ -21,10 +21,20 @@ describe Gruf::Server do
   let(:gruf_server) { described_class.new(options) }
   subject { gruf_server }
 
+  shared_context 'with stop thread mocked' do
+    let(:thread_mock) { double(Thread, join: nil) }
+
+    before do
+      allow(Thread).to receive(:new) { thread_mock }
+    end
+  end
+
   describe '#start!' do
-    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run_till_terminated: nil) }
+    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run: nil) }
 
     context 'when options passed' do
+      include_context 'with stop thread mocked'
+
       let(:options) { { pool_size: 1 } }
 
       it 'runs server with given configuration' do
@@ -34,18 +44,25 @@ describe Gruf::Server do
     end
 
     context 'when no options passed' do
+      include_context 'with stop thread mocked'
+
       it 'runs server with empty configuration' do
         expect(GRPC::RpcServer).to receive(:new).with({}).and_return(server_mock)
         gruf_server.start!
       end
     end
 
-    context 'when SignalException is raised' do
-      it 'rescues and stops gracefully' do
-        expect(GRPC::RpcServer).to receive(:new).and_return(server_mock)
-        expect(server_mock).to receive(:run_till_terminated) { raise SignalException.new(:TERM) }
-        expect(server_mock).to receive(:stop)
-        gruf_server.start!
+    context 'when TERM signal is received' do
+      it 'stops gracefully' do
+        server_thread = Thread.new do
+          srv = described_class.new
+          srv.server.handle(::Rpc::ThingService::Service)
+          srv.start!
+        end
+        sleep 3 # wait for a server to boot up
+        Process.kill('TERM', Process.pid)
+        server_thread.join
+        expect(server_thread.status).to be false # expect thread to exit normally
       end
     end
   end

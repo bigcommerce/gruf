@@ -39,7 +39,10 @@ module Gruf
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
       @services = []
       @started = false
-      setup!
+      @stop_server = false
+      @stop_server_cv = ConditionVariable.new
+      @stop_server_mu = Monitor.new
+      setup
     end
 
     ##
@@ -58,18 +61,25 @@ module Gruf
     # Start the gRPC server
     #
     # :nocov:
-    # rubocop:disable Lint/ShadowedException
     def start!
+      stop_server_thread = Thread.new do
+        loop do
+          break if @stop_server
+          @stop_server_mu.synchronize { @stop_server_cv.wait(@stop_server_mu, 10) }
+        end
+        logger.info { 'Shutting down...' }
+        server.stop
+      end
+
       logger.info { 'Booting gRPC Server...' }
       @started = true
-      server.run_till_terminated
-    rescue Interrupt, SignalException, SystemExit
-      logger.info { 'Shutting down gRPC server...' }
+      server.run
+      stop_server_thread.join
       @started = false
-      server.stop
+
+      logger.info { 'Goodbye!' }
     end
     # :nocov:
-    # rubocop:enable Lint/ShadowedException
 
     ##
     # @param [Class] klass
@@ -140,10 +150,39 @@ module Gruf
     private
 
     ##
+    # Setup server
+    #
+    # :nocov:
+    def setup
+      setup_signal_handlers
+      load_controllers
+    end
+    # :nocov:
+
+    ##
+    # Register signal handlers
+    #
+    # :nocov:
+    def setup_signal_handlers
+      Thread.abort_on_exception = true
+
+      Signal.trap('INT') do
+        @stop_server = true
+        @stop_server_cv.broadcast
+      end
+
+      Signal.trap('TERM') do
+        @stop_server = true
+        @stop_server_cv.broadcast
+      end
+    end
+    # :nocov:
+
+    ##
     # Auto-load all gRPC handlers
     #
     # :nocov:
-    def setup!
+    def load_controllers
       return unless File.directory?(controllers_path)
       path = File.realpath(controllers_path)
       $LOAD_PATH.unshift(path)
