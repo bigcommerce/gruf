@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.2.0
+
+- Run server in a monitored thread to allow for trapped exits on sigints
+
 ### 2.1.1
 
 - Add ability to pass in client stub options into Gruf::Client 
