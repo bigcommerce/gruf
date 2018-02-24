@@ -42,6 +42,7 @@ module Gruf
       @stop_server = false
       @stop_server_cv = ConditionVariable.new
       @stop_server_mu = Monitor.new
+      @server_mu = Monitor.new
       setup
     end
 
@@ -49,12 +50,14 @@ module Gruf
     # @return [GRPC::RpcServer] The GRPC server running
     #
     def server
-      unless @server
-        @server = GRPC::RpcServer.new(options)
-        @port = @server.add_http2_port(options.fetch(:hostname, Gruf.server_binding_url), ssl_credentials)
-        @services.each { |s| @server.handle(s) }
+      @server_mu.synchronize do
+        @server ||= begin
+          server = GRPC::RpcServer.new(options)
+          @port = server.add_http2_port(options.fetch(:hostname, Gruf.server_binding_url), ssl_credentials)
+          @services.each { |s| server.handle(s) }
+          server
+        end
       end
-      @server
     end
 
     ##
@@ -62,6 +65,13 @@ module Gruf
     #
     # :nocov:
     def start!
+      update_proc_title(:starting)
+
+      server_thread = Thread.new do
+        logger.info { 'Booting gRPC Server...' }
+        server.run
+      end
+
       stop_server_thread = Thread.new do
         loop do
           break if @stop_server
@@ -71,12 +81,14 @@ module Gruf
         server.stop
       end
 
-      logger.info { 'Booting gRPC Server...' }
+      server.wait_till_running
       @started = true
-      server.run
+      update_proc_title(:serving)
       stop_server_thread.join
+      server_thread.join
       @started = false
 
+      update_proc_title(:stopped)
       logger.info { 'Goodbye!' }
     end
     # :nocov:
@@ -216,6 +228,17 @@ module Gruf
       else
         :this_port_is_insecure
       end
+    end
+    # :nocov:
+
+    ##
+    # Updates proc name/title
+    #
+    # @param [Symbol] state
+    #
+    # :nocov:
+    def update_proc_title(state)
+      Process.setproctitle("gruf #{Gruf::VERSION} -- #{state}")
     end
     # :nocov:
   end

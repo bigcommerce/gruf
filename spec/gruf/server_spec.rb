@@ -30,7 +30,7 @@ describe Gruf::Server do
   end
 
   describe '#start!' do
-    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run: nil) }
+    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run: nil, wait_till_running: nil) }
 
     context 'when options passed' do
       include_context 'with stop thread mocked'
@@ -98,8 +98,8 @@ describe Gruf::Server do
 
   describe '.add_interceptor' do
     let(:interceptor_class) { TestServerInterceptor }
-    let(:options) { { foo: 'bar' } }
-    subject { gruf_server.add_interceptor(interceptor_class, options) }
+    let(:interceptor_options) { { foo: 'bar' } }
+    subject { gruf_server.add_interceptor(interceptor_class, interceptor_options) }
 
     before do
       Gruf.interceptors.clear
@@ -110,7 +110,7 @@ describe Gruf::Server do
       is = gruf_server.instance_variable_get('@interceptors').prepare(nil, nil)
       i = is.first
       expect(i).to be_a(interceptor_class)
-      expect(i.options).to eq options
+      expect(i.options).to eq interceptor_options
     end
 
     context 'if the server is already started' do
