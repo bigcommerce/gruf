@@ -34,16 +34,16 @@ module Gruf
     ##
     # Initialize a response object with the given gRPC operation
     #
-    # @param [GRPC::ActiveCall::Operation] op The given operation for the current call
+    # @param [GRPC::ActiveCall::Operation] operation The given operation for the current call
     # @param [Float] execution_time The amount of time that the response took to occur
     #
-    def initialize(op, execution_time = nil)
-      @operation = op
-      @message = op.execute
-      @metadata = op.metadata
-      @trailing_metadata = op.trailing_metadata
-      @deadline = op.deadline
-      @cancelled = op.cancelled?
+    def initialize(operation, execution_time = nil)
+      @operation = operation
+      @message = operation.execute
+      @metadata = operation.metadata
+      @trailing_metadata = operation.trailing_metadata
+      @deadline = operation.deadline
+      @cancelled = operation.cancelled?
       @execution_time = execution_time || 0.0
     end
 
@@ -53,7 +53,7 @@ module Gruf
     # @return [Object] The protobuf response message
     #
     def message
-      @message ||= op.execute
+      @message ||= @operation.execute
     end
 
     ##

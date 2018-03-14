@@ -135,13 +135,13 @@ module Gruf
     #
     # @param [Symbol] call_sig The call signature being executed
     # @param [Object] req (Optional) The protobuf request message to send
-    # @param [Hash] md (Optional) A hash of metadata key/values that are transported with the client request
+    # @param [Hash] metadata (Optional) A hash of metadata key/values that are transported with the client request
     # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
     #
-    def execute(call_sig, req, md, opts = {}, &block)
+    def execute(call_sig, req, metadata, opts = {}, &block)
       Timer.time do
         opts[:return_op] = true
-        opts[:metadata] = md
+        opts[:metadata] = metadata
         send(call_sig, req, opts, &block)
       end
     end

@@ -112,10 +112,11 @@ module Gruf
     ##
     # Ensure all metadata values are strings as HTTP/2 requires string values for transport
     #
+    # @param [Hash] metadata The existing metadata hash
     # @return [Hash] The newly set metadata
     #
-    def metadata=(md)
-      @metadata = md.map { |k, str| [k, str.to_s] }.to_h
+    def metadata=(metadata)
+      @metadata = metadata.map { |k, str| [k, str.to_s] }.to_h
     end
 
     ##
