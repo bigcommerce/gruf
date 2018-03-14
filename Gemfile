@@ -18,7 +18,7 @@ source 'https://rubygems.org'
 gemspec
 
 group :development, :test do
-  gem 'factory_girl'
+  gem 'factory_bot'
   gem 'ffaker'
   gem 'pry-byebug'
   gem 'rubocop', '~> 0.51'
