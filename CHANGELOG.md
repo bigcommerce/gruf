@@ -2,9 +2,14 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.2.1
+
+- Now changes proc title once server is ready to process incoming requests [#44] 
+- Gruf now requires gRPC 1.10.x+ due to various fixes and improvements in the gRPC core libraries
+
 ### 2.2.0
 
-- Run server in a monitored thread to allow for trapped exits on sigints
+- Run server in a monitored thread to allow for trapped exits on sigints [#43]
 
 ### 2.1.1
 
