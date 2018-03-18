@@ -39,6 +39,15 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         expect(Gruf.logger).to receive(:info).once
         subject
       end
+
+      context 'with ignore_methods set' do
+        let(:options) { { ignore_methods: %w[rpc.thing_service.get_thing] } }
+
+        it 'shouldn\'t log the call' do
+          expect(Gruf.logger).not_to receive(:info)
+          subject
+        end
+      end
     end
 
     context 'and the request was a failure' do

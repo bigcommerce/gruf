@@ -341,6 +341,7 @@ It comes with a few more options as well:
 | log_parameters | If set to true, will log parameters in the response | `false` |
 | blacklist | An array of parameter key names to redact from logging, in path.to.key format | `[]` |
 | redacted_string | The string to use for redacted parameters. | `REDACTED` |
+| ignore_methods | An array of method names to ignore from logging. E.g. `['namespace.health.check']` | `[]` |
 
 It's important to maintain a safe blacklist should you decide to log parameters; gruf does no
 parameter sanitization on its own. We also recommend blacklisting parameters that may contain
