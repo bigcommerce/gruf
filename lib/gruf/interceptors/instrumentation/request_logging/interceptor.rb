@@ -43,6 +43,8 @@ module Gruf
           # @return [String]
           #
           def call
+            return yield if options.fetch(:ignore_methods, []).include?(request.method_name)
+
             result = Gruf::Interceptors::Timer.time do
               yield
             end
