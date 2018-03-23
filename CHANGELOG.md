@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.2.2
+
+- Added ignore_methods option for RequestLogging interceptor [#45]
+
 ### 2.2.1
 
 - Now changes proc title once server is ready to process incoming requests [#44] 
