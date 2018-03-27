@@ -31,6 +31,7 @@ require_relative 'gruf/response'
 require_relative 'gruf/error'
 require_relative 'gruf/client'
 require_relative 'gruf/server'
+require_relative 'gruf/cli'
 
 ##
 # Initializes configuration of gruf core module
