@@ -40,7 +40,7 @@ module Gruf
         files_to_reopen << file unless file.closed?
       end
 
-      ::Process.daemon(true, true)
+      ::Process.daemon
 
       files_to_reopen.each do |file|
         begin
