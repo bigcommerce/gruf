@@ -23,9 +23,10 @@ module Gruf
         server = Gruf::Server.new(Gruf.server_options)
         Gruf.services.each { |s| server.add_service(s) }
         server.start!
+        exit 0
       rescue Interrupt
         Gruf.logger.info 'Shutting down'
-        exit(0)
+        exit 0
       end
     end
 
