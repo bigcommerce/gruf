@@ -72,6 +72,39 @@ end
 
 Note this returns a response object. The response object can provide `trailing_metadata` as well as a `execution_time`.
 
+### Client Interceptors
+
+Gruf comes with an assistance class for client interceptors that you can use - or you can use the native gRPC core
+interceptors. Either way, you pass them into the client_options when creating a client:
+
+```ruby
+class MyInterceptor < Gruf::Interceptors::ClientInterceptor
+  def call(request_context:)
+    logger.info "Got method #{request_context.method}!"
+    yield
+  end
+end
+
+::Gruf::Client.new(
+  service: ::Demo::ThingService, 
+  client_options: [
+    interceptors: [MyInterceptor.new]
+  ])
+```
+
+The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a 
+`Gruf::Interceptors::ClientInterceptor`, since the latter just extends the former. The gruf client interceptors
+take an optional alternative approach: rather than having separate methods for each request type, it provides a default
+`call` method that passes in a `RequestContext` object, which has the following attributes:
+
+* *type* - A Symbol of the type of request (`request_response`, `server_streamer`, etc)
+* *requests* An enumerable of requests being sent. For unary requests, this is a single request in an array
+* *call* - The `GRPC::ActiveCall` object
+* *method* - The Method being called
+* *metadata* - The hash of outgoing metadata
+
+Note that you _must_ yield back the block when building a client interceptor, so that the call can be executed.
+
 ### Server
 
 Add an initializer:
@@ -385,12 +418,9 @@ view and clone that shows how to integrate Gruf into an existing Rails applicati
 
 ### Gruf 3.0
 
-* Utilize the new core Ruby interceptors in gRPC 1.7
-* Support client interceptors
 * Change configuration to an injectable object to ensure thread safety on chained server/client interactions
 * Move all references to `Gruf.` configuration into injectable parameters
 * Redo server configuration to be fully injectable
-* Move client calls to their native method implementation
 
 ## Companies Using Gruf
 

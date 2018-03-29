@@ -2,6 +2,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add Gruf::Interceptors::ClientInterceptor for intercepting outbound client calls
 - Add command-line arguments to the gruf binstub
 - Add ability to specify server hostname via CLI argument
 

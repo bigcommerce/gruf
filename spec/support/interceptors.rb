@@ -54,3 +54,17 @@ class TestServerInterceptorInstanceVar < ::Gruf::Interceptors::ServerInterceptor
     yield
   end
 end
+
+##########################################################################################
+# Client Interceptors
+##########################################################################################
+
+class TestClientInterceptor < Gruf::Interceptors::ClientInterceptor
+  def call(request_context:)
+    timed = Gruf::Timer.time do
+      yield
+    end
+    logger.info "Got response from server in client interceptor #{request_context.route_key} of type #{request_context.type}: #{timed.time.to_f.round(2)}ms"
+    timed.result
+  end
+end

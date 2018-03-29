@@ -16,36 +16,51 @@
 module Gruf
   module Interceptors
     ##
-    # Base class for interception requests
-    #
-    class Base
-      # @var [Gruf::Controllers::Request] request
-      attr_reader :request
-      # @var [Gruf::Error] error
-      attr_reader :error
-      # @var [Hash] options
-      attr_reader :options
+    # Represents
+    class RequestContext
+      # @var [Symbol]
+      attr_reader :type
+      # @var [Enumerable] requests
+      attr_reader :requests
+      # @var [GRPC::ActiveCall]
+      attr_reader :call
+      # @var [Method] method
+      attr_reader :method
+      # @var [Hash] metadata
+      attr_reader :metadata
 
       ##
-      # @param [Gruf::Controllers::Request] request
-      # @param [Gruf::Error] error
-      # @param [Hash] options
+      # @param [Symbol] type The type of request
+      # @param [Enumerable] requests An enumerable of requests being sent
+      # @param [GRPC::ActiveCall] call The GRPC ActiveCall object
+      # @param [Method] method The method being called
+      # @param [Hash] metadata A hash of outgoing metadata
       #
-      def initialize(request, error, options = {})
-        @request = request
-        @error = error
-        @options = options || {}
+      def initialize(type:, requests:, call:, method:, metadata:)
+        @type = type
+        @requests = requests
+        @call = call
+        @method = method
+        @metadata = metadata
+      end
+
+      ##
+      # Return the name of the method being called, e.g. GetThing
+      #
+      # @return [String]
+      #
+      def method_name
+        @method.to_s.split('/').last
+      end
+
+      ##
+      # Return the proper routing key for the request
+      #
+      # @return [String]
+      #
+      def route_key
+        @method[1..-1].underscore.tr('/', '.')
       end
     end
   end
 end
-
-require_relative 'client_interceptor'
-require_relative 'server_interceptor'
-require_relative 'context'
-require_relative 'timer'
-require_relative 'active_record/connection_reset'
-require_relative 'authentication/basic'
-require_relative 'instrumentation/statsd'
-require_relative 'instrumentation/output_metadata_timer'
-require_relative 'instrumentation/request_logging/interceptor'

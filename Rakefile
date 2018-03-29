@@ -18,13 +18,15 @@ require 'rspec/core/rake_task'
 require 'ffaker'
 RSpec::Core::RakeTask.new(:spec)
 task default: :spec
+require 'gruf'
+
 
 def gruf_rake_configure_rpc!
   require 'pry'
-  require 'gruf'
   $LOAD_PATH.unshift File.expand_path('../spec/pb', __FILE__)
   require File.realpath("#{File.dirname(__FILE__)}/spec/support/grpc.rb")
   require File.realpath("#{File.dirname(__FILE__)}/spec/support/serializers/proto.rb")
+  require File.realpath("#{File.dirname(__FILE__)}/spec/support/interceptors.rb")
 
   Gruf.configure do |c|
     c.error_serializer = Serializers::Proto
@@ -39,7 +41,7 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetThing, id: rand(100_000))
-        puts "#{op.message.inspect} in #{op.execution_time}ms"
+        puts "#{op.message.inspect}"
       rescue Gruf::Client::Error => e
         puts e.error.to_h
       end
@@ -50,7 +52,6 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         resp = rpc_client.call(:GetThings)
-        puts "Executed in #{resp.execution_time}ms"
         resp.message.each do |thing|
           puts thing.inspect
         end
@@ -68,7 +69,7 @@ namespace :gruf do
         end
         rpc_client = gruf_demo_build_client
         resp = rpc_client.call(:CreateThings, things)
-        puts "#{resp.message.inspect} in #{resp.execution_time}ms"
+        puts "#{resp.message.inspect}"
       rescue Gruf::Client::Error => e
         puts e.error.to_h
       end
@@ -83,7 +84,6 @@ namespace :gruf do
         end
         rpc_client = gruf_demo_build_client
         resp = rpc_client.call(:CreateThingsInStream, things)
-        puts "Executed in #{resp.execution_time}ms"
         resp.message.each do |thing|
           puts thing.inspect
         end
@@ -145,7 +145,8 @@ namespace :gruf do
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),
         client_options: {
-          timeout: 5
+          timeout: 5,
+          interceptors: [TestClientInterceptor.new]
         }.merge(client_options)
       )
     end

@@ -13,39 +13,38 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Interceptors
-    ##
-    # Base class for interception requests
-    #
-    class Base
-      # @var [Gruf::Controllers::Request] request
-      attr_reader :request
-      # @var [Gruf::Error] error
-      attr_reader :error
-      # @var [Hash] options
-      attr_reader :options
+require 'spec_helper'
 
-      ##
-      # @param [Gruf::Controllers::Request] request
-      # @param [Gruf::Error] error
-      # @param [Hash] options
-      #
-      def initialize(request, error, options = {})
-        @request = request
-        @error = error
-        @options = options || {}
-      end
+describe Gruf::Interceptors::RequestContext do
+  let(:type) { :request_response }
+  let(:requests) { [Rpc::GetThingRequest.new] }
+  let(:call) { double(:call, output_metadata: {}) }
+  let(:grpc_method) { '/rpc.ThingService/GetThing' }
+  let(:metadata) { { foo: 'bar' } }
+  let(:request_context) do
+    described_class.new(
+      type: type,
+      requests: requests,
+      call: call,
+      method: grpc_method,
+      metadata: metadata
+    )
+  end
+
+  describe '.method_name' do
+    subject { request_context.method_name }
+
+    it 'should parse out the method name' do
+      expect(subject).to eq 'GetThing'
+    end
+
+  end
+
+  describe '.route_key' do
+    subject { request_context.route_key }
+
+    it 'should return a friendly routing key' do
+      expect(subject).to eq 'rpc.thing_service.get_thing'
     end
   end
 end
-
-require_relative 'client_interceptor'
-require_relative 'server_interceptor'
-require_relative 'context'
-require_relative 'timer'
-require_relative 'active_record/connection_reset'
-require_relative 'authentication/basic'
-require_relative 'instrumentation/statsd'
-require_relative 'instrumentation/output_metadata_timer'
-require_relative 'instrumentation/request_logging/interceptor'
