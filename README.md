@@ -133,6 +133,21 @@ Finally, you can start the server by running:
 bundle exec gruf
 ```
 
+### Command-Line Options
+
+Gruf comes baked in with a few command-line options for the binstub:
+
+| Option | Description |
+| ------ | ----------- |
+| -h, --help | Displays the help message |
+| -v, --version | Displays the gruf version |
+| --host | Specify the server binding host |
+| --suppress-default-interceptors | Do not use the default interceptors for the server |
+| --backtrace-on-error | Push backtraces on exceptions to the error serializer |
+
+These options will override whatever is passed in the Gruf configure block or 
+initializer. 
+
 ### Basic Authentication
 
 Gruf comes packaged in with a Basic Authentication interceptor. It takes in an array of supported
