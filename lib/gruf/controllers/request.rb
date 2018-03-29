@@ -33,11 +33,16 @@ module Gruf
       delegate :metadata, to: :active_call
       delegate :messages, :client_streamer?, :server_streamer?, :bidi_streamer?, :request_response?, to: :type
 
+      ##
+      # Abstract representation of a gRPC request type
+      #
       class Type
         delegate :client_streamer?, :server_streamer?, :bidi_streamer?, :request_response?, to: :@rpc_desc
 
         ##
-        # @param [GRPC::RpcDesc] rpc_desc
+        # Initialize a new request type object
+        #
+        # @param [GRPC::RpcDesc] rpc_desc The RPC descriptor for the request type
         #
         def initialize(rpc_desc)
           @rpc_desc = rpc_desc
@@ -45,6 +50,8 @@ module Gruf
       end
 
       ##
+      # Initialize an inbound controller request object
+      #
       # @param [Symbol] method_key The method symbol of the RPC method being executed
       # @param [Class] service The class of the service being executed against
       # @param [GRPC::RpcDesc] rpc_desc The RPC descriptor of the call
@@ -64,21 +71,21 @@ module Gruf
       # Returns the service name as a translated name separated by periods. Strips
       # the superfluous "Service" suffix from the name
       #
-      # @return [String]
+      # @return [String] The mapped service key
       #
       def service_key
         @service.name.underscore.tr('/', '.').gsub('.service', '')
       end
 
       ##
-      # @return [Class]
+      # @return [Class] The class of the response message
       #
       def response_class
         @rpc_desc.output
       end
 
       ##
-      # @return [Class]
+      # @return [Class] The class of the request message
       #
       def request_class
         @rpc_desc.input
@@ -96,7 +103,7 @@ module Gruf
       ##
       # Return all messages for this request, properly handling different request types
       #
-      # @return Enumerable<Object>
+      # @return Enumerable<Object> All messages for this request
       #
       def messages
         if client_streamer?

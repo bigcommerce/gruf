@@ -15,7 +15,7 @@
 #
 require 'spec_helper'
 
-describe Gruf::Interceptors::RequestContext do
+describe Gruf::Outbound::RequestContext do
   let(:type) { :request_response }
   let(:requests) { [Rpc::GetThingRequest.new] }
   let(:call) { double(:call, output_metadata: {}) }

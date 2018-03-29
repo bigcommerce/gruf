@@ -13,8 +13,6 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require_relative 'request_context'
-
 module Gruf
   module Interceptors
     ##
@@ -24,7 +22,9 @@ module Gruf
       include Gruf::Loggable
 
       ##
-      # @param [Gruf::Interceptors::RequestContext] request_context The context of the outbound request
+      # Handles interception of outbound calls. Implement this in your derivative interceptor implementation.
+      #
+      # @param [Gruf::Outbound::RequestContext] request_context The context of the outbound request
       # @return [Object] This method must return the response from the yielded block
       #
       def call(request_context:)
@@ -39,9 +39,10 @@ module Gruf
       # @param [GRPC::ActiveCall] call The GRPC ActiveCall object
       # @param [Method] method The method being called
       # @param [Hash] metadata A hash of outgoing metadata
+      # @return [Object] The response message
       #
       def request_response(request: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Interceptors::RequestContext.new(type: :request_response, requests: [request], call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(type: :request_response, requests: [request], call: call, method: method, metadata: metadata)
         call(request_context: rc) do
           yield
         end
@@ -54,9 +55,10 @@ module Gruf
       # @param [GRPC::ActiveCall] call The GRPC ActiveCall object
       # @param [Method] method The method being called
       # @param [Hash] metadata A hash of outgoing metadata
+      # @return [Object] The response message
       #
       def client_streamer(requests: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Interceptors::RequestContext.new(type: :client_streamer, requests: requests, call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(type: :client_streamer, requests: requests, call: call, method: method, metadata: metadata)
         call(request_context: rc) do
           yield
         end
@@ -69,9 +71,10 @@ module Gruf
       # @param [GRPC::ActiveCall] call The GRPC ActiveCall object
       # @param [Method] method The method being called
       # @param [Hash] metadata A hash of outgoing metadata
+      # @return [Object] The response message
       #
       def server_streamer(request: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Interceptors::RequestContext.new(type: :server_streamer, requests: [request], call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(type: :server_streamer, requests: [request], call: call, method: method, metadata: metadata)
         call(request_context: rc) do
           yield
         end
@@ -86,7 +89,7 @@ module Gruf
       # @param [Hash] metadata A hash of outgoing metadata
       #
       def bidi_streamer(requests: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Interceptors::RequestContext.new(type: :bidi_streamer, requests: requests, call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(type: :bidi_streamer, requests: requests, call: call, method: method, metadata: metadata)
         call(request_context: rc) do
           yield
         end

@@ -14,9 +14,10 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 module Gruf
-  module Interceptors
+  module Outbound
     ##
-    # Represents
+    # Encapsulates the context of an outbound client request
+    #
     class RequestContext
       # @var [Symbol]
       attr_reader :type
@@ -30,6 +31,8 @@ module Gruf
       attr_reader :metadata
 
       ##
+      # Initialize the new request context
+      #
       # @param [Symbol] type The type of request
       # @param [Enumerable] requests An enumerable of requests being sent
       # @param [GRPC::ActiveCall] call The GRPC ActiveCall object

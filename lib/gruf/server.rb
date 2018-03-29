@@ -95,6 +95,8 @@ module Gruf
     # :nocov:
 
     ##
+    # Add a gRPC service stub to be served by gruf
+    #
     # @param [Class] klass
     # @raise [ServerAlreadyStartedError] if the server is already started
     #
@@ -116,6 +118,8 @@ module Gruf
     end
 
     ##
+    # Insert an interceptor before another in the currently registered order of execution
+    #
     # @param [Class] before_class The interceptor that you want to add the new interceptor before
     # @param [Class] interceptor_class The Interceptor to add to the registry
     # @param [Hash] options A hash of options for the interceptor
@@ -126,6 +130,8 @@ module Gruf
     end
 
     ##
+    # Insert an interceptor after another in the currently registered order of execution
+    #
     # @param [Class] after_class The interceptor that you want to add the new interceptor after
     # @param [Class] interceptor_class The Interceptor to add to the registry
     # @param [Hash] options A hash of options for the interceptor
@@ -146,6 +152,8 @@ module Gruf
 
     ##
     # Remove an interceptor from the server
+    #
+    # @param [Class] klass
     #
     def remove_interceptor(klass)
       raise ServerAlreadyStartedError if @started

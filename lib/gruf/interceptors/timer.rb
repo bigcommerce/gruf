@@ -26,6 +26,11 @@ module Gruf
         attr_reader :message
         attr_reader :elapsed
 
+        ##
+        # @param [Object] message The protobuf message
+        # @param [Float] elapsed The elapsed time of the request
+        # @param [Boolean] successful If the request was successful
+        #
         def initialize(message, elapsed, successful)
           @message = message
           @elapsed = elapsed.to_f

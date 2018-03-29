@@ -25,14 +25,18 @@ module Gruf
       class BoundDesc < SimpleDelegator; end
 
       ##
-      # @param [GRPC::GenericService] service
+      # Initialize a service binder instance with the given service
+      #
+      # @param [GRPC::GenericService] service The gRPC service stub to bind
       #
       def initialize(service)
         @service = service
       end
 
       ##
-      # @param [Gruf::Controllers::Base]
+      # Bind all methods on the service to the passed controller
+      #
+      # @param [Gruf::Controllers::Base] controller
       #
       def bind!(controller)
         rpc_methods.each { |name, desc| bind_method(controller, name, desc) }
@@ -41,6 +45,8 @@ module Gruf
       private
 
       ##
+      # Bind the grpc methods to the service, allowing for server interception and execution control
+      #
       # @param [Gruf::Controllers::Base] controller
       # @param [Symbol] method_name
       # @param [BoundDesc] desc

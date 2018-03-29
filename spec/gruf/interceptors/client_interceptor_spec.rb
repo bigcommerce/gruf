@@ -24,7 +24,7 @@ describe Gruf::Interceptors::ClientInterceptor do
   let(:grpc_method) { '/rpc.ThingService/GetThing' }
   let(:metadata) { { foo: 'bar' } }
   let(:request_context) do
-    Gruf::Interceptors::RequestContext.new(
+    Gruf::Outbound::RequestContext.new(
       type: type,
       requests: requests,
       call: call,
@@ -32,7 +32,6 @@ describe Gruf::Interceptors::ClientInterceptor do
       metadata: metadata
     )
   end
-
 
   describe 'interception' do
     context 'for a request_response call' do

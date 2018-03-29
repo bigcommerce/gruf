@@ -32,11 +32,11 @@ module Gruf
       ##
       # Initialize the controller within the given request context
       #
-      # @param [Symbol] method_key
-      # @param [GRPC::GenericService] service
-      # @param [GRPC::RpcDesc] rpc_desc
-      # @param [GRPC::ActiveCall] active_call
-      # @param [Google::Protobuf::MessageExts] message
+      # @param [Symbol] method_key The gRPC method that this controller relates to
+      # @param [GRPC::GenericService] service The gRPC service stub for this controller
+      # @param [GRPC::RpcDesc] rpc_desc The RPC descriptor for this service method
+      # @param [GRPC::ActiveCall] active_call The gRPC ActiveCall object
+      # @param [Google::Protobuf::MessageExts] message The incoming protobuf request message
       #
       def initialize(method_key:, service:, rpc_desc:, active_call:, message:)
         @request = Request.new(
@@ -53,7 +53,7 @@ module Gruf
       ##
       # Bind the controller to the given service and add it to the service registry
       #
-      # @param [GRPC::GenericService] service
+      # @param [GRPC::GenericService] service The name of the service to bind this controller to
       #
       def self.bind(service)
         Gruf.services << service.name.constantize
@@ -63,7 +63,8 @@ module Gruf
       ##
       # Call a method on this controller
       #
-      # @param [Symbol] method_key
+      # @param [Symbol] method_key The name of the gRPC service method being called as a Symbol
+      # @param [block] &block The passed block for executing the method
       #
       def call(method_key, &block)
         Interceptors::Context.new(@interceptors).intercept! do

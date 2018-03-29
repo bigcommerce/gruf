@@ -15,6 +15,9 @@
 #
 module Gruf
   module Errors
+    ##
+    # Helper module for standardizing error interaction
+    #
     module Helpers
       delegate :add_field_error, :set_debug_info, :has_field_errors?, to: :error
 

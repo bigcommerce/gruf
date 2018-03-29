@@ -36,7 +36,7 @@ module Gruf
       ##
       # Return this object marshalled into a hash
       #
-      # @return [Hash] The debug info represented as a has
+      # @return [Hash] The debug info represented as a hash
       #
       def to_h
         {
