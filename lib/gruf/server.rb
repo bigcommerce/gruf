@@ -43,6 +43,7 @@ module Gruf
       @stop_server_cv = ConditionVariable.new
       @stop_server_mu = Monitor.new
       @server_mu = Monitor.new
+      @hostname = options.fetch(:hostname, Gruf.server_binding_url)
       setup
     end
 
@@ -53,7 +54,7 @@ module Gruf
       @server_mu.synchronize do
         @server ||= begin
           server = GRPC::RpcServer.new(options)
-          @port = server.add_http2_port(options.fetch(:hostname, Gruf.server_binding_url), ssl_credentials)
+          @port = server.add_http2_port(@hostname, ssl_credentials)
           @services.each { |s| server.handle(s) }
           server
         end
@@ -68,7 +69,7 @@ module Gruf
       update_proc_title(:starting)
 
       server_thread = Thread.new do
-        logger.info { 'Booting gRPC Server...' }
+        logger.info { "Starting gruf server at #{@hostname}..." }
         server.run
       end
 

@@ -37,6 +37,7 @@ class FakeStats
 end
 
 Gruf.configure do |c|
+  c.server_binding_url = 'localhost:9001'
   c.error_serializer = Serializers::Proto
   c.backtrace_on_error = true
   c.interceptors.use(
@@ -59,12 +60,7 @@ Gruf.configure do |c|
   c.interceptors.use(Gruf::Interceptors::ActiveRecord::ConnectionReset)
 end
 Gruf.logger = Logger.new(STDOUT)
+Gruf.services << ::Rpc::ThingService::Service
 
-begin
-  server = Gruf::Server.new
-  server.add_service(::Rpc::ThingService::Service)
-  server.start!
-rescue => e
-  puts e.message
-  puts e.backtrace.join("\n")
-end
+cli = Gruf::Cli::Executor.new
+cli.run

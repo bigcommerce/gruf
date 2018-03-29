@@ -2,9 +2,12 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add command-line arguments to the gruf binstub
+- Add ability to specify server hostname via CLI argument
+
 ### 2.2.2
 
-- Added ignore_methods option for RequestLogging interceptor [#45]
+- Add ignore_methods option for RequestLogging interceptor [#45]
 
 ### 2.2.1
 

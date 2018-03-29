@@ -25,15 +25,5 @@ end
 load 'config/environment.rb' if defined?(Rails)
 require 'gruf'
 
-begin
-  server = Gruf::Server.new(Gruf.server_options)
-  Gruf.services.each { |s| server.add_service(s) }
-  server.start!
-rescue => e
-  msg = "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
-  if Gruf.logger
-    Gruf.logger.fatal msg
-  else
-    Logger.new(STDOUT).fatal msg
-  end
-end
+cli = Gruf::Cli::Executor.new
+cli.run

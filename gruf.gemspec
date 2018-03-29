@@ -39,4 +39,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'grpc', '~> 1.10'
   spec.add_runtime_dependency 'grpc-tools', '~> 1.10'
   spec.add_runtime_dependency 'activesupport'
+  spec.add_runtime_dependency 'slop', '~> 4.6'
 end
