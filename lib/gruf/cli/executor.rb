@@ -21,6 +21,8 @@ module Gruf
     # Handles execution of the gruf binstub, along with command-line arguments
     #
     class Executor
+      attr_reader :opts
+
       ##
       # @param [Hash|ARGV]
       #
@@ -33,13 +35,19 @@ module Gruf
       # Run the server
       #
       def run
+        daemonize
+        write_pid
+
         server = Gruf::Server.new(Gruf.server_options)
         Gruf.services.each { |s| server.add_service(s) }
         server.start!
+
+        exit(0)
       rescue StandardError => e
         msg = "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
         logger = Gruf.logger ? Gruf.logger : Logger.new(STDERR)
         logger.fatal msg
+        exit(0)
       end
 
       private
@@ -48,12 +56,14 @@ module Gruf
       # Setup options for CLI execution and configure Gruf based on inputs
       #
       def setup!
-        opts = Slop.parse(@args) do |o|
+        @opts = Slop.parse(@args) do |o|
           o.null '-h', '--help', 'Display help message' do
             puts o
             exit(0)
           end
           o.string '--host', 'Specify the binding url for the gRPC service'
+          o.bool '-d', '--daemon', 'Daemonize process'
+          o.string '-P', '--pidfile', 'Path to pidfile'
           o.bool '--suppress-default-interceptors', 'Do not use the default interceptors'
           o.bool '--backtrace-on-error', 'Push backtraces on exceptions to the error serializer'
           o.null '-v', '--version', 'print gruf version' do
@@ -62,9 +72,40 @@ module Gruf
           end
         end
 
-        Gruf.server_binding_url = opts[:host] if opts[:host]
-        Gruf.use_default_interceptors = false if opts.suppress_default_interceptors?
-        Gruf.backtrace_on_error = true if opts.backtrace_on_error?
+        Gruf.server_binding_url = @opts[:host] if @opts[:host]
+        Gruf.use_default_interceptors = false if @opts.suppress_default_interceptors?
+        Gruf.backtrace_on_error = true if @opts.backtrace_on_error?
+      end
+
+      def daemonize
+        return if !@opts.daemon?
+
+        files_to_reopen = []
+        ObjectSpace.each_object(File) do |file|
+          files_to_reopen << file unless file.closed?
+        end
+
+        ::Process.daemon
+
+        files_to_reopen.each do |file|
+          begin
+            file.reopen file.path, "a+"
+            file.sync = true
+          rescue ::Exception
+          end
+        end
+
+        Gruf.logger.reopen
+        $stdin.reopen('/dev/null')
+      end
+
+      def write_pid
+        if path = @opts[:pidfile]
+          pidfile = File.expand_path(path)
+          File.open(pidfile, 'w') do |f|
+            f.puts ::Process.pid
+          end
+        end
       end
     end
   end
