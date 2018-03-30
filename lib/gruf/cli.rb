@@ -7,7 +7,7 @@ module Gruf
   class CLI
     include Singleton
 
-    attr_accessor :options
+    attr_reader :options
 
     def run(args=ARGV)
       @options = parse_options(args)
