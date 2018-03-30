@@ -86,13 +86,13 @@ class MyInterceptor < Gruf::Interceptors::ClientInterceptor
 end
 
 ::Gruf::Client.new(
-  service: ::Demo::ThingService, 
+  service: ::Demo::ThingService,
   client_options: [
     interceptors: [MyInterceptor.new]
   ])
 ```
 
-The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a 
+The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a
 `Gruf::Interceptors::ClientInterceptor`, since the latter just extends the former. The gruf client interceptors
 take an optional alternative approach: rather than having separate methods for each request type, it provides a default
 `call` method that passes in a `RequestContext` object, which has the following attributes:
@@ -178,8 +178,8 @@ Gruf comes baked in with a few command-line options for the binstub:
 | --suppress-default-interceptors | Do not use the default interceptors for the server |
 | --backtrace-on-error | Push backtraces on exceptions to the error serializer |
 
-These options will override whatever is passed in the Gruf configure block or 
-initializer. 
+These options will override whatever is passed in the Gruf configure block or
+initializer.
 
 ### Basic Authentication
 
