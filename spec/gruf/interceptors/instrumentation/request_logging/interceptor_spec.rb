@@ -34,6 +34,21 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   describe '.call' do
     subject { call }
 
+    context 'and the request was an invalid argument' do
+      let(:call) do
+        interceptor.call do
+          raise GRPC::InvalidArgument, 'invalid argument'
+        end
+      end
+
+      it 'should log the call properly as an INFO' do
+        expect(Gruf.logger).to receive(:info).once
+        expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
+          expect(e.details).to eq 'invalid argument'
+        end
+      end
+    end
+
     context 'and the request was successful' do
       it 'should log the call properly as an INFO' do
         expect(Gruf.logger).to receive(:info).once

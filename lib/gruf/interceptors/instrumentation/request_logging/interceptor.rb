@@ -49,7 +49,10 @@ module Gruf
               yield
             end
 
-            if result.successful?
+            if result.message.is_a?(GRPC::InvalidArgument)
+              type = options.fetch(:success_log_level, :info).to_sym
+              status_name = 'GRPC::InvalidArgument'
+            elsif result.successful?
               type = options.fetch(:success_log_level, :info).to_sym
               status_name = 'GRPC::Ok'
             else
