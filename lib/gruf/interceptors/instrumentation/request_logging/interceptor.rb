@@ -41,7 +41,7 @@ module Gruf
           LOG_LEVEL_MAPS = {
             info_level_codes: [GRPC::Ok, GRPC::InvalidArgument, GRPC::NotFound, GRPC::AlreadyExists, GRPC::OutOfRange],
             warn_level_codes: [GRPC::Unauthenticated, GRPC::PermissionDenied],
-            error_level_codes: [GRPC::Unknown, GRPC::Internal, GRPC::DataLoss, GRPC::FailedPrecondition, GRPC::Unavailable, GRPC::DeadlineExceeded, GRPC::Cancelled],
+            error_level_codes: [GRPC::Unknown, GRPC::Internal, GRPC::DataLoss, GRPC::FailedPrecondition, GRPC::Unavailable, GRPC::DeadlineExceeded, GRPC::Cancelled]
           }.freeze
 
           ###
