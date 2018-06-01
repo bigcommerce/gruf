@@ -2,6 +2,12 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.4.0
+
+- Added three log levels: warn, info, error, mapped to explicit sets of GRPC error codes [#49]
+- Override log levels supplying info_level_codes, warn_level_codes, and error_level_codes in options of Interceptor constructor
+- Non-explicitly mapped error codes will be treated as :error level
+
 ### 2.3.0
 
 - Add Gruf::Interceptors::ClientInterceptor for intercepting outbound client calls

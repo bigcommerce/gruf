@@ -34,7 +34,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   describe '.call' do
     subject { call }
 
-    context 'and the request was an invalid argument' do
+    context 'and the request was an invalid argument that was not overwritten' do
       let(:call) do
         interceptor.call do
           raise GRPC::InvalidArgument, 'invalid argument'
@@ -43,6 +43,23 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
 
       it 'should log the call properly as an INFO' do
         expect(Gruf.logger).to receive(:info).once
+        expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
+          expect(e.details).to eq 'invalid argument'
+        end
+      end
+    end
+
+    context 'and the request was an invalid argument that was overwritten' do
+      let(:options) { { warn_level_codes: [GRPC::InvalidArgument], info_level_codes: [], error_level_codes: []} }
+
+      let(:call) do
+        interceptor.call do
+          raise GRPC::InvalidArgument, 'invalid argument'
+        end
+      end
+
+      it 'should log the call properly as an WARN' do
+        expect(Gruf.logger).to receive(:warn).once
         expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
           expect(e.details).to eq 'invalid argument'
         end
@@ -72,8 +89,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
 
-      it 'should log the call properly as an ERROR' do
-        expect(Gruf.logger).to receive(:error).once
+      it 'should log the call properly as an INFO' do
+        expect(Gruf.logger).to receive(:info).once
         expect { subject }.to raise_error(GRPC::NotFound) do |e|
           expect(e.details).to eq 'thing not found'
         end

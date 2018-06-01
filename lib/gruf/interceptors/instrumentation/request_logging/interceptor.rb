@@ -14,6 +14,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 require 'socket'
+require 'pry'
 require_relative 'formatters/base'
 require_relative 'formatters/logstash'
 require_relative 'formatters/plain'
@@ -37,6 +38,13 @@ module Gruf
         #
         class Interceptor < ::Gruf::Interceptors::ServerInterceptor
 
+          # Default mappings of codes to log levels...
+          LOG_LEVEL_MAPS = {
+            info_level_codes: [GRPC::Ok, GRPC::InvalidArgument, GRPC::NotFound, GRPC::AlreadyExists, GRPC::OutOfRange],
+            warn_level_codes: [GRPC::Unauthenticated, GRPC::PermissionDenied],
+            error_level_codes: [GRPC::Unknown, GRPC::Internal, GRPC::DataLoss, GRPC::FailedPrecondition, GRPC::Unavailable, GRPC::DeadlineExceeded, GRPC::Cancelled],
+          }.freeze
+
           ###
           # Log the request, sending it to the appropriate formatter
           #
@@ -49,15 +57,20 @@ module Gruf
               yield
             end
 
-            if result.message.is_a?(GRPC::InvalidArgument)
-              type = options.fetch(:success_log_level, :info).to_sym
-              status_name = 'GRPC::InvalidArgument'
-            elsif result.successful?
-              type = options.fetch(:success_log_level, :info).to_sym
+            # Fetch from options if they have been supplied else default to internally defined mappings...
+            info_level_map = options.fetch(:info_level_codes, LOG_LEVEL_MAPS[:info_level_codes])
+            warn_level_map = options.fetch(:warn_level_codes, LOG_LEVEL_MAPS[:warn_level_codes])
+            error_level_map = options.fetch(:error_level_codes, LOG_LEVEL_MAPS[:error_level_codes])
+
+            type = :error
+            status_name = result.message_class_name
+            if result.successful? || info_level_map.include?(result.message.class)
+              type = :info
               status_name = 'GRPC::Ok'
-            else
-              type = options.fetch(:failure_log_level, :error).to_sym
-              status_name = result.message_class_name
+            elsif warn_level_map.include?(result.message.class)
+              type = :warn
+            elsif error_level_map.include?(result.message.class)
+              type = :error
             end
 
             payload = {}
