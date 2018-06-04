@@ -4,9 +4,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.4.0
 
-- Added three log levels: warn, info, error, mapped to explicit sets of GRPC error codes [#49]
-- Override log levels supplying info_level_codes, warn_level_codes, and error_level_codes in options of Interceptor constructor
-- Non-explicitly mapped error codes will be treated as :error level
+- Added a hash of error log levels to Interceptor class, mapping error code to level of logging to use.
+- To override the level of logging per error response, provide a map of codes to log level in options, key :log_levels. 
+- Default is :error log level.
 
 ### 2.3.0
 
