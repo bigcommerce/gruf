@@ -38,11 +38,20 @@ module Gruf
         class Interceptor < ::Gruf::Interceptors::ServerInterceptor
 
           # Default mappings of codes to log levels...
-          LOG_LEVEL_MAPS = {
-            info_level_codes: [GRPC::Ok, GRPC::InvalidArgument, GRPC::NotFound, GRPC::AlreadyExists, GRPC::OutOfRange],
-            warn_level_codes: [GRPC::Unauthenticated, GRPC::PermissionDenied],
-            error_level_codes: [GRPC::Unknown, GRPC::Internal, GRPC::DataLoss, GRPC::FailedPrecondition, GRPC::Unavailable, GRPC::DeadlineExceeded, GRPC::Cancelled]
-          }.freeze
+          LOG_LEVEL_MAP = { 'GRPC::Ok' => :info,
+                            'GRPC::InvalidArgument' => :info,
+                            'GRPC::NotFound' => :info,
+                            'GRPC::AlreadyExists' => :info,
+                            'GRPC::OutOfRange' => :info,
+                            'GRPC::Unauthenticated' => :warn,
+                            'GRPC::PermissionDenied' => :warn,
+                            'GRPC::Unknown' => :error,
+                            'GRPC::Internal' => :error,
+                            'GRPC::DataLoss' => :error,
+                            'GRPC::FailedPrecondition' => :error,
+                            'GRPC::Unavailable' => :error,
+                            'GRPC::DeadlineExceeded' => :error,
+                            'GRPC::Cancelled' => :error }.freeze
 
           ###
           # Log the request, sending it to the appropriate formatter
@@ -56,20 +65,16 @@ module Gruf
               yield
             end
 
-            # Fetch from options if they have been supplied else default to internally defined mappings...
-            info_level_map = options.fetch(:info_level_codes, LOG_LEVEL_MAPS[:info_level_codes])
-            warn_level_map = options.fetch(:warn_level_codes, LOG_LEVEL_MAPS[:warn_level_codes])
-            error_level_map = options.fetch(:error_level_codes, LOG_LEVEL_MAPS[:error_level_codes])
+            # Fetch log level options and merge with default...
+            log_level_map = LOG_LEVEL_MAP.merge(options.fetch(:log_levels, {}))
 
-            type = :error
-            status_name = result.message_class_name
-            if result.successful? || info_level_map.include?(result.message.class)
+            # A result is either successful, or, some level of feedback handled in the else block...
+            if result.successful?
               type = :info
               status_name = 'GRPC::Ok'
-            elsif warn_level_map.include?(result.message.class)
-              type = :warn
-            elsif error_level_map.include?(result.message.class)
-              type = :error
+            else
+              type = log_level_map[result.message_class_name] || :error
+              status_name = result.message_class_name
             end
 
             payload = {}

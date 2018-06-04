@@ -50,7 +50,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
     end
 
     context 'and the request was an invalid argument that was overwritten' do
-      let(:options) { { warn_level_codes: [GRPC::InvalidArgument], info_level_codes: [], error_level_codes: []} }
+      let(:options) { { log_levels: { 'GRPC::InvalidArgument' => :warn } } }
 
       let(:call) do
         interceptor.call do
