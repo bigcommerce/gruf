@@ -37,6 +37,22 @@ module Gruf
         #
         class Interceptor < ::Gruf::Interceptors::ServerInterceptor
 
+          # Default mappings of codes to log levels...
+          LOG_LEVEL_MAP = { 'GRPC::Ok' => :info,
+                            'GRPC::InvalidArgument' => :info,
+                            'GRPC::NotFound' => :info,
+                            'GRPC::AlreadyExists' => :info,
+                            'GRPC::OutOfRange' => :info,
+                            'GRPC::Unauthenticated' => :warn,
+                            'GRPC::PermissionDenied' => :warn,
+                            'GRPC::Unknown' => :error,
+                            'GRPC::Internal' => :error,
+                            'GRPC::DataLoss' => :error,
+                            'GRPC::FailedPrecondition' => :error,
+                            'GRPC::Unavailable' => :error,
+                            'GRPC::DeadlineExceeded' => :error,
+                            'GRPC::Cancelled' => :error }.freeze
+
           ###
           # Log the request, sending it to the appropriate formatter
           #
@@ -49,11 +65,15 @@ module Gruf
               yield
             end
 
+            # Fetch log level options and merge with default...
+            log_level_map = LOG_LEVEL_MAP.merge(options.fetch(:log_levels, {}))
+
+            # A result is either successful, or, some level of feedback handled in the else block...
             if result.successful?
-              type = options.fetch(:success_log_level, :info).to_sym
+              type = :info
               status_name = 'GRPC::Ok'
             else
-              type = options.fetch(:failure_log_level, :error).to_sym
+              type = log_level_map[result.message_class_name] || :error
               status_name = result.message_class_name
             end
 
