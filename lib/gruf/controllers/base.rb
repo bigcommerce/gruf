@@ -73,6 +73,7 @@ module Gruf
       rescue GRPC::BadStatus
         raise # passthrough
       rescue StandardError => e
+        Gruf.logger.error "Unhandled #{e.class.name}: #{e.message} #{e.backtrace.join("\n")}"
         set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
         error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
         fail!(:internal, :unknown, error_message)
