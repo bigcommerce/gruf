@@ -4,9 +4,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.4.0
 
-- Added a hash of error log levels to Interceptor class, mapping error code to level of logging to use.
-- To override the level of logging per error response, provide a map of codes to log level in options, key :log_levels. 
-- Default is :error log level.
+- Added a hash of error log levels to RequestLogging interceptor, mapping error code to level of logging to use. To 
+override the level of logging per error response, provide a map of codes to log level in options, key :log_levels. 
+The default is :error log level.
 
 ### 2.3.0
 
