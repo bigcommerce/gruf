@@ -395,6 +395,77 @@ It's important to maintain a safe blacklist should you decide to log parameters;
 parameter sanitization on its own. We also recommend blacklisting parameters that may contain
 very large values (such as binary or json data).
 
+## Testing with RSpec
+
+### Controllers
+
+In order to test your controller, you first need to mock a GRPC ActiveCall. You can create the following file under `/spec/support/` path of your project:
+```
+require 'grpc'
+
+module Rpc
+  module Test
+    class Call
+      attr_reader :metadata
+
+      def initialize(md = nil)
+        @metadata = md || { 'authorization' => "Basic #{Base64.encode64('grpc:magic')}" }
+      end
+
+      def output_metadata
+        @output_metadata ||= {}
+      end
+    end
+  end
+end
+```
+
+Imagine you have the following controller to test:
+```
+class ThingController < ::Gruf::Controllers::Base
+  bind ::Rpc::ThingService::Service
+
+  def get_thing
+    thing = Rpc::Thing.new(id: message_id, name: 'Foo')
+    Rpc::GetThingResponse.new(thing: thing)
+  end
+
+  private
+
+  def message_id
+    request.message.id
+  end
+end
+```
+
+You can stub it in the specs this way:
+```
+describe ThingController do
+  let(:rpc_service) { ::Rpc::ThingService::Service }
+  let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs.values.first }
+  let(:message) { Rpc::GetThingRequest.new(id: 1) }
+  let(:controller) do
+    described_class.new(
+      method_key: :get_thing,
+      service: rpc_service,
+      active_call: Rpc::Test::Call.new,
+      message: message,
+      rpc_desc: rpc_desc
+    )
+  end
+
+  describe '.call' do
+    context 'with :get_thing as an argument' do
+      let(:result) { controller.call(:get_thing) }
+
+      it 'returns an instance of Rpc::GetThingResponse' do
+        expect(result).to be_instance_of(Rpc::GetThingResponse)
+      end
+    end
+  end
+end
+```
+
 ## Plugins
 
 You can build your own hooks and middleware for gruf; here's a list of known open source gems for
