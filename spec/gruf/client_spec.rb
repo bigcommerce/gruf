@@ -108,6 +108,7 @@ describe Gruf::Client do
             expect(e.error['code']).to eq error_code.to_s
             expect(e.error['app_code']).to eq app_error_code.to_s
             expect(e.error['message']).to eq error_message
+            expect(e.message).to eq("GRPC Not found: #{error_message}")
           end
         end
       end
@@ -181,6 +182,32 @@ describe Gruf::Client::Error do
   context '.initialize' do
     it 'should set the error object on the class' do
       expect(subject.error).to eq err_obj
+    end
+
+    it "set the exception's message to #{described_class.to_s}" do
+      expect(subject.message).to eq(described_class.to_s)
+    end
+
+    context 'error obj a Hash' do
+      context "without keys 'code' and 'message'" do
+        let(:err_obj) { { 'some' => 'hash' } }
+
+        it "set the exception's message to #{described_class.to_s}" do
+          expect(subject.error).to eq err_obj
+          expect(subject.message).to eq(described_class.to_s)
+        end
+      end
+
+      context "having keys 'code' and 'message'" do
+        let(:error_message) { 'An error occurred' }
+        let(:error_code) { :not_found }
+        let(:err_obj) { { 'code' => error_code, 'message' => error_message } }
+
+        it 'formats the exception message' do
+          expect(subject.error).to eq err_obj
+          expect(subject.message).to eq("GRPC Not found: #{error_message}")
+        end
+      end
     end
   end
 end
