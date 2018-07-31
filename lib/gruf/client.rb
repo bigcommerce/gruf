@@ -49,6 +49,23 @@ module Gruf
       #
       def initialize(error)
         @error = error
+        super(error_message)
+      end
+
+      private
+
+      ##
+      # Format the exception message
+      #
+      # @return [String] A formatted exception message
+      #
+      def error_message
+        if @error.is_a?(Hash) && @error.key?('code') && @error.key?('message')
+          return "GRPC #{@error['code'].to_s.humanize.capitalize}: #{@error['message']}"
+        end
+
+        # Default exception message is the class name
+        self.class.to_s
       end
     end
 
