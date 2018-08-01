@@ -81,8 +81,8 @@ describe Gruf::Client do
     end
 
     context 'if a GRPC::BadStatus is raised' do
-      let(:req) { Rpc::GetFailRequest.new(params) }
-      let(:method_name) { :GetFail }
+      let(:req) { Rpc::GetThingRequest.new(params) }
+      let(:method_name) { :GetThing }
       let(:error_message) { 'Thing with ID 1 not found!' }
       let(:error_code) { :not_found }
       let(:app_error_code) { :thing_not_found }
@@ -90,35 +90,58 @@ describe Gruf::Client do
       let(:metadata_response) { { Gruf.error_metadata_key.to_s => err_obj.serialize } }
       let(:grpc_error) { GRPC::NotFound.new(error_message, metadata_response) }
 
-      before do
-        expect(client).to receive(:execute).and_raise(grpc_error)
-      end
+      context 'if the serializer is the default' do
+        before do
+          expect(client).to receive(:execute).and_raise(grpc_error)
+        end
 
-      it 'should raise the error' do
-        expect {
-          subject
-        }.to raise_error(Gruf::Client::Error)
-      end
-
-      context 'and has a serialized error payload' do
-        it 'should pass it through deserialized' do
+        it 'should raise the error' do
           expect {
             subject
-          }.to raise_error(Gruf::Client::Error) do |e|
-            expect(e.error['code']).to eq error_code.to_s
-            expect(e.error['app_code']).to eq app_error_code.to_s
-            expect(e.error['message']).to eq error_message
+          }.to raise_error(Gruf::Client::Error)
+        end
+
+        context 'and has a serialized error payload' do
+          it 'should pass it through deserialized' do
+            expect {
+              subject
+            }.to raise_error(Gruf::Client::Error) do |e|
+              expect(e.error['code']).to eq error_code.to_s
+              expect(e.error['app_code']).to eq app_error_code.to_s
+              expect(e.error['message']).to eq error_message
+            end
+          end
+        end
+
+        context 'and has no serialized error payload' do
+          let(:metadata_response) { {} }
+
+          it 'should just passthrough the error object as-is' do
+            expect {
+              subject
+            }.to raise_error(GRPC::NotFound)
           end
         end
       end
 
-      context 'and has no serialized error payload' do
-        let(:metadata_response) { {} }
 
-        it 'should just passthrough the error object as-is' do
+      context 'if the serializer is the proto serializer' do
+        before do
+          Gruf.error_serializer = Serializers::Proto
+          expect(client).to receive(:execute).and_raise(grpc_error)
+        end
+
+        after do
+          Gruf.error_serializer = nil
+        end
+
+        it 'should pass it through deserialized' do
           expect {
             subject
-          }.to raise_error(GRPC::NotFound)
+          }.to raise_error(Gruf::Client::Error) do |e|
+            expect(e.error.error_code).to eq app_error_code.to_s
+            expect(e.error.error_message).to eq error_message.to_s
+          end
         end
       end
     end
