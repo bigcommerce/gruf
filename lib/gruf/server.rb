@@ -31,11 +31,11 @@ module Gruf
     ##
     # Initialize the server and load and setup the services
     #
-    # @param [Hash] options
+    # @param [Hash] opts
     #
-    def initialize(options = {})
-      @options = options || {}
-      @interceptors = options.fetch(:interceptor_registry, Gruf.interceptors)
+    def initialize(opts = {})
+      @options = opts || {}
+      @interceptors = opts.fetch(:interceptor_registry, Gruf.interceptors)
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
       @services = []
       @started = false
@@ -43,7 +43,7 @@ module Gruf
       @stop_server_cv = ConditionVariable.new
       @stop_server_mu = Monitor.new
       @server_mu = Monitor.new
-      @hostname = options.fetch(:hostname, Gruf.server_binding_url)
+      @hostname = opts.fetch(:hostname, Gruf.server_binding_url)
       setup
     end
 
@@ -51,9 +51,20 @@ module Gruf
     # @return [GRPC::RpcServer] The GRPC server running
     #
     def server
+      # For backward compatibility, we allow these options to be passed directly
+      # in the Gruf::Server options, or via Gruf.rpc_server_options.
+      server_options = {
+        pool_size: options.fetch(:pool_size, Gruf.rpc_server_options[:pool_size]),
+        max_waiting_requests: options.fetch(:max_waiting_requests, Gruf.rpc_server_options[:max_waiting_requests]),
+        poll_period: options.fetch(:poll_period, Gruf.rpc_server_options[:poll_period]),
+        pool_keep_alive: options.fetch(:pool_keep_alive, Gruf.rpc_server_options[:pool_keep_alive]),
+        connect_md_proc: options.fetch(:connect_md_proc, Gruf.rpc_server_options[:connect_md_proc]),
+        server_args: options.fetch(:server_args, Gruf.rpc_server_options[:server_args])
+      }
+
       @server_mu.synchronize do
         @server ||= begin
-          server = GRPC::RpcServer.new(options)
+          server = GRPC::RpcServer.new(server_options)
           @port = server.add_http2_port(@hostname, ssl_credentials)
           @services.each { |s| server.handle(s) }
           server
@@ -122,11 +133,11 @@ module Gruf
     #
     # @param [Class] before_class The interceptor that you want to add the new interceptor before
     # @param [Class] interceptor_class The Interceptor to add to the registry
-    # @param [Hash] options A hash of options for the interceptor
+    # @param [Hash] opts A hash of options for the interceptor
     #
-    def insert_interceptor_before(before_class, interceptor_class, options = {})
+    def insert_interceptor_before(before_class, interceptor_class, opts = {})
       raise ServerAlreadyStartedError if @started
-      @interceptors.insert_before(before_class, interceptor_class, options)
+      @interceptors.insert_before(before_class, interceptor_class, opts)
     end
 
     ##
@@ -134,11 +145,11 @@ module Gruf
     #
     # @param [Class] after_class The interceptor that you want to add the new interceptor after
     # @param [Class] interceptor_class The Interceptor to add to the registry
-    # @param [Hash] options A hash of options for the interceptor
+    # @param [Hash] opts A hash of options for the interceptor
     #
-    def insert_interceptor_after(after_class, interceptor_class, options = {})
+    def insert_interceptor_after(after_class, interceptor_class, opts = {})
       raise ServerAlreadyStartedError if @started
-      @interceptors.insert_after(after_class, interceptor_class, options)
+      @interceptors.insert_after(after_class, interceptor_class, opts)
     end
 
     ##

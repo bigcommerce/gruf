@@ -17,8 +17,8 @@ up fast and efficiently at scale. Some of its features include:
   still preserving gRPC BadStatus codes
 * Server and client execution timings in responses
 
-gruf currently has active support for gRPC 1.10.x+. gruf is compatible and tested with Ruby 2.2-2.5. 
-gruf is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any Ruby framework 
+gruf currently has active support for gRPC 1.10.x+. gruf is compatible and tested with Ruby 2.2-2.5.
+gruf is also not [Rails](https://github.com/rails/rails)-specific, and can be used in any Ruby framework
 (such as [Grape](https://github.com/ruby-grape/grape), for instance).
 
 ## Installation
@@ -86,13 +86,13 @@ class MyInterceptor < Gruf::Interceptors::ClientInterceptor
 end
 
 ::Gruf::Client.new(
-  service: ::Demo::ThingService, 
+  service: ::Demo::ThingService,
   client_options: [
     interceptors: [MyInterceptor.new]
   ])
 ```
 
-The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a 
+The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a
 `Gruf::Interceptors::ClientInterceptor`, since the latter just extends the former. The gruf client interceptors
 take an optional alternative approach: rather than having separate methods for each request type, it provides a default
 `call` method that passes in a `RequestContext` object, which has the following attributes:
@@ -178,8 +178,8 @@ Gruf comes baked in with a few command-line options for the binstub:
 | --suppress-default-interceptors | Do not use the default interceptors for the server |
 | --backtrace-on-error | Push backtraces on exceptions to the error serializer |
 
-These options will override whatever is passed in the Gruf configure block or 
-initializer. 
+These options will override whatever is passed in the Gruf configure block or
+initializer.
 
 ### Basic Authentication
 
@@ -252,6 +252,18 @@ Gruf.configure do |c|
   c.use_ssl = true
   c.ssl_crt_file = "#{Rails.root}/config/ssl/#{Rails.env}.crt"
   c.ssl_key_file = "#{Rails.root}/config/ssl/#{Rails.env}.key"
+end
+```
+
+### GRPC::RpcServer configuration
+To customize parameters for the underlying GRPC::RpcServer, such as the size of the gRPC thread pool,
+you can pass them in via Gruf.rpc\_server\_options.
+
+```ruby
+Gruf.configure do |c|
+  # The size of the underlying thread pool. No more concurrent requests can be made
+  # than the size of the thread pool.
+  c.rpc_server_options[:pool_size] = 100
 end
 ```
 
