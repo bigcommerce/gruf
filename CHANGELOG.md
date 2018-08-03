@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Safer configuration of GRPC::RpcServer. From now on, use Gruf.rpc\_server\_options for the params
+to be sent to GPRC::RpcServer. Also provide sane defaults for params for GRPC::RpcServer. [#55]
+
 ### 2.4.0
 
 - Added a hash of error log levels to RequestLogging interceptor, mapping error code to level of logging to use. To 

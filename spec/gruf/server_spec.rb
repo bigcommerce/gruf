@@ -32,13 +32,36 @@ describe Gruf::Server do
   describe '#start!' do
     let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run: nil, wait_till_running: nil) }
 
-    context 'when options passed' do
+    context 'when valid options passed' do
       include_context 'with stop thread mocked'
 
-      let(:options) { { pool_size: 1 } }
+      let(:options) { { pool_size: Random.rand(10) } }
 
-      it 'runs server with given configuration' do
-        expect(GRPC::RpcServer).to receive(:new).with(options).and_return(server_mock)
+      it 'runs server with given overrides' do
+        expect(GRPC::RpcServer).to receive(:new).with(Gruf.rpc_server_options.merge(options)).and_return(server_mock)
+        gruf_server.start!
+      end
+    end
+
+    context 'when invalid options passed' do
+      include_context 'with stop thread mocked'
+
+      let(:options) { { random_option: Random.rand(10) } }
+
+      it 'runs server with default configuration' do
+        expect(GRPC::RpcServer).to receive(:new).with(Gruf.rpc_server_options).and_return(server_mock)
+        gruf_server.start!
+      end
+    end
+
+    context 'when some valid and some invalid options passed' do
+      include_context 'with stop thread mocked'
+
+      let(:options) { { random_option: Random.rand(10), pool_size: Random.rand(10) } }
+
+      it 'runs server with valid overrides only' do
+        valid_options = { pool_size: options[:pool_size] }
+        expect(GRPC::RpcServer).to receive(:new).with(Gruf.rpc_server_options.merge(valid_options)).and_return(server_mock)
         gruf_server.start!
       end
     end
@@ -46,8 +69,8 @@ describe Gruf::Server do
     context 'when no options passed' do
       include_context 'with stop thread mocked'
 
-      it 'runs server with empty configuration' do
-        expect(GRPC::RpcServer).to receive(:new).with({}).and_return(server_mock)
+      it 'runs server with default configuration' do
+        expect(GRPC::RpcServer).to receive(:new).with(Gruf.rpc_server_options).and_return(server_mock)
         gruf_server.start!
       end
     end

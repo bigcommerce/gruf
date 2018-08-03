@@ -37,7 +37,15 @@ module Gruf
       use_default_interceptors: true,
       backtrace_on_error: false,
       use_exception_message: true,
-      internal_error_message: 'Internal Server Error'
+      internal_error_message: 'Internal Server Error',
+      rpc_server_options: {
+        pool_size: GRPC::RpcServer::DEFAULT_POOL_SIZE,
+        max_waiting_requests: GRPC::RpcServer::DEFAULT_MAX_WAITING_REQUESTS,
+        poll_period: GRPC::RpcServer::DEFAULT_POLL_PERIOD,
+        pool_keep_alive: GRPC::Pool::DEFAULT_KEEP_ALIVE,
+        connect_md_proc: nil,
+        server_args: {}
+      }.freeze
     }.freeze
 
     attr_accessor *VALID_CONFIG_KEYS.keys
