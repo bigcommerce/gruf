@@ -2,8 +2,11 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
-- Safer configuration of GRPC::RpcServer. From now on, use Gruf.rpc\_server\_options for the params
-to be sent to GPRC::RpcServer. Also provide sane defaults for params for GRPC::RpcServer. [#55]
+- Safer configuration of GRPC::RpcServer. From now on, use `Gruf.rpc_server_options` for the params
+  to be sent to GPRC::RpcServer. Also provide sane defaults for params for GRPC::RpcServer. [#55]
+- Added ability to monitor `RESOURCE_EXHAUSTED` and `UNIMPLEMENTED`. By setting `event_listener_proc` in
+  the Gruf configuration, you will receive a callback when these events occur. The parameter to your
+  callback will be a symbol (`:thread_pool_exhausted` or `:unimplemented`). Others may be added in the future.
 
 ### 2.4.0
 
