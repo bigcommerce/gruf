@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.4.1
+
 - Safer configuration of GRPC::RpcServer. From now on, use `Gruf.rpc_server_options` for the params
   to be sent to GPRC::RpcServer. Also provide sane defaults for params for GRPC::RpcServer. [#55]
 - Added ability to monitor `RESOURCE_EXHAUSTED` and `UNIMPLEMENTED`. By setting `event_listener_proc` in

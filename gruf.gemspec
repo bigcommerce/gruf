@@ -25,7 +25,7 @@ Gem::Specification.new do |spec|
   spec.licenses      = ['MIT']
 
   spec.summary       = 'gRPC Ruby Framework'
-  spec.description   = spec.summary
+  spec.description   = 'gRPC Ruby Framework for building complex gRPC applications at scale'
   spec.homepage      = 'https://github.com/bigcommerce/gruf'
 
   spec.files         = Dir['README.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'lib/**/*', 'gruf.gemspec']
