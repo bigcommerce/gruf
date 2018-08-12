@@ -87,9 +87,9 @@ end
 
 ::Gruf::Client.new(
   service: ::Demo::ThingService,
-  client_options: [
+  client_options: {
     interceptors: [MyInterceptor.new]
-  ])
+  })
 ```
 
 The `interceptors` option in `client_options` can accept either a `GRPC::ClientInterceptor` class or a
@@ -239,9 +239,11 @@ For the client, you'll need to point to the public certificate:
 ```ruby
 ::Gruf::Client.new(
   service: Demo::ThingService,
-  ssl_certificate: 'x509 public certificate here',
-  # OR
-  ssl_certificate_file: '/path/to/my.crt'
+  options: {
+    ssl_certificate: 'x509 public certificate here',
+    # OR
+    ssl_certificate_file: '/path/to/my.crt'
+  }
 )
 ```
 
