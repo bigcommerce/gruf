@@ -73,8 +73,6 @@ Gruf.configure do |c|
   }
 end
 
-Thread.abort_on_exception = true
-
 Gruf.logger = Logger.new(STDOUT)
 Gruf.logger.level = Logger::Severity::INFO
 Gruf.grpc_logger = Logger.new(STDOUT)

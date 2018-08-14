@@ -142,10 +142,9 @@ namespace :gruf do
         sleep: ENV.fetch('SERVER_SLEEP_TIME', 1).to_i
       )
       gruf_rake_configure_rpc!
-      puts "Running GetThing #{args[:times]} times"
-
       Gruf.logger.level = Logger::Severity::INFO
-      Thread.abort_on_exception = true
+
+      Gruf.logger.info "Running GetThing #{args[:times]} times"
 
       threads = []
       call_divisor = ENV.fetch('CLIENT_CALL_SLEEP_DIVISOR', 1000).to_i
@@ -163,7 +162,7 @@ namespace :gruf do
         end
       end
       threads.each(&:join)
-      puts 'Done.'
+      Gruf.logger.info 'Done.'
     end
 
     ##
