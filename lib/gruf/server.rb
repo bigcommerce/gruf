@@ -203,8 +203,6 @@ module Gruf
     #
     # :nocov:
     def setup_signal_handlers
-      Thread.abort_on_exception = true
-
       Signal.trap('INT') do
         @stop_server = true
         @stop_server_cv.broadcast

@@ -1,6 +1,10 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
 ### Pending release
+- Added error handling for GRPC::Core::CallError, a low-level error in the grpc library that does not inherit
+  from StandardError. [#59]
+- Removed `Thread.abort\_on\_exception = true`. Exceptions should be handled by gruf or the application,
+  and should not cause the server process to crash. [#59]
 
 ### 2.4.1
 

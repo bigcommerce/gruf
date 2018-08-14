@@ -48,5 +48,3 @@ RSpec.configure do |config|
 
   include Gruf::Helpers
 end
-
-Thread.abort_on_exception = true
