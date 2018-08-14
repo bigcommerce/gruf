@@ -55,6 +55,7 @@ message Thing {
 // Request for geting a single thing
 message GetThingRequest {
     uint32 id = 1;
+    uint32 sleep = 2;
 }
 
 // Response for getting a single thing

@@ -22,7 +22,9 @@ class ThingController < ::Gruf::Controllers::Base
   bind ::Rpc::ThingService::Service
 
   def get_thing
-    Rpc::GetThingResponse.new(thing: Rpc::Thing.new(id: request.message.id, name: 'Foo'))
+    sleep_value = request.message.sleep.to_i
+    sleep(sleep_value) unless sleep_value.zero?
+    Rpc::GetThingResponse.new(thing: Rpc::Thing.new(id: request.message.id, name: FFaker::Name.first_name))
   end
 
   def get_things

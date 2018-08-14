@@ -10,6 +10,7 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   end
   add_message "rpc.GetThingRequest" do
     optional :id, :uint32, 1
+    optional :sleep, :uint32, 2
   end
   add_message "rpc.GetThingResponse" do
     optional :thing, :message, 1, "rpc.Thing"

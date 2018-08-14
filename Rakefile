@@ -136,6 +136,38 @@ namespace :gruf do
       end
     end
 
+    task :performance, [:times, :sleep] do |_t, args|
+      args.with_defaults(
+        times: 3000,
+        sleep: 1
+      )
+      gruf_rake_configure_rpc!
+      puts "Running GetThing #{args[:times]} times"
+
+      Gruf.logger.level = Logger::Severity::INFO
+      Thread.abort_on_exception = true
+
+      threads = []
+      args[:times].to_i.times do |idx|
+        threads << Thread.new do
+          begin
+            sleep (idx / 1000).ceil
+            rpc_client = gruf_demo_build_client
+            Gruf.logger.info "- #{idx}: Making call"
+            op = rpc_client.call(:GetThing, id: idx, sleep: args[:sleep].to_i)
+            Gruf.logger.info "-- #{idx}: #{op.message.inspect}"
+          rescue Gruf::Client::Error => e
+            Gruf.logger.error e.error.to_h
+          end
+        end
+      end
+      threads.each(&:join)
+      puts 'Done.'
+    end
+
+    ##
+    # @return [Gruf::Client]
+    #
     def gruf_demo_build_client(options = {}, client_options = {})
       Gruf::Client.new(
         service: Rpc::ThingService,
@@ -145,7 +177,7 @@ namespace :gruf do
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),
         client_options: {
-          timeout: 5,
+          timeout: 10,
           interceptors: [TestClientInterceptor.new]
         }.merge(client_options)
       )

@@ -29,10 +29,10 @@ require File.realpath("#{File.dirname(__FILE__)}/support/serializers/proto.rb")
 
 class FakeStats
   def increment(k)
-    Gruf.logger.info "statsd.increment: #{k}"
+    Gruf.logger.debug "statsd.increment: #{k}"
   end
   def timing(k, t)
-    Gruf.logger.info "statsd.timing: #{k} -> #{t}"
+    Gruf.logger.debug "statsd.timing: #{k} -> #{t}"
   end
 end
 
@@ -58,8 +58,25 @@ Gruf.configure do |c|
     log_parameters: true
   )
   c.interceptors.use(Gruf::Interceptors::ActiveRecord::ConnectionReset)
+  c.event_listener_proc = lambda do |event|
+    case event
+    when :thread_pool_exhausted
+      Gruf.logger.error('gRPC thread pool exhausted!')
+    else
+      # noop
+    end
+  end
+  c.server_options = {
+    pool_size: ENV.fetch('POOL_SIZE', 30).to_i
+  }
 end
+
+Thread.abort_on_exception = true
+
 Gruf.logger = Logger.new(STDOUT)
+Gruf.logger.level = Logger::Severity::INFO
+Gruf.grpc_logger = Logger.new(STDOUT)
+Gruf.grpc_logger.level = Logger::Severity::DEBUG
 Gruf.services << ::Rpc::ThingService::Service
 
 cli = Gruf::Cli::Executor.new
