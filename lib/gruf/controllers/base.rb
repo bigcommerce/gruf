@@ -71,8 +71,8 @@ module Gruf
           send(method_key, &block)
         end
       rescue GRPC::BadStatus
-        raise # passthrough
-      rescue StandardError => e
+        raise # passthrough, to be caught by Gruf::Interceptors::Timer
+      rescue GRPC::Core::CallError, StandardError => e # CallError is not a StandardError
         set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
         error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
         fail!(:internal, :unknown, error_message)
