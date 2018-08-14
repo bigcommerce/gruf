@@ -139,7 +139,7 @@ namespace :gruf do
     task :performance, [:times, :sleep] do |_t, args|
       args.with_defaults(
         times: 3000,
-        sleep: 1
+        sleep: ENV.fetch('SERVER_SLEEP_TIME', 1).to_i
       )
       gruf_rake_configure_rpc!
       puts "Running GetThing #{args[:times]} times"
@@ -148,10 +148,11 @@ namespace :gruf do
       Thread.abort_on_exception = true
 
       threads = []
+      call_divisor = ENV.fetch('CLIENT_CALL_SLEEP_DIVISOR', 1000).to_i
       args[:times].to_i.times do |idx|
         threads << Thread.new do
           begin
-            sleep (idx / 1000).ceil
+            sleep((idx / call_divisor).ceil)
             rpc_client = gruf_demo_build_client
             Gruf.logger.info "- #{idx}: Making call"
             op = rpc_client.call(:GetThing, id: idx, sleep: args[:sleep].to_i)
@@ -177,7 +178,7 @@ namespace :gruf do
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),
         client_options: {
-          timeout: 10,
+          timeout: ENV.fetch('CLIENT_TIMEOUT', 10).to_i,
           interceptors: [TestClientInterceptor.new]
         }.merge(client_options)
       )
