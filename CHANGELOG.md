@@ -5,6 +5,13 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
   from StandardError. [#59]
 - Removed `Thread.abort\_on\_exception = true`. Exceptions should be handled by gruf or the application,
   and should not cause the server process to crash. [#59]
+- Added guard for size of trailing metadata attached to grpc call. The default max for http2 trailing metadata
+  in the gRPC C library is 8kb. If we go over that limit (either through custom metadata attached to the
+  error by the application, or via the error payload encoded by the error serializer), the gRPC library
+  will throw RESOURCE\_EXHAUSTED. Gruf now detects this case, and attempts to prevent it by logging the
+  original error and substituting it with an internal error indicating that the metadata was too large. [#60]
+- Truncate stack trace in error payload to help avoid overflowing the trailing metadata. Added backtrace\_limit
+  configuration parameter, which defaults to 10.[#60]
 
 ### 2.4.1
 
@@ -16,8 +23,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.4.0
 
-- Added a hash of error log levels to RequestLogging interceptor, mapping error code to level of logging to use. To 
-override the level of logging per error response, provide a map of codes to log level in options, key :log_levels. 
+- Added a hash of error log levels to RequestLogging interceptor, mapping error code to level of logging to use. To
+override the level of logging per error response, provide a map of codes to log level in options, key :log_levels.
 The default is :error log level.
 
 ### 2.3.0
@@ -32,7 +39,7 @@ The default is :error log level.
 
 ### 2.2.1
 
-- Now changes proc title once server is ready to process incoming requests [#44] 
+- Now changes proc title once server is ready to process incoming requests [#44]
 - Gruf now requires gRPC 1.10.x+ due to various fixes and improvements in the gRPC core libraries
 
 ### 2.2.0
@@ -41,13 +48,13 @@ The default is :error log level.
 
 ### 2.1.1
 
-- Add ability to pass in client stub options into Gruf::Client 
+- Add ability to pass in client stub options into Gruf::Client
 
 ### 2.1.0
 
 - Add ability to list, clear, insert before, insert after, and remove to a server's interceptor
 registry
-- Ensure interceptors and services cannot be adjusted on the server after it starts to 
+- Ensure interceptors and services cannot be adjusted on the server after it starts to
 prevent threading issues
 - [#36], [#37] Adds `response_class`, `request_class`, and `service` accessors to controller request
 
@@ -110,22 +117,22 @@ Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for de
 - Instrumentation hooks now execute similarly to outer_around hooks; they can
   now instrument failures
 - Instrumentation hooks now pass a `RequestContext` object that contains information
-  about the incoming request, instead of relying on instance variables 
+  about the incoming request, instead of relying on instance variables
 - StatsD hook now sends success/failure metrics for endpoints
 - Add ability to turn off sending exception message on uncaught exception.
 - Add configuration to set the error message when an uncaught exception is
   handled by gruf.
-- Add a request logging hook for Rails-style request logging, with optional 
-  parameter logging, blacklists, and formatter support 
+- Add a request logging hook for Rails-style request logging, with optional
+  parameter logging, blacklists, and formatter support
 - Optimizations around Symbol casting within service calls
 
 ### 1.1.0
 
-- Add the ability for call options to the client, which enables deadline setting 
+- Add the ability for call options to the client, which enables deadline setting
 
 ### 1.0.0
 
-- Bump gRPC to 1.4 
+- Bump gRPC to 1.4
 
 ### 0.14.2
 
@@ -154,7 +161,7 @@ Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for de
 ### 0.12.0
 
 - Add ability to run multiple around hooks
-- Fix bug with error handling that caused error messages to repeat across streams 
+- Fix bug with error handling that caused error messages to repeat across streams
 
 ### 0.11.5
 

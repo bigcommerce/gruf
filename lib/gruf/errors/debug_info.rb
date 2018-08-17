@@ -30,7 +30,12 @@ module Gruf
       #
       def initialize(detail, stack_trace = [])
         @detail = detail
-        @stack_trace = stack_trace.is_a?(String) ? stack_trace.split("\n") : stack_trace
+        @stack_trace = (stack_trace.is_a?(String) ? stack_trace.split("\n") : stack_trace)
+
+        # Limit the size of the stack trace to reduce risk of overflowing metadata
+        stack_trace_limit = Gruf.backtrace_limit.to_i
+        stack_trace_limit = 10 if stack_trace_limit < 0
+        @stack_trace = @stack_trace[0..stack_trace_limit] if stack_trace_limit > 0
       end
 
       ##
