@@ -50,6 +50,13 @@ module Gruf
       data_loss: GRPC::DataLoss
     }.freeze
 
+    # Default limit on trailing metadata is 8KB. We need to be careful
+    # not to overflow this limit, or the response message will never
+    # be sent. Instead, resource_exhausted will be thrown.
+    MAX_METADATA_SIZE = 7.5 * 1_024
+    METADATA_SIZE_EXCEEDED_CODE = 'metadata_size_exceeded'.freeze
+    METADATA_SIZE_EXCEEDED_MSG = 'Metadata too long, risks exceeding http2 trailing metadata limit.'.freeze
+
     # @return [Symbol] The given internal gRPC code for the error
     attr_accessor :code
     # @return [Symbol] An arbitrary application code that can be used for logical processing of the error by the client
@@ -58,8 +65,8 @@ module Gruf
     attr_accessor :message
     # @return [Array] An array of field errors that can be returned by the server
     attr_accessor :field_errors
-    # @return [Object] A hash of debugging information, such as a stack trace and exception name, that can be used to
-    # debug an given error response. This is sent by the server over the trailing metadata.
+    # @return [Errors::DebugInfo] A object containing debugging information, such as a stack trace and exception name,
+    # that can be used to debug an given error response. This is sent by the server over the trailing metadata.
     attr_accessor :debug_info
     # @return [GRPC::BadStatus] The gRPC BadStatus error object that was generated
     attr_writer :grpc_error
@@ -72,10 +79,11 @@ module Gruf
     # @param [Hash] args (Optional) An optional hash of arguments that will set fields on the error object
     #
     def initialize(args = {})
+      @field_errors = []
+      @metadata = {}
       args.each do |k, v|
         send("#{k}=", v) if respond_to?(k)
       end
-      @field_errors = []
     end
 
     ##
@@ -130,16 +138,30 @@ module Gruf
     end
 
     ##
-    # Append any appropriate errors to the gRPC call and properly update the output metadata
+    # Update the trailing metadata on the given gRPC call, including the error payload if configured
+    # to do so.
     #
     # @param [GRPC::ActiveCall] active_call The marshalled gRPC call
-    # @return [Error] Return the error itself with the GRPC::ActiveCall attached and error metadata appended
+    # @return [Error] Return the error itself after updating metadata on the given gRPC call.
+    #                 In the case of a metadata overflow error, we replace the current error with
+    #                 a new one that won't cause a low-level http2 error.
     #
     def attach_to_call(active_call)
       metadata[Gruf.error_metadata_key.to_sym] = serialize if Gruf.append_server_errors_to_trailing_metadata
-      if !metadata.empty? && active_call && active_call.respond_to?(:output_metadata)
-        active_call.output_metadata.update(metadata)
+      return self if metadata.empty? || !active_call || !active_call.respond_to?(:output_metadata)
+
+      # Check if we've overflown the maximum size of output metadata. If so,
+      # log a warning and replace the metadata with something smaller to avoid
+      # resource exhausted errors.
+      if metadata.inspect.size > MAX_METADATA_SIZE
+        code = METADATA_SIZE_EXCEEDED_CODE
+        msg = METADATA_SIZE_EXCEEDED_MSG
+        logger.warn "#{code}: #{msg} Original error: #{to_h.inspect}"
+        err = Gruf::Error.new(code: :internal, app_code: code, message: msg)
+        return err.attach_to_call(active_call)
       end
+
+      active_call.output_metadata.update(metadata)
       self
     end
 

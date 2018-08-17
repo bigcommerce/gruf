@@ -36,6 +36,7 @@ module Gruf
       append_server_errors_to_trailing_metadata: true,
       use_default_interceptors: true,
       backtrace_on_error: false,
+      backtrace_limit: 10,
       use_exception_message: true,
       internal_error_message: 'Internal Server Error',
       event_listener_proc: nil,

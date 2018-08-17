@@ -60,6 +60,17 @@ describe Gruf::Error do
           expect(subject).to be_a(described_class)
         end
       end
+
+      context 'with a very large error message' do
+        let(:message) { SecureRandom.hex(10000) }
+        it 'should log the original error and replace the outgoing error with a new one' do
+          expect(Gruf.logger).to receive(:warn)
+          expect(subject).to be_a(described_class)
+          expect(subject.code).to eq(:internal)
+          expect(subject.app_code).to eq(described_class::METADATA_SIZE_EXCEEDED_CODE)
+          expect(subject.message).to eq(described_class::METADATA_SIZE_EXCEEDED_MSG)
+        end
+      end
     end
   end
 
