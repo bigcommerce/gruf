@@ -50,7 +50,7 @@ module Gruf
       # @return [Boolean] Whether or not this result was a success
       #
       def success?
-        !result.is_a?(GRPC::BadStatus)
+        !result.is_a?(GRPC::BadStatus) && !result.is_a?(StandardError) && !result.is_a?(GRPC::Core::CallError)
       end
     end
 
@@ -65,7 +65,7 @@ module Gruf
       start_time = Time.now
       begin
         result = yield
-      rescue GRPC::BadStatus => e
+      rescue GRPC::BadStatus, StandardError, GRPC::Core::CallError => e
         result = e
       end
       end_time = Time.now

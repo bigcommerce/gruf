@@ -92,13 +92,13 @@ describe Gruf::Client do
 
       context 'if the serializer is the default' do
         before do
-          expect(client).to receive(:execute).and_raise(grpc_error)
+          expect(client).to receive(:get_thing).and_raise(grpc_error)
         end
 
         it 'should raise the error' do
           expect {
             subject
-          }.to raise_error(Gruf::Client::Error)
+          }.to raise_error(Gruf::Client::Errors::NotFound)
         end
 
         context 'and has a serialized error payload' do
@@ -119,7 +119,7 @@ describe Gruf::Client do
           it 'should just passthrough the error object as-is' do
             expect {
               subject
-            }.to raise_error(GRPC::NotFound)
+            }.to raise_error(Gruf::Client::Errors::NotFound)
           end
         end
       end
@@ -128,7 +128,7 @@ describe Gruf::Client do
       context 'if the serializer is the proto serializer' do
         before do
           Gruf.error_serializer = Serializers::Proto
-          expect(client).to receive(:execute).and_raise(grpc_error)
+          expect(client).to receive(:get_thing).and_raise(grpc_error)
         end
 
         after do
@@ -138,7 +138,7 @@ describe Gruf::Client do
         it 'should pass it through deserialized' do
           expect {
             subject
-          }.to raise_error(Gruf::Client::Error) do |e|
+          }.to raise_error(Gruf::Client::Errors::NotFound) do |e|
             expect(e.error.error_code).to eq app_error_code.to_s
             expect(e.error.error_message).to eq error_message.to_s
           end

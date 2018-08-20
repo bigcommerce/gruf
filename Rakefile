@@ -98,8 +98,12 @@ namespace :gruf do
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetFail, id: rand(100_000))
         puts op.message.inspect
+      rescue Gruf::Client::Errors::NotFound => e
+        puts "Client got a not found error: #{e.error.to_h}"
+      rescue Gruf::Client::Errors::Validation => e
+        puts "Client got a validation error: #{e.error.to_h}"
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        puts "Unknown error: #{e.error.to_h}"
       end
     end
 
