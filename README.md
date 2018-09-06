@@ -487,6 +487,8 @@ gruf that you can use today:
 
 * [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
 integration
+* [gruf-lightstep](https://github.com/bigcommerce/gruf-lightstep) - Provides a seamless 
+[LightStep](https://lightstep.com) integration
 * [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Circuit breaker
 support for services
 * [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage
