@@ -48,7 +48,7 @@ Gruf.configure do |c|
 end
 ```
 
-If you don't explicitly set `default_client_host`, you will need to pass it into the client options, like so:
+If you don't explicitly set `default_client_host`, you will need to pass it into the options, like so:
 
 ```ruby
 client = ::Gruf::Client.new(service: ::Demo::ThingService, options: {hostname: 'grpc.service.com:9003'})
@@ -72,10 +72,46 @@ end
 
 Note this returns a response object. The response object can provide `trailing_metadata` as well as a `execution_time`.
 
+### SynchronizedClient
+
+SynchronizedClient wraps Client with some additional behavior to help prevent generating spikes
+of redundant requests. If multiple calls to the same endpoint with the same parameters are made,
+the first one will be executed and the following ones will block, waiting for the first result.
+
+```ruby
+require 'gruf'
+require 'thwait'
+
+id = args[:id].to_i.presence || 1
+client = ::Gruf::SynchronizedClient.new(service: ::Demo::ThingService)
+thread1 = Thread.new { client.call(:GetMyThing, id: id) }
+thread2 = Thread.new { client.call(:GetMyThing, id: id) }
+ThreadsWait.all_waits(thread1, thread2)
+```
+
+In the above example, thread1 will make the rpc call, thread2 will block until the call is complete, and then
+will get the same value without making a second rpc call.
+
+You can also skip this behavior for certain methods if desired.
+
+```ruby
+require 'gruf'
+require 'thwait'
+
+id = args[:id].to_i.presence || 1
+client = ::Gruf::SynchronizedClient.new(service: ::Demo::ThingService, options: { unsynchronized_methods: [:GetMyThing] })
+thread1 = Thread.new { client.call(:GetMyThing, id: id) }
+thread2 = Thread.new { client.call(:GetMyThing, id: id) }
+ThreadsWait.all_waits(thread1, thread2)
+```
+
+In the above example, thread1 and thread2 will make rpc calls in parallel, in the same way as if you had used
+`Gruf::Client`.
+
 ### Client Interceptors
 
 Gruf comes with an assistance class for client interceptors that you can use - or you can use the native gRPC core
-interceptors. Either way, you pass them into the client_options when creating a client:
+interceptors. Either way, you pass them into the `client_options` when creating a client:
 
 ```ruby
 class MyInterceptor < Gruf::Interceptors::ClientInterceptor
@@ -487,7 +523,7 @@ gruf that you can use today:
 
 * [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
 integration
-* [gruf-lightstep](https://github.com/bigcommerce/gruf-lightstep) - Provides a seamless 
+* [gruf-lightstep](https://github.com/bigcommerce/gruf-lightstep) - Provides a seamless
 [LightStep](https://lightstep.com) integration
 * [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Circuit breaker
 support for services

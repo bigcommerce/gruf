@@ -67,11 +67,13 @@ module Gruf
       t = Thread.new { grpc_server.run }
       grpc_server.wait_till_running
 
-      yield
-
-      grpc_server.stop
-      sleep(0.1) until grpc_server.stopped?
-      t.join
+      begin
+        yield
+      ensure
+        grpc_server.stop
+        sleep(0.1) until grpc_server.stopped?
+        t.join
+      end
     end
 
     ##
@@ -79,6 +81,20 @@ module Gruf
     #
     def build_client(options = {})
       Gruf::Client.new(
+        service: ::Rpc::ThingService,
+        options: {
+          hostname: "0.0.0.0:#{@server.port}",
+          username: USERNAME,
+          password: PASSWORD
+        }.merge(options)
+      )
+    end
+
+    ##
+    # Builds a client
+    #
+    def build_sync_client(options = {})
+      Gruf::SynchronizedClient.new(
         service: ::Rpc::ThingService,
         options: {
           hostname: "0.0.0.0:#{@server.port}",

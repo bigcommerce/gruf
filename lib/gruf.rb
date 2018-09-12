@@ -32,6 +32,7 @@ require_relative 'gruf/timer'
 require_relative 'gruf/response'
 require_relative 'gruf/error'
 require_relative 'gruf/client'
+require_relative 'gruf/synchronized_client'
 require_relative 'gruf/instrumentable_grpc_server'
 require_relative 'gruf/server'
 

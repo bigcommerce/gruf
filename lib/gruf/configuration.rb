@@ -40,6 +40,7 @@ module Gruf
       use_exception_message: true,
       internal_error_message: 'Internal Server Error',
       event_listener_proc: nil,
+      synchronized_client_internal_cache_expiry: 60,
       rpc_server_options: {
         pool_size: GRPC::RpcServer::DEFAULT_POOL_SIZE,
         max_waiting_requests: GRPC::RpcServer::DEFAULT_MAX_WAITING_REQUESTS,
