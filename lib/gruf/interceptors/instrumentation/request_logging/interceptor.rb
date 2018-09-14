@@ -78,7 +78,7 @@ module Gruf
             end
 
             payload = {}
-            unless request.client_streamer? or request.bidi_streamer?
+            if !request.client_streamer? && !request.bidi_streamer?
               payload[:params] = sanitize(request.message.to_h) if options.fetch(:log_parameters, false)
               payload[:message] = message(request, result)
               payload[:status] = status(result.message, result.successful?)
@@ -87,6 +87,7 @@ module Gruf
               payload[:message] = ''
               payload[:status] = GRPC::Core::StatusCodes::OK
             end
+
             payload[:service] = request.service_key
             payload[:method] = request.method_key
             payload[:action] = request.method_key
