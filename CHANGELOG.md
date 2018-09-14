@@ -1,6 +1,9 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
 ### Pending release
+
+### 2.5.0
+
 - Client exceptions raised now contain mapped subclasses, such as `Gruf::Client::Errors::InvalidArgument`
 - Client exceptions will also now catch StandardError and GRPC::Core errors, and handle them as Internal errors
 - Added SynchronizedClient which prevents multiple calls to the same endpoint with the same params at
