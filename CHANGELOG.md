@@ -1,9 +1,11 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
 ### Pending release
-
 - Client exceptions raised now contain mapped subclasses, such as `Gruf::Client::Errors::InvalidArgument`
 - Client exceptions will also now catch StandardError and GRPC::Core errors, and handle them as Internal errors
+- Added SynchronizedClient which prevents multiple calls to the same endpoint with the same params at
+  a given time. This is useful for mitigating thundering herds. To skip this behavior for certain endpoints,
+  pass the `options[:unsynchronized_methods]` param with a list of method names (as symbols).
 
 ### 2.4.2
 
