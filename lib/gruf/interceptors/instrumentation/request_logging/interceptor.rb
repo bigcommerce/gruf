@@ -78,7 +78,7 @@ module Gruf
             end
 
             payload = {}
-            if !request.client_streamer?
+            unless request.client_streamer? or request.bidi_streamer?
               payload[:params] = sanitize(request.message.to_h) if options.fetch(:log_parameters, false)
               payload[:message] = message(request, result)
               payload[:status] = status(result.message, result.successful?)
