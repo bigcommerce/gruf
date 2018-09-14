@@ -21,7 +21,8 @@ describe Gruf::Response do
   let(:trailing_metadata) { { 'timer' => internal_execution_time } }
   let(:operation) { build_operation(trailing_metadata: trailing_metadata, execution_time: execution_time) }
   let(:execution_time) { nil }
-  let(:response) { described_class.new(operation, execution_time) }
+  let(:message) { Rpc::GetThingResponse.new }
+  let(:response) { described_class.new(operation: operation, message: message, execution_time: execution_time) }
 
   describe '.initialize' do
     subject { response }
@@ -29,7 +30,7 @@ describe Gruf::Response do
     it 'should setup the appropriate values' do
       expect(subject).to be_a(described_class)
       expect(subject.operation).to eq operation
-      expect(subject.message).to eq operation.execute
+      expect(subject.message).to eq message
       expect(subject.metadata).to eq operation.metadata
       expect(subject.trailing_metadata).to eq operation.trailing_metadata
       expect(subject.deadline).to eq operation.deadline
@@ -55,7 +56,7 @@ describe Gruf::Response do
     subject { response.message }
 
     it 'should return the operation execution result' do
-      expect(subject).to eq operation.execute
+      expect(subject).to eq message
     end
   end
 

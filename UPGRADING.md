@@ -1,5 +1,21 @@
 This document guides on how to upgrade between significant versions of Gruf.
 
+## Upgrading to 2.5.0
+
+Gruf 2.5 introduces the concept of Client Error subclasses, such as:
+
+- `Gruf::Client::Errors::InvalidArgument`
+- `Gruf::Client::Errors::NotFound`
+- etc
+
+These closely map with their `GRPC::BadStatus` counterparts, and each subclass `Gruf::Client::Error`. This should be
+fully backwards compatible with your existing client error handling code, as the original exception through is still
+available via `.error` on the raised exception.
+
+However, one change is that Gruf will now catch `StandardError` and `GRPC::Core::CallError` exceptions at the client 
+boundary, and translate them into `Gruf::Client::Errors::Internal` exceptions in the client. If you have code that
+does not expect this case, you will need to adjust accordingly.
+
 ## Upgrading to 2.0.0
 
 Gruf 2.0 is a major shift from Gruf 1.0. The following summarizes the changes:

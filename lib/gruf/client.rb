@@ -13,6 +13,9 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require_relative 'client/error'
+require_relative 'client/error_factory'
+
 module Gruf
   ##
   # Abstracts out the calling interface for interacting with gRPC clients. Streamlines calling and provides
@@ -32,25 +35,6 @@ module Gruf
   #
   class Client < SimpleDelegator
     include Gruf::Loggable
-
-    ##
-    # Represents an error that was returned from the server's trailing metadata. Used as a custom exception object
-    # that is instead raised in the case of the service returning serialized error data, as opposed to the normal
-    # GRPC::BadStatus error
-    #
-    class Error < StandardError
-      # @return [Object] error The deserialized error
-      attr_reader :error
-
-      ##
-      # Initialize the client error
-      #
-      # @param [Object] error The deserialized error
-      #
-      def initialize(error)
-        @error = error
-      end
-    end
 
     # @return [Class] The base, friendly name of the service being requested
     attr_reader :base_klass
@@ -74,6 +58,7 @@ module Gruf
       @opts = options || {}
       @opts[:password] = options.fetch(:password, '').to_s
       @opts[:hostname] = options.fetch(:hostname, Gruf.default_client_host)
+      @error_factory = Gruf::Client::ErrorFactory.new
       client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
       super(client)
     end
@@ -98,16 +83,11 @@ module Gruf
 
       raise NotImplementedError, "The method #{request_method} has not been implemented in this service." unless call_sig
 
-      resp = execute(call_sig, req, md, opts, &block)
+      resp, operation = execute(call_sig, req, md, opts, &block)
 
-      Gruf::Response.new(resp.result, resp.time)
-    rescue GRPC::BadStatus => e
-      emk = Gruf.error_metadata_key.to_s
-      raise Gruf::Client::Error, error_deserializer_class.new(e.metadata[emk]).deserialize if e.respond_to?(:metadata) && e.metadata.key?(emk)
-      raise # passthrough
-    rescue StandardError => e
-      Gruf.logger.error e.message
-      raise
+      raise @error_factory.from_exception(resp.result) unless resp.success?
+
+      Gruf::Response.new(operation: operation, message: resp.result, execution_time: resp.time)
     end
 
     ##
@@ -137,13 +117,17 @@ module Gruf
     # @param [Object] req (Optional) The protobuf request message to send
     # @param [Hash] metadata (Optional) A hash of metadata key/values that are transported with the client request
     # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
+    # @return [Array<Gruf::Timer::Result, GRPC::ActiveCall::Operation>]
     #
     def execute(call_sig, req, metadata, opts = {}, &block)
-      Timer.time do
+      operation = nil
+      result = Gruf::Timer.time do
         opts[:return_op] = true
         opts[:metadata] = metadata
-        send(call_sig, req, opts, &block)
+        operation = send(call_sig, req, opts, &block)
+        operation.execute
       end
+      [result, operation]
     end
 
     ##

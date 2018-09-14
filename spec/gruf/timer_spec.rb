@@ -43,12 +43,23 @@ describe Gruf::Timer do
           expect(subject.time).to be > 0.00
         end
       end
+      context 'that is a GRPC::Core::CallError' do
+        let(:err) { GRPC::Core::CallError.new('really bad things') }
+
+        it 'should return it as the result with a time' do
+          expect(subject).to be_a(Gruf::Timer::Result)
+          expect(subject.result).to eq err
+          expect(subject.time).to be > 0.00
+        end
+      end
 
       context 'that is any other exception' do
         let(:err) { StandardError.new("it's a trap!") }
 
-        it 'should pass through that exception' do
-          expect { subject }.to raise_error(err)
+        it 'should return it as the result with a time' do
+          expect(subject).to be_a(Gruf::Timer::Result)
+          expect(subject.result).to eq err
+          expect(subject.time).to be > 0.00
         end
       end
     end

@@ -35,11 +35,12 @@ module Gruf
     # Initialize a response object with the given gRPC operation
     #
     # @param [GRPC::ActiveCall::Operation] operation The given operation for the current call
+    # @param [StdClass] message
     # @param [Float] execution_time The amount of time that the response took to occur
     #
-    def initialize(operation, execution_time = nil)
+    def initialize(operation:, message:, execution_time: nil)
       @operation = operation
-      @message = operation.execute
+      @message = message
       @metadata = operation.metadata
       @trailing_metadata = operation.trailing_metadata
       @deadline = operation.deadline

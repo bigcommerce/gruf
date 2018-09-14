@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Client exceptions raised now contain mapped subclasses, such as `Gruf::Client::Errors::InvalidArgument`
+- Client exceptions will also now catch StandardError and GRPC::Core errors, and handle them as Internal errors
+
 ### 2.4.2
 
 - Added error handling for GRPC::Core::CallError, a low-level error in the grpc library that does not inherit
