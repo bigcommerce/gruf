@@ -450,7 +450,8 @@ very large values (such as binary or json data).
 ### Controllers
 
 In order to test your controller, you first need to mock a GRPC ActiveCall. You can create the following file under `/spec/support/` path of your project:
-```
+
+```ruby
 require 'grpc'
 
 module Rpc
@@ -471,25 +472,21 @@ end
 ```
 
 Imagine you have the following controller to test:
-```
+
+```ruby
 class ThingController < ::Gruf::Controllers::Base
   bind ::Rpc::ThingService::Service
 
   def get_thing
-    thing = Rpc::Thing.new(id: message_id, name: 'Foo')
+    thing = Rpc::Thing.new(id: request.message.id, name: 'Foo')
     Rpc::GetThingResponse.new(thing: thing)
-  end
-
-  private
-
-  def message_id
-    request.message.id
   end
 end
 ```
 
 You can stub it in the specs this way:
-```
+
+```ruby
 describe ThingController do
   let(:rpc_service) { ::Rpc::ThingService::Service }
   let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs.values.first }
@@ -510,6 +507,7 @@ describe ThingController do
 
       it 'returns an instance of Rpc::GetThingResponse' do
         expect(result).to be_instance_of(Rpc::GetThingResponse)
+        expect(result.id).to eq request.id
       end
     end
   end
@@ -521,16 +519,17 @@ end
 You can build your own hooks and middleware for gruf; here's a list of known open source gems for
 gruf that you can use today:
 
-* [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
-integration
 * [gruf-lightstep](https://github.com/bigcommerce/gruf-lightstep) - Provides a seamless
 [LightStep](https://lightstep.com) integration
-* [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Circuit breaker
-support for services
-* [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage
-reports for clients and services
+* [gruf-zipkin](https://github.com/bigcommerce/gruf-zipkin) - Provides a [Zipkin](https://zipkin.io)
+integration
+* [gruf-newrelic](https://github.com/bigcommerce/gruf-newrelic) - Easy [New Relic](https://newrelic.com/) integration
 * [gruf-commander](https://github.com/bigcommerce/gruf-commander) - Request/command-style validation and
 execution patterns for services
+* [gruf-profiler](https://github.com/bigcommerce/gruf-profiler) - Profiles and provides memory usage
+reports for clients and services
+* [gruf-circuit-breaker](https://github.com/bigcommerce/gruf-circuit-breaker) - Circuit breaker
+support for services
 
 ## Demo Rails App
 
