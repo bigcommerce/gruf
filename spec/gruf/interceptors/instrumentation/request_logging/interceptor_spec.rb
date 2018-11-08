@@ -96,6 +96,21 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
     end
+
+    context 'and the request was unspecified failure' do
+      let(:call) do
+        interceptor.call do
+          raise NoMethodError
+        end
+      end
+
+      it 'should log the call properly as an ERROR' do
+        expect(Gruf.logger).to receive(:error).once
+        expect { subject }.to raise_error(NoMethodError) do |e|
+          expect(e.class).to eq NoMethodError
+        end
+      end
+    end
   end
 
   describe '.sanitize' do

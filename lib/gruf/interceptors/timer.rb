@@ -73,7 +73,7 @@ module Gruf
         end_time = Time.now
         elapsed = (end_time - start_time) * 1000.0
         Result.new(message, elapsed, true)
-      rescue GRPC::BadStatus => e
+      rescue StandardError => e
         end_time = Time.now
         elapsed = (end_time - start_time) * 1000.0
         Result.new(e, elapsed, false)

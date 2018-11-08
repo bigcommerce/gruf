@@ -128,7 +128,9 @@ module Gruf
           # @return [Boolean] The proper status code
           #
           def status(response, successful)
-            successful ? GRPC::Core::StatusCodes::OK : response.code
+            return GRPC::Core::StatusCodes::OK if successful
+
+            response.respond_to?(:code) ? response.code : GRPC::Core::StatusCodes::UNKNOWN
           end
 
           ##
