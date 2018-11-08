@@ -50,6 +50,15 @@ describe Gruf::Client do
         expect(subject).to be_a(Gruf::Client)
         expect(subject.timeout).to eq timeout
       end
+
+      context 'if the timeout is passed as a string' do
+        let(:timeout) { '30' }
+
+        it 'should be cast as an int' do
+          expect(subject).to be_a(Gruf::Client)
+          expect(subject.timeout).to eq 30
+        end
+      end
     end
   end
 

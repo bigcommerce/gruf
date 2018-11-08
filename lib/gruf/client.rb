@@ -59,6 +59,7 @@ module Gruf
       @opts[:password] = options.fetch(:password, '').to_s
       @opts[:hostname] = options.fetch(:hostname, Gruf.default_client_host)
       @error_factory = Gruf::Client::ErrorFactory.new
+      client_options[:timeout] = client_options[:timeout].to_i if client_options.key?(:timeout)
       client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
       super(client)
     end
