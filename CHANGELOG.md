@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Ensure `timeout` is an int when passed as a client option to a gRPC client
+- Add `bound_service` reader to `Gruf::Controllers::Base` for finding the service bound to the given controller
+
 ### 2.5.0
 
 - Client exceptions raised now contain mapped subclasses, such as `Gruf::Client::Errors::InvalidArgument`

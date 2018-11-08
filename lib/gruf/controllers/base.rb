@@ -29,6 +29,11 @@ module Gruf
       # @var [Gruf::Error] error
       attr_reader :error
 
+      class << self
+        # @var [GRPC::GenericService] bound_service
+        attr_reader :bound_service
+      end
+
       ##
       # Initialize the controller within the given request context
       #
@@ -56,8 +61,10 @@ module Gruf
       # @param [GRPC::GenericService] service The name of the service to bind this controller to
       #
       def self.bind(service)
-        Gruf.services << service.name.constantize
-        ServiceBinder.new(service).bind!(self)
+        service_class = service.name.constantize
+        Gruf.services << service_class
+        @bound_service = service_class
+        ServiceBinder.new(service_class).bind!(self)
       end
 
       ##

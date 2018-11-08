@@ -37,6 +37,14 @@ describe ::Gruf::Controllers::Base do
       expect(rpc_service.instance_methods).to include(:get_thing)
       expect(controller_class.instance_methods).to include(:get_thing)
     end
+
+    it 'should bind the service name to the service class' do
+      expect(controller_class.bound_service).to eq rpc_service
+    end
+
+    it 'should not bind the service name to the base class' do
+      expect(Gruf::Controllers::Base.bound_service).to be_nil
+    end
   end
 
   describe '.call' do
