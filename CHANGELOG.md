@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.5.2
+
 - Log ok/validation responses at DEBUG levels to prevent log stampeding in high-volume environments
 
 ### 2.5.1
