@@ -21,7 +21,7 @@ group :development, :test do
   gem 'factory_bot'
   gem 'ffaker'
   gem 'pry-byebug'
-  gem 'rubocop', '~> 0.53.0'
+  gem 'rubocop', '~> 0.54.0'
 end
 
 group :test do
