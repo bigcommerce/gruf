@@ -30,6 +30,11 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   let(:errors) { build :error }
   let(:interceptor) { described_class.new(controller_request, errors, options) }
   let(:call) { interceptor.call { true } }
+  let(:logger) { ::Logger.new('/dev/null') }
+
+  before do
+    allow(interceptor).to receive(:logger).and_return(logger)
+  end
 
   describe '.call' do
     subject { call }
@@ -41,8 +46,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
 
-      it 'should log the call properly as an INFO' do
-        expect(Gruf.logger).to receive(:info).once
+      it 'should log the call properly as a DEBUG' do
+        expect(logger).to receive(:debug).once
         expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
           expect(e.details).to eq 'invalid argument'
         end
@@ -59,7 +64,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       end
 
       it 'should log the call properly as an WARN' do
-        expect(Gruf.logger).to receive(:warn).once
+        expect(logger).to receive(:warn).once
         expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
           expect(e.details).to eq 'invalid argument'
         end
@@ -67,8 +72,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
     end
 
     context 'and the request was successful' do
-      it 'should log the call properly as an INFO' do
-        expect(Gruf.logger).to receive(:info).once
+      it 'should log the call properly as a DEBUG' do
+        expect(logger).to receive(:debug).once
         subject
       end
 
@@ -76,7 +81,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         let(:options) { { ignore_methods: %w[rpc.thing_service.get_thing] } }
 
         it 'shouldn\'t log the call' do
-          expect(Gruf.logger).not_to receive(:info)
+          expect(logger).not_to receive(:debug)
           subject
         end
       end
@@ -89,8 +94,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
 
-      it 'should log the call properly as an INFO' do
-        expect(Gruf.logger).to receive(:info).once
+      it 'should log the call properly as a DEBUG' do
+        expect(logger).to receive(:debug).once
         expect { subject }.to raise_error(GRPC::NotFound) do |e|
           expect(e.details).to eq 'thing not found'
         end

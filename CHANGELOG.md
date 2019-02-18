@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Log ok/validation responses at DEBUG levels to prevent log stampeding in high-volume environments
+
 ### 2.5.1
 
 - Ensure `timeout` is an int when passed as a client option to a gRPC client

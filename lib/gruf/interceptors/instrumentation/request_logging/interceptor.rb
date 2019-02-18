@@ -38,20 +38,22 @@ module Gruf
         class Interceptor < ::Gruf::Interceptors::ServerInterceptor
 
           # Default mappings of codes to log levels...
-          LOG_LEVEL_MAP = { 'GRPC::Ok' => :info,
-                            'GRPC::InvalidArgument' => :info,
-                            'GRPC::NotFound' => :info,
-                            'GRPC::AlreadyExists' => :info,
-                            'GRPC::OutOfRange' => :info,
-                            'GRPC::Unauthenticated' => :warn,
-                            'GRPC::PermissionDenied' => :warn,
-                            'GRPC::Unknown' => :error,
-                            'GRPC::Internal' => :error,
-                            'GRPC::DataLoss' => :error,
-                            'GRPC::FailedPrecondition' => :error,
-                            'GRPC::Unavailable' => :error,
-                            'GRPC::DeadlineExceeded' => :error,
-                            'GRPC::Cancelled' => :error }.freeze
+          LOG_LEVEL_MAP = {
+            'GRPC::Ok' => :debug,
+            'GRPC::InvalidArgument' => :debug,
+            'GRPC::NotFound' => :debug,
+            'GRPC::AlreadyExists' => :debug,
+            'GRPC::OutOfRange' => :debug,
+            'GRPC::Unauthenticated' => :warn,
+            'GRPC::PermissionDenied' => :warn,
+            'GRPC::Unknown' => :error,
+            'GRPC::Internal' => :error,
+            'GRPC::DataLoss' => :error,
+            'GRPC::FailedPrecondition' => :error,
+            'GRPC::Unavailable' => :error,
+            'GRPC::DeadlineExceeded' => :error,
+            'GRPC::Cancelled' => :error
+          }.freeze
 
           ###
           # Log the request, sending it to the appropriate formatter
@@ -70,7 +72,7 @@ module Gruf
 
             # A result is either successful, or, some level of feedback handled in the else block...
             if result.successful?
-              type = :info
+              type = log_level_map['GRPC::Ok'] || :debug
               status_name = 'GRPC::Ok'
             else
               type = log_level_map[result.message_class_name] || :error
@@ -97,13 +99,20 @@ module Gruf
             payload[:time] = Time.now.to_s
             payload[:host] = Socket.gethostname
 
-            ::Gruf.logger.send(type, formatter.format(payload))
+            logger.send(type, formatter.format(payload))
 
             raise result.message unless result.successful?
             result.message
           end
 
           private
+
+          ##
+          # @return [::Gruf::Logger]
+          #
+          def logger
+            @logger ||= options.fetch(:logger, ::Gruf.logger)
+          end
 
           ##
           # Return an appropriate log message dependent on the status
