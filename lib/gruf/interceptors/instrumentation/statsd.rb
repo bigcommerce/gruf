@@ -39,6 +39,7 @@ module Gruf
           client.timing(route_key, result.elapsed)
 
           raise result.message unless result.successful?
+
           result.message
         end
 

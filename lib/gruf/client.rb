@@ -68,8 +68,8 @@ module Gruf
     # Call the client's method with given params
     #
     # @param [String|Symbol] request_method The method that is being requested on the service
-    # @param [Hash] params (Optional) A hash of parameters that will be inserted into the gRPC request message that is required
-    # for the given above call
+    # @param [Hash] params (Optional) A hash of parameters that will be inserted into the gRPC request message that is
+    # required for the given above call
     # @param [Hash] metadata (Optional) A hash of metadata key/values that are transported with the client request
     # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
     # @return [Gruf::Response] The response from the server
@@ -82,7 +82,9 @@ module Gruf
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
 
-      raise NotImplementedError, "The method #{request_method} has not been implemented in this service." unless call_sig
+      unless call_sig
+        raise NotImplementedError, "The method #{request_method} has not been implemented in this service."
+      end
 
       resp, operation = execute(call_sig, req, md, opts, &block)
 

@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Drop Ruby 2.2 support
+- Bump rubocop to 0.64, address violations, update activesupport/concurrent-ruby dependencies to have a min version
+
 ### 2.5.2
 
 - Log ok/validation responses at DEBUG levels to prevent log stampeding in high-volume environments

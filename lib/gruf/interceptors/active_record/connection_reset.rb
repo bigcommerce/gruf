@@ -25,9 +25,8 @@ module Gruf
         # connection pool, we need to ensure that this is done to properly
         #
         def call
-          if enabled? && !::ActiveRecord::Base.connection.active?
-            ::ActiveRecord::Base.establish_connection
-          end
+          ::ActiveRecord::Base.establish_connection if enabled? && !::ActiveRecord::Base.connection.active?
+
           yield
         ensure
           ::ActiveRecord::Base.clear_active_connections! if enabled?

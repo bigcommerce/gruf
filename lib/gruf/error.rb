@@ -197,7 +197,7 @@ module Gruf
     # @return [GRPC::BadStatus]
     #
     def grpc_error
-      md = @metadata ? @metadata : {}
+      md = @metadata || {}
       @grpc_error = grpc_class.new(message, **md)
     end
 

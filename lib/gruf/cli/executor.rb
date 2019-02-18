@@ -38,7 +38,7 @@ module Gruf
         server.start!
       rescue StandardError => e
         msg = "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
-        logger = Gruf.logger ? Gruf.logger : Logger.new(STDERR)
+        logger = Gruf.logger || Logger.new(STDERR)
         logger.fatal msg
       end
 

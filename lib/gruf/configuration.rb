@@ -51,7 +51,7 @@ module Gruf
       }.freeze
     }.freeze
 
-    attr_accessor *VALID_CONFIG_KEYS.keys
+    attr_accessor(* VALID_CONFIG_KEYS.keys)
 
     ##
     # Whenever this is extended into a class, setup the defaults

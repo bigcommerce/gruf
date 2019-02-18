@@ -36,7 +36,6 @@ module Gruf
         #   Gruf::Instrumentation::Registry.add(:request_logging, Gruf::Instrumentation::RequestLogging::Hook)
         #
         class Interceptor < ::Gruf::Interceptors::ServerInterceptor
-
           # Default mappings of codes to log levels...
           LOG_LEVEL_MAP = {
             'GRPC::Ok' => :debug,
@@ -102,6 +101,7 @@ module Gruf
             logger.send(type, formatter.format(payload))
 
             raise result.message unless result.successful?
+
             result.message
           end
 
@@ -122,11 +122,9 @@ module Gruf
           # @return [String] The appropriate message body
           #
           def message(request, result)
-            if result.successful?
-              "[GRPC::Ok] (#{request.method_name})"
-            else
-              "[#{result.message_class_name}] (#{request.method_name}) #{result.message.message}"
-            end
+            return "[GRPC::Ok] (#{request.method_name})" if result.successful?
+
+            "[#{result.message_class_name}] (#{request.method_name}) #{result.message.message}"
           end
 
           ##
@@ -149,13 +147,14 @@ module Gruf
             unless @formatter
               fmt = options.fetch(:formatter, :plain)
               @formatter = case fmt
-                             when Symbol
-                               klass = "Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::#{fmt.to_s.capitalize}"
-                               fmt = klass.constantize.new
-                             when Class
-                               fmt = fmt.new
-                             else
-                               fmt
+                           when Symbol
+                             prefix = 'Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::'
+                             klass = "#{prefix}#{fmt.to_s.capitalize}"
+                             fmt = klass.constantize.new
+                           when Class
+                             fmt = fmt.new
+                           else
+                             fmt
                            end
               raise InvalidFormatterError unless fmt.is_a?(Formatters::Base)
             end
@@ -188,7 +187,9 @@ module Gruf
           #
           def redact!(parts = [], idx = 0, params = {}, redacted_string = 'REDACTED')
             return unless parts.is_a?(Array) && params.is_a?(Hash)
+
             return if idx >= parts.size || !params.key?(parts[idx])
+
             if idx == parts.size - 1
               if params[parts[idx]].is_a? Hash
                 hash_deep_redact!(params[parts[idx]], redacted_string)

@@ -37,6 +37,7 @@ module Gruf
     #
     def notify(event)
       return unless @event_listener_proc && @event_listener_proc.respond_to?(:call)
+
       @event_listener_proc.call(event)
     end
 
