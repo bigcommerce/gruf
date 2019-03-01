@@ -14,37 +14,13 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require 'thing_controller'
-require 'stuff_controller'
+require 'rpc/ThingService_services_pb'
 
-module Rpc
-  module Test
-    class Call
-      attr_reader :metadata
+# A controller for the test to bind multiple controllers to a single service.
+class StuffController < ::Gruf::Controllers::Base
+  bind ::Rpc::ThingService::Service
 
-      def initialize(md = nil)
-        @metadata = md || { 'authorization' => "Basic #{Base64.encode64('grpc:magic')}" }
-      end
-
-      def output_metadata
-        @output_metadata ||= {}
-      end
-    end
-  end
-end
-
-class TestClient
-  def get_thing(id: 1)
-    request = ::Rpc::GetThingRequest.new(id: id)
-    rpc_client = ::ThingService.new
-
-    c = Rpc::Test::Call.new('authorization' => "Basic #{Base64.encode64('grpc:magic')}")
-    begin
-      thing = rpc_client.get_thing(request, c)
-    rescue Gruf::Client::Error => e
-      puts e.error.inspect
-    end
-    thing
+  def get_stuff
+    Rpc::GetStuffResponse.new(stuff: Rpc::Stuff.new(id: request.message.id))
   end
 end
