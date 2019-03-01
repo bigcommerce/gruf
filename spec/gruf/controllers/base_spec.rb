@@ -45,6 +45,10 @@ describe ::Gruf::Controllers::Base do
     it 'should not bind the service name to the base class' do
       expect(Gruf::Controllers::Base.bound_service).to be_nil
     end
+
+    it 'should register the service without duplication if #bind is called for the same service more than once' do
+      expect(Gruf.services.select { |sv| sv == rpc_service }.count).to eq 1
+    end
   end
 
   describe '.call' do

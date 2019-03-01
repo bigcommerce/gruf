@@ -62,7 +62,7 @@ module Gruf
       #
       def self.bind(service)
         service_class = service.name.constantize
-        Gruf.services << service_class
+        Gruf.services << service_class unless Gruf.services.include?(service_class)
         @bound_service = service_class
         ServiceBinder.new(service_class).bind!(self)
       end
