@@ -42,6 +42,9 @@ service ThingService {
     rpc GetException(GetThingRequest) returns (GetThingResponse) {}
     // For testing an uncaught exception
     rpc GetUncaughtException(GetThingRequest) returns (GetThingResponse) {}
+
+    // For testing multiple controllers binding to a single service
+    rpc GetStuff(GetStuffRequest) returns (GetStuffResponse) {}
 }
 
 // Represents a generic thing
@@ -72,4 +75,21 @@ message GetThingsRequest {
 // Response for creating multiple things
 message CreateThingsResponse {
     repeated Thing things = 1;
+}
+
+// Represents generic stuff
+message Stuff {
+    uint32 id = 1;
+}
+
+// Requests
+
+// Request for getting single stuff
+message GetStuffRequest {
+    uint32 id = 1;
+}
+
+// Response for getting single stuff
+message GetStuffResponse {
+    Stuff stuff = 1;
 }
