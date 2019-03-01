@@ -52,6 +52,8 @@ module Rpc
       rpc :GetException, GetThingRequest, GetThingResponse
       # For testing an uncaught exception
       rpc :GetUncaughtException, GetThingRequest, GetThingResponse
+      # For testing multiple controllers binding to a single service
+      rpc :GetStuff, GetStuffRequest, GetStuffResponse
     end
 
     Stub = Service.rpc_stub_class

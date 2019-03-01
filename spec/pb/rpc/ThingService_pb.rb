@@ -22,6 +22,15 @@ Google::Protobuf::DescriptorPool.generated_pool.build do
   add_message "rpc.CreateThingsResponse" do
     repeated :things, :message, 1, "rpc.Thing"
   end
+  add_message "rpc.Stuff" do
+    optional :id, :uint32, 1
+  end
+  add_message "rpc.GetStuffRequest" do
+    optional :id, :uint32, 1
+  end
+  add_message "rpc.GetStuffResponse" do
+    optional :stuff, :message, 1, "rpc.Stuff"
+  end
 end
 
 module Rpc
@@ -30,4 +39,7 @@ module Rpc
   GetThingResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.GetThingResponse").msgclass
   GetThingsRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.GetThingsRequest").msgclass
   CreateThingsResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.CreateThingsResponse").msgclass
+  Stuff = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.Stuff").msgclass
+  GetStuffRequest = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.GetStuffRequest").msgclass
+  GetStuffResponse = Google::Protobuf::DescriptorPool.generated_pool.lookup("rpc.GetStuffResponse").msgclass
 end
