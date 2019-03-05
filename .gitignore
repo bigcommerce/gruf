@@ -1,4 +1,6 @@
 /.bundle/
+/.byebug_history
+/.idea/
 /.yardoc
 /Gemfile.lock
 /_yardoc/
