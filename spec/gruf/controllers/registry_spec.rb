@@ -1,3 +1,4 @@
+# coding: utf-8
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -13,34 +14,18 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/controllers/registry'
-require_relative 'gruf/configuration'
-require_relative 'gruf/errors/helpers'
-require_relative 'gruf/cli/executor'
-require_relative 'gruf/controllers/base'
-require_relative 'gruf/controllers/service_binder'
-require_relative 'gruf/outbound/request_context'
-require_relative 'gruf/interceptors/registry'
-require_relative 'gruf/interceptors/base'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/synchronized_client'
-require_relative 'gruf/instrumentable_grpc_server'
-require_relative 'gruf/server'
+require 'spec_helper'
 
-##
-# Initializes configuration of gruf core module
-#
-module Gruf
-  extend Configuration
+describe ::Gruf::Controllers::Registry do
+  describe '#add' do
+    subject { registry.add(ThingController, Rpc::ThingService) }
+
+    let(:registry) { described_class.new }
+
+    it 'registers the controller and service' do
+      subject
+
+      expect(registry[ThingController]).to eq Rpc::ThingService
+    end
+  end
 end

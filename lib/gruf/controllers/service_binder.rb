@@ -53,6 +53,9 @@ module Gruf
       #
       def bind_method(controller, method_name, desc)
         method_key = method_name.to_s.underscore.to_sym
+
+        return unless controller.public_method_defined?(method_key)
+
         service_ref = @service
 
         @service.class_eval do

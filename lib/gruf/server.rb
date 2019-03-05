@@ -195,6 +195,7 @@ module Gruf
     def setup
       setup_signal_handlers
       load_controllers
+      bind_services
     end
     # :nocov:
 
@@ -236,6 +237,16 @@ module Gruf
     #
     def controllers_path
       options.fetch(:controllers_path, Gruf.controllers_path)
+    end
+
+    ##
+    # Bind each gRPC service to associated controllers
+    #
+    # :nocov:
+    def bind_services
+      Gruf.controller_registry.each do |controller, service|
+        Gruf::Controllers::ServiceBinder.new(service).bind!(controller)
+      end
     end
 
     ##

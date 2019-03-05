@@ -28,6 +28,7 @@ module Gruf
       ssl_crt_file: '',
       ssl_key_file: '',
       controllers_path: '',
+      controller_registry: Gruf::Controllers::Registry.new,
       services: [],
       logger: nil,
       grpc_logger: nil,

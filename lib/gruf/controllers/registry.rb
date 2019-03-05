@@ -13,34 +13,42 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/controllers/registry'
-require_relative 'gruf/configuration'
-require_relative 'gruf/errors/helpers'
-require_relative 'gruf/cli/executor'
-require_relative 'gruf/controllers/base'
-require_relative 'gruf/controllers/service_binder'
-require_relative 'gruf/outbound/request_context'
-require_relative 'gruf/interceptors/registry'
-require_relative 'gruf/interceptors/base'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/synchronized_client'
-require_relative 'gruf/instrumentable_grpc_server'
-require_relative 'gruf/server'
-
-##
-# Initializes configuration of gruf core module
-#
 module Gruf
-  extend Configuration
+  module Controllers
+    ##
+    # A controller registry to record controllers bound to services
+    #
+    class Registry
+      def initialize
+        @registry = {}
+      end
+
+      ##
+      # Register a controller with a service bound to the controller.
+      #
+      # @param [Class] controller
+      # @param [GRPC::GenericService] service
+      def add(controller, service)
+        @registry[controller] = service
+      end
+
+      ##
+      # Return a service class by a controller class
+      #
+      # @param [Class] controller
+      # @return [GRPC::GenericService]
+      def [](controller)
+        @registry[controller]
+      end
+
+      ##
+      # Iterate each controller with bound service
+      #
+      # @yieldparam [Class] controller
+      # @yieldparam [GRPC::GenericService] service
+      def each
+        @registry.each { |controller, service| yield controller, service }
+      end
+    end
+  end
 end
