@@ -21,12 +21,12 @@ group :development, :test do
   gem 'factory_bot'
   gem 'ffaker'
   gem 'pry-byebug'
-  gem 'rubocop', '~> 0.54.0'
+  gem 'rubocop', '~> 0.64.0'
 end
 
 group :test do
   gem 'bundler-audit'
   gem 'null-logger'
-  gem 'rspec', '~> 3.6'
+  gem 'rspec', '~> 3.8'
   gem 'simplecov', require: false
 end

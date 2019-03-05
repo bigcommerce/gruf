@@ -1,6 +1,3 @@
-inherit_from:
-  - .rubocop_todo.yml
-
 AllCops:
   TargetRubyVersion: 2.2
   Exclude:
@@ -12,3 +9,37 @@ AllCops:
     - log/**/*
     - Rakefile
     - gruf.gemspec
+
+Layout/EndAlignment:
+  Enabled: false
+
+Metrics/AbcSize:
+  Max: 147
+
+Metrics/ClassLength:
+  Max: 406
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/LineLength:
+  Max: 120
+
+Metrics/MethodLength:
+  Max: 88
+
+Metrics/ModuleLength:
+  Max: 1000
+
+Metrics/ParameterLists:
+  Max: 9
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Naming/PredicateName:
+  Enabled: false
+
+Metrics/BlockLength:
+  Enabled: false
+

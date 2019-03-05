@@ -34,6 +34,7 @@ module Gruf
           output_metadata.update(metadata_key => result.elapsed.to_s)
 
           raise result.message unless result.successful?
+
           result.message
         end
 

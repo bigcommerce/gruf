@@ -94,6 +94,7 @@ module Gruf
       stop_server_thread = Thread.new do
         loop do
           break if @stop_server
+
           @stop_server_mu.synchronize { @stop_server_cv.wait(@stop_server_mu, 10) }
         end
         logger.info { 'Shutting down...' }
@@ -120,6 +121,7 @@ module Gruf
     #
     def add_service(klass)
       raise ServerAlreadyStartedError if @started
+
       @services << klass unless @services.include?(klass)
     end
 
@@ -132,6 +134,7 @@ module Gruf
     #
     def add_interceptor(klass, opts = {})
       raise ServerAlreadyStartedError if @started
+
       @interceptors.use(klass, opts)
     end
 
@@ -144,6 +147,7 @@ module Gruf
     #
     def insert_interceptor_before(before_class, interceptor_class, opts = {})
       raise ServerAlreadyStartedError if @started
+
       @interceptors.insert_before(before_class, interceptor_class, opts)
     end
 
@@ -156,6 +160,7 @@ module Gruf
     #
     def insert_interceptor_after(after_class, interceptor_class, opts = {})
       raise ServerAlreadyStartedError if @started
+
       @interceptors.insert_after(after_class, interceptor_class, opts)
     end
 
@@ -175,6 +180,7 @@ module Gruf
     #
     def remove_interceptor(klass)
       raise ServerAlreadyStartedError if @started
+
       @interceptors.remove(klass)
     end
 
@@ -183,6 +189,7 @@ module Gruf
     #
     def clear_interceptors
       raise ServerAlreadyStartedError if @started
+
       @interceptors.clear
     end
 
@@ -221,10 +228,12 @@ module Gruf
     # :nocov:
     def load_controllers
       return unless File.directory?(controllers_path)
+
       path = File.realpath(controllers_path)
       $LOAD_PATH.unshift(path)
       Dir["#{path}/**/*.rb"].each do |f|
         next if f.include?('_pb') # exclude if people include proto generated files in app/rpc
+
         logger.info "- Loading gRPC service file: #{f}"
         load File.realpath(f)
       end
@@ -245,14 +254,12 @@ module Gruf
     #
     # :nocov:
     def ssl_credentials
-      if options.fetch(:use_ssl, Gruf.use_ssl)
-        private_key = File.read(options.fetch(:ssl_key_file, Gruf.ssl_key_file))
-        cert_chain = File.read(options.fetch(:ssl_crt_file, Gruf.ssl_crt_file))
-        certs = [nil, [{ private_key: private_key, cert_chain: cert_chain }], false]
-        GRPC::Core::ServerCredentials.new(*certs)
-      else
-        :this_port_is_insecure
-      end
+      return :this_port_is_insecure unless options.fetch(:use_ssl, Gruf.use_ssl)
+
+      private_key = File.read(options.fetch(:ssl_key_file, Gruf.ssl_key_file))
+      cert_chain = File.read(options.fetch(:ssl_crt_file, Gruf.ssl_crt_file))
+      certs = [nil, [{ private_key: private_key, cert_chain: cert_chain }], false]
+      GRPC::Core::ServerCredentials.new(*certs)
     end
     # :nocov:
 

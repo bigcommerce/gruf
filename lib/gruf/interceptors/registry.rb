@@ -22,7 +22,7 @@ module Gruf
       class InterceptorNotFoundError < StandardError; end
 
       def initialize
-        @registry ||= []
+        @registry = []
       end
 
       ##
@@ -49,6 +49,7 @@ module Gruf
       def remove(interceptor_class)
         pos = @registry.find_index { |opts| opts.fetch(:klass, '') == interceptor_class }
         raise InterceptorNotFoundError if pos.nil?
+
         @registry.delete_at(pos)
       end
 
@@ -64,6 +65,7 @@ module Gruf
         interceptors_mutex do
           pos = @registry.find_index { |opts| opts.fetch(:klass, '') == before_class }
           raise InterceptorNotFoundError if pos.nil?
+
           @registry.insert(
             pos,
             klass: interceptor_class,
@@ -84,6 +86,7 @@ module Gruf
         interceptors_mutex do
           pos = @registry.find_index { |opts| opts.fetch(:klass, '') == after_class }
           raise InterceptorNotFoundError if pos.nil?
+
           @registry.insert(
             (pos + 1),
             klass: interceptor_class,

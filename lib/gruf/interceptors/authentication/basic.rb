@@ -22,7 +22,9 @@ module Gruf
       # Handles basic authentication for gRPC requests
       #
       class Basic < Gruf::Interceptors::ServerInterceptor
-
+        ##
+        # Validate authentication
+        #
         def call
           fail!(:unauthenticated, :unauthenticated) unless bypass? || valid?
           yield
@@ -63,7 +65,11 @@ module Gruf
         # @return [String] The decoded request credentials
         #
         def request_credentials
-          credentials = request.active_call.respond_to?(:metadata) ? request.active_call.metadata['authorization'].to_s : ''
+          credentials = if request.active_call.respond_to?(:metadata)
+                          request.active_call.metadata['authorization'].to_s
+                        else
+                          ''
+                        end
           Base64.decode64(credentials.to_s.gsub('Basic ', '').strip)
         end
 

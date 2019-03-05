@@ -32,13 +32,16 @@ Gem::Specification.new do |spec|
   spec.executables   << 'gruf'
   spec.require_paths = ['lib']
 
+  spec.required_ruby_version = '~> 2.4'
+
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'rake', '~> 10.0'
-  spec.add_development_dependency 'pry'
+  spec.add_development_dependency 'pry', '~> 0.11'
 
   spec.add_runtime_dependency 'grpc', '~> 1.10'
   spec.add_runtime_dependency 'grpc-tools', '~> 1.10'
-  spec.add_runtime_dependency 'activesupport'
-  spec.add_runtime_dependency 'concurrent-ruby'
+  spec.add_runtime_dependency 'activesupport', '> 4'
+
+  spec.add_runtime_dependency 'concurrent-ruby', '> 1'
   spec.add_runtime_dependency 'slop', '~> 4.6'
 end

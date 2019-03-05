@@ -58,22 +58,46 @@ module Gruf
         @service.class_eval do
           if desc.request_response?
             define_method(method_key) do |message, active_call|
-              c = controller.new(method_key: method_key, service: service_ref, message: message, active_call: active_call, rpc_desc: desc)
+              c = controller.new(
+                method_key: method_key,
+                service: service_ref,
+                message: message,
+                active_call: active_call,
+                rpc_desc: desc
+              )
               c.call(method_key)
             end
           elsif desc.client_streamer?
             define_method(method_key) do |active_call|
-              c = controller.new(method_key: method_key, service: service_ref, message: proc { |&block| active_call.each_remote_read(&block) }, active_call: active_call, rpc_desc: desc)
+              c = controller.new(
+                method_key: method_key,
+                service: service_ref,
+                message: proc { |&block| active_call.each_remote_read(&block) },
+                active_call: active_call,
+                rpc_desc: desc
+              )
               c.call(method_key)
             end
           elsif desc.server_streamer?
             define_method(method_key) do |message, active_call, &block|
-              c = controller.new(method_key: method_key, service: service_ref, message: message, active_call: active_call, rpc_desc: desc)
+              c = controller.new(
+                method_key: method_key,
+                service: service_ref,
+                message: message,
+                active_call: active_call,
+                rpc_desc: desc
+              )
               c.call(method_key, &block)
             end
           else # bidi
             define_method(method_key) do |messages, active_call, &block|
-              c = controller.new(method_key: method_key, service: service_ref, message: messages, active_call: active_call, rpc_desc: desc)
+              c = controller.new(
+                method_key: method_key,
+                service: service_ref,
+                message: messages,
+                active_call: active_call,
+                rpc_desc: desc
+              )
               c.call(method_key, &block)
             end
           end

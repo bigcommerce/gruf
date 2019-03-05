@@ -28,8 +28,10 @@ module Gruf
     #
     # @param [Module] service The namespace of the client Stub that is desired to load
     # @param [Hash] options A hash of options for the client
-    # @option options [Array] :unsynchronized_methods A list of methods (as symbols) that should be excluded from synchronization
-    # @option options [Integer] :internal_cache_expiry The length of time to keep results around for other threads to fetch (in seconds)
+    # @option options [Array] :unsynchronized_methods A list of methods (as symbols) that
+    #   should be excluded from synchronization
+    # @option options [Integer] :internal_cache_expiry The length of time to keep results
+    #   around for other threads to fetch (in seconds)
     # @param [Hash] client_options A hash of options to pass to the gRPC client stub
     #
     def initialize(service:, options: {}, client_options: {})
@@ -45,8 +47,8 @@ module Gruf
     # params, block until the active call is complete. When unblocked, callers will get a copy of the original result.
     #
     # @param [String|Symbol] request_method The method that is being requested on the service
-    # @param [Hash] params (Optional) A hash of parameters that will be inserted into the gRPC request message that is required
-    # for the given above call
+    # @param [Hash] params (Optional) A hash of parameters that will be inserted into the gRPC request
+    #   message that is required for the given above call
     # @param [Hash] metadata (Optional) A hash of metadata key/values that are transported with the client request
     # @param [Hash] opts (Optional) A hash of options to send to the gRPC request_response method
     # @return [Gruf::Response] The response from the server

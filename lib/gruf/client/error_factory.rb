@@ -31,11 +31,6 @@ module Gruf
       )
         @default_class = default_class || Gruf::Client::Errors::Internal
         @metadata_key = (metadata_key || Gruf.error_metadata_key).to_s
-        default_serializer = if Gruf.error_serializer
-                               Gruf.error_serializer.is_a?(Class) ? Gruf.error_serializer : Gruf.error_serializer.to_s.constantize
-                             else
-                               Gruf::Serializers::Errors::Json
-                             end
         @deserializer_class = deserializer_class || default_serializer
       end
 
@@ -93,6 +88,15 @@ module Gruf
         error_class
       rescue NameError => _
         @default_class
+      end
+
+      ##
+      # @return [Gruf::Serializers::Errors::Base]
+      #
+      def default_serializer
+        return Gruf::Serializers::Errors::Json unless Gruf.error_serializer
+
+        Gruf.error_serializer.is_a?(Class) ? Gruf.error_serializer : Gruf.error_serializer.to_s.constantize
       end
     end
   end

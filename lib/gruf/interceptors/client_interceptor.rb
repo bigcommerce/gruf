@@ -42,7 +42,13 @@ module Gruf
       # @return [Object] The response message
       #
       def request_response(request: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Outbound::RequestContext.new(type: :request_response, requests: [request], call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(
+          type: :request_response,
+          requests: [request],
+          call: call,
+          method: method,
+          metadata: metadata
+        )
         call(request_context: rc) do
           yield
         end
@@ -58,7 +64,13 @@ module Gruf
       # @return [Object] The response message
       #
       def client_streamer(requests: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Outbound::RequestContext.new(type: :client_streamer, requests: requests, call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(
+          type: :client_streamer,
+          requests: requests,
+          call: call,
+          method: method,
+          metadata: metadata
+        )
         call(request_context: rc) do
           yield
         end
@@ -74,7 +86,13 @@ module Gruf
       # @return [Object] The response message
       #
       def server_streamer(request: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Outbound::RequestContext.new(type: :server_streamer, requests: [request], call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(
+          type: :server_streamer,
+          requests: [request],
+          call: call,
+          method: method,
+          metadata: metadata
+        )
         call(request_context: rc) do
           yield
         end
@@ -89,7 +107,13 @@ module Gruf
       # @param [Hash] metadata A hash of outgoing metadata
       #
       def bidi_streamer(requests: nil, call: nil, method: nil, metadata: nil)
-        rc = Gruf::Outbound::RequestContext.new(type: :bidi_streamer, requests: requests, call: call, method: method, metadata: metadata)
+        rc = Gruf::Outbound::RequestContext.new(
+          type: :bidi_streamer,
+          requests: requests,
+          call: call,
+          method: method,
+          metadata: metadata
+        )
         call(request_context: rc) do
           yield
         end
