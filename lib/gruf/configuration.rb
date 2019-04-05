@@ -57,7 +57,11 @@ module Gruf
     # Whenever this is extended into a class, setup the defaults
     #
     def self.extended(base)
-      base.reset
+      if defined?(Rails)
+        Gruf::Integrations::Rails::Railtie.config.before_initialize { base.reset }
+      else
+        base.reset
+      end
     end
 
     ##

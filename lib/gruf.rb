@@ -35,6 +35,7 @@ require_relative 'gruf/client'
 require_relative 'gruf/synchronized_client'
 require_relative 'gruf/instrumentable_grpc_server'
 require_relative 'gruf/server'
+require_relative 'gruf/integrations/rails/railtie' if defined?(Rails)
 
 ##
 # Initializes configuration of gruf core module
