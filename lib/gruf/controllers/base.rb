@@ -68,6 +68,17 @@ module Gruf
       end
 
       ##
+      # Call a method on this controller.
+      # Override this in a subclass to modify the behavior around processing a method
+      #
+      # @param [Symbol] method_key The name of the gRPC service method being called as a Symbol
+      # @param [block] &block The passed block for executing the method
+      #
+      def process_action(method_key, &block)
+        send(method_key, &block)
+      end
+
+      ##
       # Call a method on this controller
       #
       # @param [Symbol] method_key The name of the gRPC service method being called as a Symbol
@@ -75,7 +86,7 @@ module Gruf
       #
       def call(method_key, &block)
         Interceptors::Context.new(@interceptors).intercept! do
-          send(method_key, &block)
+          process_action(method_key, &block)
         end
       rescue GRPC::BadStatus
         raise # passthrough, to be caught by Gruf::Interceptors::Timer
