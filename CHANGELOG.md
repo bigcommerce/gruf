@@ -2,7 +2,11 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.6.0
+
 - Drop Ruby 2.2 support
+- Abstract gruf controller's send to make it usable in filters 
+- Adjusts configuration reset into a Railtie for Rails systems to ensure proper OOE 
 - Bump rubocop to 0.64, address violations, update activesupport/concurrent-ruby dependencies to have a min version
 
 ### 2.5.2
