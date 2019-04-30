@@ -28,5 +28,6 @@ group :test do
   gem 'bundler-audit'
   gem 'null-logger'
   gem 'rspec', '~> 3.8'
+  gem 'rspec_junit_formatter', '~> 0.4.1'
   gem 'simplecov', require: false
 end
