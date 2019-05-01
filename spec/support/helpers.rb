@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,9 +17,9 @@
 #
 module Gruf
   module Helpers
-    HOST = ENV.fetch('GRPC_HOSTNAME', '0.0.0.0:0').freeze
-    USERNAME = ENV.fetch('GRPC_USERNAME', 'gruf').freeze
-    PASSWORD = ENV.fetch('GRPC_PASSWORD', 'furg').freeze
+    HOST = ENV.fetch('GRPC_HOSTNAME', '0.0.0.0:0').to_s
+    USERNAME = ENV.fetch('GRPC_USERNAME', 'gruf').to_s
+    PASSWORD = ENV.fetch('GRPC_PASSWORD', 'furg').to_s
 
     ##
     # Build a gRPC operation stub for testing

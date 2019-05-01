@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -56,8 +58,8 @@ module Gruf
       @base_klass = service
       @service_klass = "#{base_klass}::Service".constantize
       @opts = options || {}
-      @opts[:password] = options.fetch(:password, '').to_s
-      @opts[:hostname] = options.fetch(:hostname, Gruf.default_client_host)
+      @opts[:password] = @opts.fetch(:password, '').to_s
+      @opts[:hostname] = @opts.fetch(:hostname, Gruf.default_client_host)
       @error_factory = Gruf::Client::ErrorFactory.new
       client_options[:timeout] = client_options[:timeout].to_i if client_options.key?(:timeout)
       client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
@@ -152,7 +154,7 @@ module Gruf
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
-      desc && desc.input ? desc.input.new(params) : nil
+      desc&.input ? desc.input.new(params) : nil
     end
 
     ##
@@ -162,7 +164,7 @@ module Gruf
     #
     def call_signature(request_method)
       desc = rpc_desc(request_method)
-      desc && desc.name ? desc.name.to_s.underscore.to_sym : nil
+      desc&.name ? desc.name.to_s.underscore.to_sym : nil
     end
 
     ##

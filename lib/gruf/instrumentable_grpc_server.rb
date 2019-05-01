@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Gruf
   ##
   # A subclass of GRPC::RpcServer that can be used for enhanced monitoring
@@ -36,7 +38,7 @@ module Gruf
     # Notify the event listener of something interesting
     #
     def notify(event)
-      return unless @event_listener_proc && @event_listener_proc.respond_to?(:call)
+      return if @event_listener_proc.nil? || !@event_listener_proc.respond_to?(:call)
 
       @event_listener_proc.call(event)
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -54,8 +56,8 @@ module Gruf
     # not to overflow this limit, or the response message will never
     # be sent. Instead, resource_exhausted will be thrown.
     MAX_METADATA_SIZE = 7.5 * 1_024
-    METADATA_SIZE_EXCEEDED_CODE = 'metadata_size_exceeded'.freeze
-    METADATA_SIZE_EXCEEDED_MSG = 'Metadata too long, risks exceeding http2 trailing metadata limit.'.freeze
+    METADATA_SIZE_EXCEEDED_CODE = 'metadata_size_exceeded'
+    METADATA_SIZE_EXCEEDED_MSG = 'Metadata too long, risks exceeding http2 trailing metadata limit.'
 
     # @return [Symbol] The given internal gRPC code for the error
     attr_accessor :code

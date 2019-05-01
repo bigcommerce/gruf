@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -34,8 +36,8 @@ module Gruf
 
         # Limit the size of the stack trace to reduce risk of overflowing metadata
         stack_trace_limit = Gruf.backtrace_limit.to_i
-        stack_trace_limit = 10 if stack_trace_limit < 0
-        @stack_trace = @stack_trace[0..stack_trace_limit] if stack_trace_limit > 0
+        stack_trace_limit = 10 if stack_trace_limit.negative?
+        @stack_trace = @stack_trace[0..stack_trace_limit] if stack_trace_limit.positive?
       end
 
       ##
