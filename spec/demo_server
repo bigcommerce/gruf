@@ -36,6 +36,17 @@ class FakeStats
   end
 end
 
+class DemoHook < Gruf::Hooks::Base
+  def before_server_start(server:)
+    raise StandardError, 'Failed in before_server_start hook' if ENV.fetch('FAIL_IN_BEFORE_START', 0).to_i.positive?
+    Gruf.logger.info 'Executing before server start hook...'
+  end
+
+  def after_server_stop(server:)
+    Gruf.logger.info 'Executing after server stop hook...'
+  end
+end
+
 Gruf.configure do |c|
   c.server_binding_url = 'localhost:9001'
   c.error_serializer = Serializers::Proto
@@ -71,6 +82,7 @@ Gruf.configure do |c|
     pool_keep_alive: ENV.fetch('POOL_KEEP_ALIVE', 1).to_i, # 1s
     poll_period: ENV.fetch('DEFAULT_POLL_PERIOD', 1).to_i, # 1s
   }
+  c.hooks.use(DemoHook)
 end
 
 Gruf.logger = Logger.new(STDOUT)

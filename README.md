@@ -382,6 +382,46 @@ By default, the ActiveRecord Connection Reset interceptor and Output Metadata Ti
 are loaded into gruf unless explicitly told not to via the `use_default_interceptors` configuration
 parameter.
 
+## Hooks
+
+Hooks, unlike interceptors, are executed outside of the request chain, such as when a server starts
+or stops. They run in FIFO order sequentially and do not wrap one another. They can be used to provide
+custom boot sequences, external instrumentation support, or shutdown alerting. 
+
+You can create a hook by extending the `Gruf::Hooks::Base` class and defining the methods
+on the hook you wish to implement:
+
+```ruby
+class MyHook < Gruf::Hooks::Base
+  def before_server_start(server:)
+    # do my thing before the server starts  
+  end
+  
+  def after_server_stop(server:)
+    # do my thing after the server stops
+  end
+end
+
+# Then in an initializer:
+
+Gruf.configure do |c|
+  c.hooks.use(MyHook, option_foo: 'value 123')
+end
+```
+
+Exceptions raised in hooks will halt the execution chain and bubble up the stack appropriately.
+
+### Available Hook Insertion Points
+
+Current hook insertion points are:
+
+* `before_server_start` - Right before the gRPC server starts
+* `after_server_stop` - Right after the gRPC server is shutdown
+
+Note that exceptions raised in `before_server_start` will halt the execution chain for the remaining 
+`before_server_start` hooks, but will still execute the `after_server_stop` hooks as expected. Exceptions raised
+in `after_server_stop` will prevent further `after_server_stop` hooks from running.
+
 ## Instrumentation
 
 gruf comes out of the box with a couple of instrumentation interceptors packed in:

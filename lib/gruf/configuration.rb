@@ -25,6 +25,7 @@ module Gruf
       server_binding_url: '0.0.0.0:9001',
       server_options: {},
       interceptors: nil,
+      hooks: nil,
       default_client_host: '',
       use_ssl: false,
       ssl_crt_file: '',
@@ -99,6 +100,7 @@ module Gruf
         send((k.to_s + '='), v)
       end
       self.interceptors = Gruf::Interceptors::Registry.new
+      self.hooks = Gruf::Hooks::Registry.new
       self.root_path = Rails.root.to_s.chomp('/') if defined?(Rails)
       if defined?(Rails) && Rails.logger
         self.logger = Rails.logger

@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add hook support for executing code paths before a server is started, and after a server stops
+
 ### 2.6.1
 
 - Add frozen_string_literal: true to files, update rubocop to 0.68
