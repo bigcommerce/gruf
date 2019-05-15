@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.7.0
+
 - Add hook support for executing code paths before a server is started, and after a server stops
 
 ### 2.6.1
