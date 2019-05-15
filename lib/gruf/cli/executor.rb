@@ -26,22 +26,39 @@ module Gruf
       ##
       # @param [Hash|ARGV]
       #
-      def initialize(args = ARGV)
+      def initialize(
+        args = ARGV,
+        server: nil,
+        services: nil,
+        hook_executor: nil,
+        logger: nil
+      )
         @args = args
-        setup!
+        setup! # ensure we set some defaults from CLI here so we can allow configuration
+        @services = services || Gruf.services
+        @hook_executor = hook_executor || Gruf::Hooks::Executor.new(hooks: Gruf.hooks&.prepare)
+        @server = server || Gruf::Server.new(Gruf.server_options)
+        @logger = logger || Gruf.logger || ::Logger.new(STDERR)
       end
 
       ##
       # Run the server
       #
       def run
-        server = Gruf::Server.new(Gruf.server_options)
-        Gruf.services.each { |s| server.add_service(s) }
-        server.start!
-      rescue StandardError => e
-        msg = "FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}"
-        logger = Gruf.logger || ::Logger.new(STDERR)
-        logger.fatal msg
+        exception = nil
+        begin
+          @services.each { |s| @server.add_service(s) }
+          @hook_executor.call(:before_server_start, server: @server)
+          @server.start!
+        rescue StandardError => e
+          exception = e
+          # Catch the exception here so that we always ensure the post hook runs
+          # This allows systems wanting to provide external server instrumentation
+          # the ability to properly handle server failures
+          @logger.fatal("FATAL ERROR: #{e.message} #{e.backtrace.join("\n")}")
+        end
+        @hook_executor.call(:after_server_stop, server: @server)
+        raise exception if exception
       end
 
       private

@@ -15,36 +15,20 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/errors/helpers'
-require_relative 'gruf/cli/executor'
-require_relative 'gruf/controllers/base'
-require_relative 'gruf/outbound/request_context'
-require_relative 'gruf/interceptors/registry'
-require_relative 'gruf/interceptors/base'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/hooks/executor'
-require_relative 'gruf/hooks/base'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/synchronized_client'
-require_relative 'gruf/instrumentable_grpc_server'
-require_relative 'gruf/server'
-require_relative 'gruf/integrations/rails/railtie' if defined?(Rails)
-
-##
-# Initializes configuration of gruf core module
-#
 module Gruf
-  extend Configuration
+  module Hooks
+    ##
+    # Base class for a hook that allows execution at various points of Gruf server processes
+    #
+    class Base
+      include Gruf::Loggable
+
+      ##
+      # @param [Hash] options
+      #
+      def initialize(options: nil)
+        @options = options || {}
+      end
+    end
+  end
 end
