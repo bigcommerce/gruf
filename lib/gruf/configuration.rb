@@ -26,6 +26,7 @@ module Gruf
       server_options: {},
       interceptors: nil,
       hooks: nil,
+      default_channel_credentials: nil,
       default_client_host: '',
       use_ssl: false,
       ssl_crt_file: '',
