@@ -41,6 +41,44 @@ describe Gruf::Client do
         expect(subject.opts[:hostname]).to eq 'test.dev'
       end
     end
+    
+    context 'when no channel credentials options are passed' do
+      let(:channel_credentials) { GRPC::Core::ChannelCredentials.new }
+      
+      after do
+        Gruf.configure do |config|
+          config.default_channel_credentials = nil
+        end
+      end
+      
+      it 'should return nil' do
+        expect(subject).to be_a(Gruf::Client)
+        expect(subject.opts[:channel_credentials]).to be_nil
+      end
+      
+      it 'should use default channel credentials' do
+        Gruf.configure do |config|
+          config.default_channel_credentials = channel_credentials
+        end
+        
+        expect(subject).to be_a(Gruf::Client)
+        expect(subject.opts[:channel_credentials]).to eq(channel_credentials)
+      end
+    end
+    
+    context 'when channel credentials options are passed' do
+      let(:channel_credentials) { GRPC::Core::ChannelCredentials.new }
+      let(:options) { { channel_credentials: channel_credentials } }
+      
+      after do
+        subject.opts[:channel_credentials] = nil
+      end
+      
+      it 'should set channel credentials' do
+        expect(subject).to be_a(Gruf::Client)
+        expect(subject.opts[:channel_credentials]).to eq(channel_credentials)
+      end
+    end
 
     context 'if client options are passed' do
       let(:timeout) { 30 }
