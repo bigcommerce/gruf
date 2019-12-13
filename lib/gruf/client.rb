@@ -60,6 +60,7 @@ module Gruf
       @opts = options || {}
       @opts[:password] = @opts.fetch(:password, '').to_s
       @opts[:hostname] = @opts.fetch(:hostname, Gruf.default_client_host)
+      @opts[:channel_credentials] = @opts.fetch(:channel_credentials, Gruf.default_channel_credentials)
       @error_factory = Gruf::Client::ErrorFactory.new
       client_options[:timeout] = client_options[:timeout].to_i if client_options.key?(:timeout)
       client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
@@ -190,6 +191,8 @@ module Gruf
     #
     # :nocov:
     def build_ssl_credentials
+      return opts[:channel_credentials] if opts[:channel_credentials]
+      
       cert = nil
       if opts[:ssl_certificate_file]
         cert = File.read(opts[:ssl_certificate_file]).to_s.strip
