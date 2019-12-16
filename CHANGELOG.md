@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.7.1
+
 - Add `channel_credentials` option to `Gruf::Client` and `default_channel_credentials` option to `Gruf::Configuration` [#85] [#87]
 
 ### 2.7.0

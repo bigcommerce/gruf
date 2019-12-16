@@ -192,7 +192,7 @@ module Gruf
     # :nocov:
     def build_ssl_credentials
       return opts[:channel_credentials] if opts[:channel_credentials]
-      
+
       cert = nil
       if opts[:ssl_certificate_file]
         cert = File.read(opts[:ssl_certificate_file]).to_s.strip
