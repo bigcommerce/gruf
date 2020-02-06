@@ -23,10 +23,12 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Plain 
   let(:execution_time) { 0.001 }
   let(:message) { 'foo' }
   let(:params) { { id: 1 } }
+  let(:request) { build :controller_request }
+  let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { { message: message, status: status, method: route_key, duration: execution_time, params: params } }
 
   describe '.format' do
-    subject { formatter.format(payload) }
+    subject { formatter.format(payload, request: request, result: result) }
 
     context 'when params are sent to the formatter' do
       it 'should return the message, without params' do

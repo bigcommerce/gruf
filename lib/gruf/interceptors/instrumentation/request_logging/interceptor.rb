@@ -100,7 +100,7 @@ module Gruf
             payload[:time] = Time.now.to_s
             payload[:host] = Socket.gethostname
 
-            logger.send(type, formatter.format(payload))
+            logger.send(type, formatter.format(payload, request: request, result: result))
 
             raise result.message unless result.successful?
 

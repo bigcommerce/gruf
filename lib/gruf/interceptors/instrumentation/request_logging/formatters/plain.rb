@@ -28,9 +28,11 @@ module Gruf
             # Format the request by only outputting the message body and params (if set to log params)
             #
             # @param [Hash] payload The incoming request payload
+            # @param [Gruf::Controllers::Request] request The current controller request
+            # @param [Gruf::Interceptors::Timer::Result] result The timed result of the response
             # @return [String] The formatted string
             #
-            def format(payload)
+            def format(payload, request:, result:)
               time = payload.fetch(:duration, 0)
               grpc_status = payload.fetch(:grpc_status, 'GRPC::Ok')
               route_key = payload.fetch(:method, 'unknown')

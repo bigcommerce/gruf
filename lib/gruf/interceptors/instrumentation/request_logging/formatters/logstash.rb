@@ -30,9 +30,11 @@ module Gruf
             # Format the request into a JSON-friendly payload
             #
             # @param [Hash] payload The incoming request payload
+            # @param [Gruf::Controllers::Request] request The current controller request
+            # @param [Gruf::Interceptors::Timer::Result] result The timed result of the response
             # @return [String] The JSON representation of the payload
             #
-            def format(payload)
+            def format(payload, request:, result:)
               payload.merge(format: 'json').to_json
             end
           end

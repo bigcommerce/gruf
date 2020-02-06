@@ -86,9 +86,9 @@ Gruf.configure do |c|
 end
 
 Gruf.logger = Logger.new(STDOUT)
-Gruf.logger.level = Logger::Severity::INFO
+Gruf.logger.level = Logger::Severity::DEBUG
 Gruf.grpc_logger = Logger.new(STDOUT)
-Gruf.grpc_logger.level = Logger::Severity::DEBUG
+Gruf.grpc_logger.level = Logger::Severity::INFO
 Gruf.services << ::Rpc::ThingService::Service
 
 cli = Gruf::Cli::Executor.new
