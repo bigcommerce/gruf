@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.8.0
+
 - Pass the controller request object into the request logging formatters [#92]  
 
 ### 2.7.1
