@@ -22,7 +22,7 @@ Metrics/ClassLength:
 Metrics/CyclomaticComplexity:
   Max: 12
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
@@ -43,3 +43,7 @@ Naming/PredicateName:
 Metrics/BlockLength:
   Enabled: false
 
+# Rubocop is opinionated here, which makes compositional base classes/interfaces with keyword arguments problematic.
+# Disabling this allows base class stub methods to have keyword args.
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true

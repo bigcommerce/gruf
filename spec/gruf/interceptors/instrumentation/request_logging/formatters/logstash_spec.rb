@@ -18,10 +18,12 @@ require 'spec_helper'
 
 describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash do
   let(:formatter) { described_class.new }
+  let(:request) { build :controller_request }
+  let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { { message: 'foo', params: {one: 2} } }
 
   describe '.format' do
-    subject { formatter.format(payload) }
+    subject { formatter.format(payload, request: request, result: result) }
 
     it 'should return the payload as a JSON object' do
       expect(subject).to eq payload.merge(format: 'json').to_json

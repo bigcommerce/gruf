@@ -135,7 +135,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       end
 
       context 'with nested blacklist' do
-        let(:blacklist) { ['data.array', 'hello'] }
+        let(:blacklist) { %w[data.array hello] }
         let(:options) { { blacklist: blacklist } }
 
         it 'should support nested filtering' do

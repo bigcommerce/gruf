@@ -28,9 +28,11 @@ module Gruf
             # Format the parameters into a loggable string. Must be implemented in every derivative class
             #
             # @param [Hash] _payload The incoming request payload
+            # @param [Gruf::Controllers::Request] request The current controller request
+            # @param [Gruf::Interceptors::Timer::Result] result The timed result of the response
             # @return [String] The formatted string
             #
-            def format(_payload)
+            def format(_payload, request:, result:)
               raise NotImplementedError
             end
           end
