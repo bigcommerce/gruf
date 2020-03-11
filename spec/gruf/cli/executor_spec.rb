@@ -70,5 +70,75 @@ describe Gruf::Cli::Executor do
         expect { subject }.to raise_error(exception)
       end
     end
+
+  end
+
+  describe '.setup!' do
+    let(:interceptors) { Gruf.interceptors.list }
+
+    subject { executor }
+
+    before do
+      Gruf.reset
+    end
+
+    context 'if --host is' do
+      context 'passed' do
+        let(:args) { %w[--host 0.0.0.0:9999] }
+
+        it 'should set server_binding_url to the host' do
+          subject
+          expect(Gruf.server_binding_url).to eq '0.0.0.0:9999'
+        end
+      end
+
+      context 'not passed' do
+        let(:args) { [] }
+
+        it 'should set server_binding_url to the default host' do
+          subject
+          expect(Gruf.server_binding_url).to eq '0.0.0.0:9001'
+        end
+      end
+    end
+
+    context 'if --suppress-default-interceptors is' do
+      context 'passed' do
+        let(:args) { %w[--suppress-default-interceptors] }
+
+        it 'should unset the default interceptors' do
+          subject
+          expect(interceptors).to be_empty
+        end
+      end
+
+      context 'not passed' do
+        let(:args) { [] }
+
+        it 'should leave the default interceptors intact' do
+          subject
+          expect(interceptors.count).to eq 2
+          expect(interceptors).to include(Gruf::Interceptors::ActiveRecord::ConnectionReset)
+          expect(interceptors).to include(Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
+        end
+      end
+    end
+
+    context 'if --backtrace-on-error is' do
+      context 'passed' do
+        let(:args) { %w[--backtrace-on-error] }
+        it 'should set backtrace_on_error to true' do
+          subject
+          expect(Gruf.backtrace_on_error).to be_truthy
+        end
+      end
+
+      context 'not passed' do
+        it 'should leave backtrace_on_error at the default value' do
+          subject
+          expect(Gruf.backtrace_on_error).to be_falsey
+        end
+      end
+    end
   end
 end
