@@ -2,7 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.8.1
+
 - Fix issue with --suppress-default-interceptors not working [#95]
+- Loosen rake development dependency to >= 10.0 [#97]
 
 ### 2.8.0
 
