@@ -67,7 +67,23 @@ module Gruf
       # Setup options for CLI execution and configure Gruf based on inputs
       #
       def setup!
-        opts = Slop.parse(@args) do |o|
+        opts = parse_options
+
+        Gruf.server_binding_url = opts[:host] if opts[:host]
+        if opts.suppress_default_interceptors?
+          Gruf.interceptors.remove(Gruf::Interceptors::ActiveRecord::ConnectionReset)
+          Gruf.interceptors.remove(Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
+        end
+        Gruf.backtrace_on_error = true if opts.backtrace_on_error?
+      end
+
+      ##
+      # Parse all CLI arguments into an options result
+      #
+      # @return [Slop::Result]
+      #
+      def parse_options
+        ::Slop.parse(@args) do |o|
           o.null '-h', '--help', 'Display help message' do
             puts o
             exit(0)
@@ -80,10 +96,6 @@ module Gruf
             exit(0)
           end
         end
-
-        Gruf.server_binding_url = opts[:host] if opts[:host]
-        Gruf.use_default_interceptors = false if opts.suppress_default_interceptors?
-        Gruf.backtrace_on_error = true if opts.backtrace_on_error?
       end
     end
   end

@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Fix issue with --suppress-default-interceptors not working [#95]
+
 ### 2.8.0
 
 - Pass the controller request object into the request logging formatters [#92]  
