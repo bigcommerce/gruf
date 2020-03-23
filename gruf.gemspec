@@ -45,4 +45,5 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency 'concurrent-ruby', '> 1'
   spec.add_runtime_dependency 'slop', '~> 4.6'
+  spec.add_runtime_dependency 'zeitwerk', '~> 2.3.0'
 end

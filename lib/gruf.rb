@@ -20,26 +20,13 @@ require 'active_support/core_ext/module/delegation'
 require 'active_support/concern'
 require 'active_support/inflector'
 require 'base64'
-require_relative 'gruf/version'
-require_relative 'gruf/logging'
-require_relative 'gruf/loggable'
-require_relative 'gruf/configuration'
-require_relative 'gruf/errors/helpers'
-require_relative 'gruf/cli/executor'
-require_relative 'gruf/controllers/base'
-require_relative 'gruf/outbound/request_context'
-require_relative 'gruf/interceptors/registry'
-require_relative 'gruf/interceptors/base'
-require_relative 'gruf/hooks/registry'
-require_relative 'gruf/hooks/executor'
-require_relative 'gruf/hooks/base'
-require_relative 'gruf/timer'
-require_relative 'gruf/response'
-require_relative 'gruf/error'
-require_relative 'gruf/client'
-require_relative 'gruf/synchronized_client'
-require_relative 'gruf/instrumentable_grpc_server'
-require_relative 'gruf/server'
+require 'zeitwerk'
+
+loader = Zeitwerk::Loader.for_gem
+loader.ignore(__dir__ + '/gruf/integrations/rails')
+loader.setup
+loader.eager_load
+
 require_relative 'gruf/integrations/rails/railtie' if defined?(Rails)
 
 ##

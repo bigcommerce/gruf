@@ -16,7 +16,6 @@
 #
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 $LOAD_PATH.unshift File.expand_path('../pb', __FILE__)
-require_relative 'simplecov_helper'
 require 'gruf'
 require 'ffaker'
 require 'pry'
