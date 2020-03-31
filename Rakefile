@@ -35,6 +35,23 @@ def gruf_rake_configure_rpc!
   end
 end
 
+class ThingCreatorEnumerator
+  def initialize(num: 10)
+    @num = num.to_i
+  end
+
+  def each
+    return enum_for(:each) unless block_given?
+
+    @num.times do
+      sleep rand(0..1)
+      item = Rpc::Thing.new(id: rand(1..1000), name: FFaker::Lorem.word)
+      Gruf.logger.info "Sending: #{item.inspect}"
+      yield item
+    end
+  end
+end
+
 # demo server tests
 namespace :gruf do
   namespace :demo do
@@ -43,9 +60,9 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetThing, id: rand(100_000))
-        puts "#{op.message.inspect}"
+        Gruf.logger.info "#{op.message.inspect}"
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.info e.error.to_h
       end
     end
 
@@ -55,42 +72,36 @@ namespace :gruf do
         rpc_client = gruf_demo_build_client
         resp = rpc_client.call(:GetThings)
         resp.message.each do |thing|
-          puts thing.inspect
+          Gruf.logger.info thing.inspect
         end
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
     task :create_things do
       gruf_rake_configure_rpc!
       begin
-        things = []
-        5.times do
-          things << Rpc::Thing.new(id: rand(1..1000), name: FFaker::Lorem.word)
-        end
         rpc_client = gruf_demo_build_client
-        resp = rpc_client.call(:CreateThings, things)
-        puts "#{resp.message.inspect}"
+        enumerator = ThingCreatorEnumerator.new
+        resp = rpc_client.call(:CreateThings, enumerator.each)
+        Gruf.logger.info "#{resp.message.inspect}"
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
     task :create_things_in_stream do
       gruf_rake_configure_rpc!
       begin
-        things = []
-        5.times do
-          things << Rpc::Thing.new(id: rand(1..1000), name: FFaker::Lorem.word)
-        end
         rpc_client = gruf_demo_build_client
-        resp = rpc_client.call(:CreateThingsInStream, things)
+        enumerator = ThingCreatorEnumerator.new
+        resp = rpc_client.call(:CreateThingsInStream, enumerator.each)
         resp.message.each do |thing|
-          puts thing.inspect
+          Gruf.logger.info "Received: #{thing.inspect}"
         end
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
@@ -99,13 +110,13 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetFail, id: rand(100_000))
-        puts op.message.inspect
+        Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Errors::NotFound => e
-        puts "Client got a not found error: #{e.error.to_h}"
+        Gruf.logger.error "Client got a not found error: #{e.error.to_h}"
       rescue Gruf::Client::Errors::Validation => e
-        puts "Client got a validation error: #{e.error.to_h}"
+        Gruf.logger.error "Client got a validation error: #{e.error.to_h}"
       rescue Gruf::Client::Error => e
-        puts "Unknown error: #{e.error.to_h}"
+        Gruf.logger.error "Unknown error: #{e.error.to_h}"
       end
     end
 
@@ -114,9 +125,9 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetFieldErrorFail, id: rand(100_000))
-        puts op.message.inspect
+        Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
@@ -125,9 +136,9 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetException, id: rand(100_000))
-        puts op.message.inspect
+        Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
@@ -136,9 +147,9 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client(password: 'no')
         op = rpc_client.call(:GetThing, id: rand(100_000))
-        puts op.message.inspect
+        Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Error => e
-        puts e.error.to_h
+        Gruf.logger.error e.error.to_h
       end
     end
 
@@ -178,7 +189,7 @@ namespace :gruf do
       Gruf::Client.new(
         service: Rpc::ThingService,
         options: {
-          hostname: ENV.fetch('HOST', '0.0.0.0:9001'),
+          hostname: ENV.fetch('HOST', '0.0.0.0:8001'),
           username: ENV.fetch('USERNAME', 'grpc'),
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),
