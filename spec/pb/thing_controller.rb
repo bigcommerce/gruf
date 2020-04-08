@@ -28,11 +28,12 @@ class ThingController < ::Gruf::Controllers::Base
   end
 
   def get_things
-    things = []
+    return enum_for(:get_things) unless block_given?
+
     5.times do
-      things << Rpc::Thing.new(id: rand(1..1000).to_i, name: FFaker::Lorem.word.to_s)
+      yield Rpc::Thing.new(id: rand(1..1000).to_i, name: FFaker::Lorem.word.to_s)
+      sleep rand(0..1)
     end
-    things
   end
 
   def create_things
@@ -44,11 +45,12 @@ class ThingController < ::Gruf::Controllers::Base
   end
 
   def create_things_in_stream
-    things = []
+    return enum_for(:create_things_in_stream) unless block_given?
+
     request.messages.each do |msg|
-      things << Rpc::Thing.new(id: msg.id.to_i, name: msg.name.to_s)
+      yield Rpc::Thing.new(id: msg.id.to_i, name: msg.name.to_s)
+      sleep rand(0..1)
     end
-    things
   end
 
   # Error calls

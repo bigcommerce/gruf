@@ -48,7 +48,7 @@ class DemoHook < Gruf::Hooks::Base
 end
 
 Gruf.configure do |c|
-  c.server_binding_url = 'localhost:9001'
+  c.server_binding_url = 'localhost:8001'
   c.error_serializer = Serializers::Proto
   c.backtrace_on_error = true
   c.interceptors.use(
