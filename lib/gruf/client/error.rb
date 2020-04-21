@@ -50,7 +50,7 @@ module Gruf
       class NotFound < Validation; end
       class AlreadyExists < Validation; end
       class OutOfRange < Validation; end
-
+      class ResourceExhausted  < Validation; end
       class Cancelled < Error; end
       class DataLoss < Error; end
       class DeadlineExceeded < Error; end
