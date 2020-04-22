@@ -62,7 +62,6 @@ module Gruf
       class Unavailable < Error; end
       class Unimplemented < Error; end
       class Unknown < Error; end
-
     end
   end
 end
