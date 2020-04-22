@@ -57,6 +57,7 @@ module Gruf
       class FailedPrecondition < Error; end
       class Internal < Error; end
       class PermissionDenied < Error; end
+      class ResourceExhausted < Error; end
       class Unauthenticated < Error; end
       class Unavailable < Error; end
       class Unimplemented < Error; end
