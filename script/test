@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+set -eou pipefail
+
+bundle install
+bundle exec bundle-audit update
+bundle exec bundle-audit check -v
+bundle exec rubocop -P -c ./.rubocop.yml
+bundle exec rspec
