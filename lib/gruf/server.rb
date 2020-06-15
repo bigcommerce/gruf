@@ -69,9 +69,9 @@ module Gruf
 
           server = if @event_listener_proc
                      server_options[:event_listener_proc] = @event_listener_proc
-                     Gruf::InstrumentableGrpcServer.new(server_options)
+                     Gruf::InstrumentableGrpcServer.new(**server_options)
                    else
-                     GRPC::RpcServer.new(server_options)
+                     GRPC::RpcServer.new(**server_options)
                    end
 
           @port = server.add_http2_port(@hostname, ssl_credentials)
