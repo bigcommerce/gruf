@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
+
 ### 2.8.1
 
 - Fix issue with --suppress-default-interceptors not working [#95]
