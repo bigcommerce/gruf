@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add Ruby 2.7 support
+- Explicitly declare development dependencies
+- Add script/e2e test for full e2e test 
 - Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
 
 ### 2.8.1

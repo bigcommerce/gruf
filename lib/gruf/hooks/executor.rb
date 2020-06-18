@@ -39,7 +39,7 @@ module Gruf
         @hooks.each do |hook|
           next unless hook.respond_to?(name)
 
-          hook.send(name, arguments)
+          hook.send(name, **arguments)
         end
       end
     end

@@ -18,19 +18,25 @@ executors:
     parameters:
       ruby-version:
         type: string
-        default: "2.4.6"
+        default: "2.4.9"
   ruby_2_5:
     <<: *ruby_env
     parameters:
       ruby-version:
         type: string
-        default: "2.5.5"
+        default: "2.5.8"
   ruby_2_6:
     <<: *ruby_env
     parameters:
       ruby-version:
         type: string
-        default: "2.6.3"
+        default: "2.6.6"
+  ruby_2_7:
+    <<: *ruby_env
+    parameters:
+      ruby-version:
+        type: string
+        default: "2.7.1"
 
 commands:
   pre-setup:
@@ -39,12 +45,18 @@ commands:
       - checkout
   bundle-install:
     steps:
+      - run:
+          name: "Install bundler 1.17.3"
+          command: |
+            echo 'export BUNDLER_VERSION=1.17.3' >> $BASH_ENV
+            source $BASH_ENV
+            gem install bundler:1.17.3
       - restore_cache:
           keys:
             - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
             - gem-cache-{{ arch }}-{{ .Branch }}
             - gem-cache
-      - run: bundle check || bundle install --path vendor/bundle
+      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
       - save_cache:
           key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
@@ -79,6 +91,9 @@ commands:
   rubocop:
     steps:
       - run: bundle exec rubocop -p
+  e2e:
+    steps:
+      - run: ./script/e2e
 
 jobs:
   bundle-audit:
@@ -86,7 +101,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_2_4"
+        default: "ruby_2_6"
     steps:
       - pre-setup
       - bundle-install
@@ -96,7 +111,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_2_4"
+        default: "ruby_2_6"
     steps:
       - pre-setup
       - bundle-install
@@ -106,11 +121,21 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_2_4"
+        default: "ruby_2_6"
     steps:
       - pre-setup
       - bundle-install
       - rspec-unit
+  e2e:
+    executor: <<parameters.e>>
+    parameters:
+      e:
+        type: executor
+        default: "ruby_2_6"
+    steps:
+      - pre-setup
+      - bundle-install
+      - e2e
 
 workflows:
   version: 2
@@ -118,10 +143,16 @@ workflows:
     jobs:
       - bundle-audit:
           name: "ruby-2_4-bundle_audit"
+          e: "ruby_2_4"
       - rubocop:
           name: "ruby-2_4-rubocop"
+          e: "ruby_2_4"
       - rspec-unit:
           name: "ruby-2_4-rspec"
+          e: "ruby_2_4"
+      - e2e:
+          name: "ruby-2_4-e2e"
+          e: "ruby_2_4"
   ruby_2_5:
     jobs:
       - bundle-audit:
@@ -132,6 +163,9 @@ workflows:
           e: "ruby_2_5"
       - rspec-unit:
           name: "ruby-2_5-rspec"
+          e: "ruby_2_5"
+      - e2e:
+          name: "ruby-2_5-e2e"
           e: "ruby_2_5"
   ruby_2_6:
     jobs:
@@ -144,3 +178,20 @@ workflows:
       - rspec-unit:
           name: "ruby-2_6-rspec"
           e: "ruby_2_6"
+      - e2e:
+          name: "ruby-2_6-e2e"
+          e: "ruby_2_6"
+  ruby_2_7:
+    jobs:
+      - bundle-audit:
+          name: "ruby-2_7-bundle_audit"
+          e: "ruby_2_7"
+      - rubocop:
+          name: "ruby-2_7-rubocop"
+          e: "ruby_2_7"
+      - rspec-unit:
+          name: "ruby-2_7-rspec"
+          e: "ruby_2_7"
+      - e2e:
+          name: "ruby-2_7-e2e"
+          e: "ruby_2_7"

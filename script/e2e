@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+set -o errexit
+green='\033[0;32m'
+no_color='\033[0m'
+
+ok() {
+    echo -e "$green$1$no_color"
+}
+
+ok "Beginning full e2e test..."
+
+ok "Installing gems..."
+bundle install
+
+ok "Starting gruf server..."
+spec/demo_server &
+server_pid=$!
+
+sleep 5 # let the server start
+ok "Running unary test..."
+bundle exec rake gruf:demo:get_thing
+ok "Running server streamer test..."
+bundle exec rake gruf:demo:get_things
+ok "Running client streamer test..."
+bundle exec rake gruf:demo:create_things
+ok "Running bidi streamer test..."
+bundle exec rake gruf:demo:create_things_in_stream
+
+ok "Tests successful! Shutting down server..."
+kill -9 $server_pid
+ok "Server shutdown, E2E test finished successfully."

@@ -63,7 +63,7 @@ module Gruf
       @opts[:channel_credentials] = @opts.fetch(:channel_credentials, Gruf.default_channel_credentials)
       @error_factory = Gruf::Client::ErrorFactory.new
       client_options[:timeout] = client_options[:timeout].to_i if client_options.key?(:timeout)
-      client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, client_options)
+      client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, **client_options)
       super(client)
     end
 

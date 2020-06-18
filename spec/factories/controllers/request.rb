@@ -22,7 +22,7 @@ FactoryBot.define do
     active_call { Rpc::Test::Call.new }
     message { Rpc::GetThingResponse.new }
 
-    initialize_with { new(attributes) }
+    initialize_with { new(**attributes) }
     skip_create
   end
 end

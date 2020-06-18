@@ -58,7 +58,7 @@ module Gruf
       # @param [Class] service The class of the service being executed against
       # @param [GRPC::RpcDesc] rpc_desc The RPC descriptor of the call
       # @param [GRPC::ActiveCall] active_call The restricted view of the call
-      # @param [Object] message The protobuf message (or messages) of the request
+      # @param [Object|Google::Protobuf::MessageExts] message The protobuf message (or messages) of the request
       #
       def initialize(method_key:, service:, rpc_desc:, active_call:, message:)
         @method_key = method_key

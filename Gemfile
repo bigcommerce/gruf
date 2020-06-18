@@ -18,18 +18,3 @@
 source 'https://rubygems.org'
 
 gemspec
-
-group :development, :test do
-  gem 'factory_bot'
-  gem 'ffaker'
-  gem 'pry-byebug'
-  gem 'rubocop', '~> 0.68'
-end
-
-group :test do
-  gem 'bundler-audit'
-  gem 'null-logger'
-  gem 'rspec', '~> 3.8'
-  gem 'rspec_junit_formatter', '~> 0.4.1'
-  gem 'simplecov', require: false
-end
