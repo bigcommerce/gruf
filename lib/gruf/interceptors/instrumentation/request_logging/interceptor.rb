@@ -151,7 +151,7 @@ module Gruf
               @formatter = case fmt
                            when Symbol
                              prefix = 'Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::'
-                             klass = "#{prefix}#{fmt.to_s.capitalize}"
+                             klass = "#{prefix}#{fmt.to_s.classify}"
                              fmt = klass.constantize.new
                            when Class
                              fmt = fmt.new

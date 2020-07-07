@@ -7,6 +7,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 - Add script/e2e test for full e2e test 
 - Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
 
+### 2.8.2
+
+- Accept multiple word logging formatter class name [#113]
+
 ### 2.8.1
 
 - Fix issue with --suppress-default-interceptors not working [#95]

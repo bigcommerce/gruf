@@ -169,6 +169,20 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
 
+      context 'and has multiple words name' do
+        before do 
+          module Gruf::Interceptors::Instrumentation::RequestLogging::Formatters
+            class MultipleWord < Base; end
+          end
+        end
+
+        let(:options) { { formatter: :multiple_word } }
+
+        it 'should return the formatter' do
+          expect(subject).to be_a(Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::MultipleWord)
+        end
+      end
+
       context 'and is invalid' do
         let(:options) { { formatter: :bar } }
 
