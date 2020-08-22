@@ -37,7 +37,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'bundler-audit', '>= 0.6'
-  spec.add_development_dependency 'factory_bot', '>= 5.2'
+  spec.add_development_dependency 'factory_bot', (Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5') ? '>= 6.1' : '~> 5.2')
   spec.add_development_dependency 'ffaker', '>= 2.15'
   spec.add_development_dependency 'rake', '>= 10.0'
   spec.add_development_dependency 'null-logger', '>= 0.1'
