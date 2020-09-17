@@ -164,26 +164,26 @@ module Gruf
           end
 
           ##
-          # Redact any blacklisted params and return an updated hash
+          # Redact any blocklisted params and return an updated hash
           #
           # @param [Hash] params The hash of parameters to sanitize
           # @return [Hash] The sanitized params in hash form
           #
           def sanitize(params = {})
-            blacklists = options.fetch(:blacklist, []).map(&:to_s)
+            blocklists = options.fetch(:blocklist, []).map(&:to_s)
             redacted_string = options.fetch(:redacted_string, 'REDACTED')
-            blacklists.each do |blacklist|
-              parts = blacklist.split('.').map(&:to_sym)
+            blocklists.each do |blocklist|
+              parts = blocklist.split('.').map(&:to_sym)
               redact!(parts, 0, params, redacted_string)
             end
             params
           end
 
           ##
-          # Helper method to recursively redact based on the black list
+          # Helper method to recursively redact based on the blocklist
           #
-          # @param [Array] parts The blacklist. ex. 'data.schema' -> [:data, :schema]
-          # @param [Integer] idx The current index of the blacklist
+          # @param [Array] parts The blocklist. ex. 'data.schema' -> [:data, :schema]
+          # @param [Integer] idx The current index of the blocklist
           # @param [Hash] params The hash of parameters to sanitize
           # @param [String] redacted_string The custom redact string
           #

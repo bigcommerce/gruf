@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Change to racially neutral terminology across library
+  - blacklist->blocklist
+  - master->main
 - Add Ruby 2.7 support
 - Explicitly declare development dependencies
 - Add script/e2e test for full e2e test 
@@ -150,11 +153,11 @@ Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for de
 ### 1.2.4
 
 - Loosen explicit Protobuf dependency now that 3.4.0.2 is released
-- Guard against nil params in logger blacklist
+- Guard against nil params in logger blocklist
 
 ### 1.2.3
 
-- Support nested blacklist parameters in path.to.key format
+- Support nested blocklist parameters in path.to.key format
 
 ### 1.2.2
 
@@ -176,7 +179,7 @@ Gruf 2.0 is a major shift from Gruf 1.0. See [UPGRADING.md](UPGRADING.md) for de
 - Add configuration to set the error message when an uncaught exception is
   handled by gruf.
 - Add a request logging hook for Rails-style request logging, with optional
-  parameter logging, blacklists, and formatter support
+  parameter logging, blocklists, and formatter support
 - Optimizations around Symbol casting within service calls
 
 ### 1.1.0
