@@ -113,11 +113,11 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       end
     end
 
-    context 'with a blacklist' do
-      let(:blacklist) { [:foo] }
-      let(:options) { { blacklist: blacklist } }
+    context 'with a blocklist' do
+      let(:blocklist) { [:foo] }
+      let(:options) { { blocklist: blocklist } }
 
-      it 'should return all params that are not filtered by the blacklist' do
+      it 'should return all params that are not filtered by the blocklist' do
         expected = params.dup
         expected[:foo] = 'REDACTED'
         expect(subject).to eq expected
@@ -125,18 +125,18 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
 
       context 'with a custom redacted string' do
         let(:str) { 'goodbye' }
-        let(:options) { { blacklist: blacklist, redacted_string: str } }
+        let(:options) { { blocklist: blocklist, redacted_string: str } }
 
-        it 'should return all params that are not filtered by the blacklist' do
+        it 'should return all params that are not filtered by the blocklist' do
           expected = params.dup
           expected[:foo] = str
           expect(subject).to eq expected
         end
       end
 
-      context 'with nested blacklist' do
-        let(:blacklist) { %w[data.array hello] }
-        let(:options) { { blacklist: blacklist } }
+      context 'with nested blocklist' do
+        let(:blocklist) { %w[data.array hello] }
+        let(:options) { { blocklist: blocklist } }
 
         it 'should support nested filtering' do
           expected = Marshal.load(Marshal.dump(params))

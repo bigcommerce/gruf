@@ -155,8 +155,8 @@ Gruf.configure do |c|
 end
 ```
 
-If you want to log parameters, we recommend setting a blacklist to ensure you don't accidentally
+If you want to log parameters, we recommend setting a blocklist to ensure you don't accidentally
 log sensitive data.
 
-We also recommend blacklisting parameters that may contain very large values (such as binary
+We also recommend blocklisting parameters that may contain very large values (such as binary
 or json data).
