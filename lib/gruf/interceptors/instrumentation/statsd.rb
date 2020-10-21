@@ -25,7 +25,7 @@ module Gruf
         ##
         # Push data to StatsD, only doing so if a client is set
         #
-        def call
+        def call(&block)
           unless client
             Gruf.logger.error 'Statsd module loaded, but no client configured!'
             return yield
@@ -33,9 +33,7 @@ module Gruf
 
           client.increment(route_key)
 
-          result = Gruf::Interceptors::Timer.time do
-            yield
-          end
+          result = Gruf::Interceptors::Timer.time(&block)
 
           client.increment("#{route_key}.#{postfix(result.successful?)}")
           client.timing(route_key, result.elapsed)

@@ -98,7 +98,7 @@ module Gruf
     #
     def reset
       VALID_CONFIG_KEYS.each do |k, v|
-        send((k.to_s + '='), v)
+        send("#{k}=", v)
       end
       self.interceptors = Gruf::Interceptors::Registry.new
       self.hooks = Gruf::Hooks::Registry.new
@@ -107,7 +107,7 @@ module Gruf
         self.logger = Rails.logger
       else
         require 'logger'
-        self.logger = ::Logger.new(STDOUT)
+        self.logger = ::Logger.new($stdout)
       end
       self.grpc_logger = logger if grpc_logger.nil?
       self.ssl_crt_file = "#{root_path}config/ssl/#{environment}.crt"

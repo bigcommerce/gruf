@@ -22,7 +22,6 @@ RSpec::Core::RakeTask.new(:spec)
 task default: :spec
 require 'gruf'
 
-
 def gruf_rake_configure_rpc!
   require 'pry'
   $LOAD_PATH.unshift File.expand_path('../spec/pb', __FILE__)
@@ -55,6 +54,7 @@ end
 # demo server tests
 namespace :gruf do
   namespace :demo do
+    desc 'Get a single Thing to illustrate a unary gRPC call'
     task :get_thing do
       gruf_rake_configure_rpc!
       begin
@@ -66,6 +66,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Get a bunch of Things to illustrate a server streamer call'
     task :get_things do
       gruf_rake_configure_rpc!
       begin
@@ -79,6 +80,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Create Things using a client streamer call'
     task :create_things do
       gruf_rake_configure_rpc!
       begin
@@ -91,6 +93,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Create Things in a bidi stream'
     task :create_things_in_stream do
       gruf_rake_configure_rpc!
       begin
@@ -105,6 +108,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Demonstrate a failure response'
     task :get_fail do
       gruf_rake_configure_rpc!
       begin
@@ -120,6 +124,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Demonstrate a field error in a failure response'
     task :get_field_error_fail do
       gruf_rake_configure_rpc!
       begin
@@ -131,6 +136,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Demonstrate an exception in a failure response'
     task :get_exception do
       gruf_rake_configure_rpc!
       begin
@@ -142,6 +148,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Show an GRPC::Unauthorized response for a unary call'
     task :get_unauthorized do
       gruf_rake_configure_rpc!
       begin
@@ -153,6 +160,7 @@ namespace :gruf do
       end
     end
 
+    desc 'Perform a performance test against a unary endpoint'
     task :performance, [:times, :sleep] do |_t, args|
       args.with_defaults(
         times: 3000,

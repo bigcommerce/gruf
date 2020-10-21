@@ -38,7 +38,7 @@ module Gruf
         @services = services || Gruf.services
         @hook_executor = hook_executor || Gruf::Hooks::Executor.new(hooks: Gruf.hooks&.prepare)
         @server = server || Gruf::Server.new(Gruf.server_options)
-        @logger = logger || Gruf.logger || ::Logger.new(STDERR)
+        @logger = logger || Gruf.logger || ::Logger.new($stderr)
       end
 
       ##

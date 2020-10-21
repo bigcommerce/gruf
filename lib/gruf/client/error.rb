@@ -33,6 +33,7 @@ module Gruf
       #
       def initialize(error)
         @error = error
+        super
       end
     end
 

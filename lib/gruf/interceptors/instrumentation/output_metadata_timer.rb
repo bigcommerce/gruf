@@ -27,12 +27,10 @@ module Gruf
         ##
         # Handle the instrumented response. Note: this will only instrument timings of _successful_ responses.
         #
-        def call
+        def call(&block)
           return unless active_call.respond_to?(:output_metadata)
 
-          result = Gruf::Interceptors::Timer.time do
-            yield
-          end
+          result = Gruf::Interceptors::Timer.time(&block)
           output_metadata.update(metadata_key => result.elapsed.to_s)
 
           raise result.message unless result.successful?

@@ -61,12 +61,10 @@ module Gruf
           #
           # @return [String]
           #
-          def call
-            return yield if options.fetch(:ignore_methods, []).include?(request.method_name)
+          def call(&block)
+            return yield if options.fetch(:ignore_methods, [])&.include?(request.method_name)
 
-            result = Gruf::Interceptors::Timer.time do
-              yield
-            end
+            result = Gruf::Interceptors::Timer.time(&block)
 
             # Fetch log level options and merge with default...
             log_level_map = LOG_LEVEL_MAP.merge(options.fetch(:log_levels, {}))
@@ -113,7 +111,7 @@ module Gruf
           # @return [::Gruf::Logger]
           #
           def logger
-            @logger ||= options.fetch(:logger, ::Gruf.logger)
+            @logger ||= (options.fetch(:logger, nil) || Gruf.logger)
           end
 
           ##
@@ -170,8 +168,8 @@ module Gruf
           # @return [Hash] The sanitized params in hash form
           #
           def sanitize(params = {})
-            blocklists = options.fetch(:blocklist, []).map(&:to_s)
-            redacted_string = options.fetch(:redacted_string, 'REDACTED')
+            blocklists = (options.fetch(:blocklist, []) || []).map(&:to_s)
+            redacted_string = options.fetch(:redacted_string, nil) || 'REDACTED'
             blocklists.each do |blocklist|
               parts = blocklist.split('.').map(&:to_sym)
               redact!(parts, 0, params, redacted_string)
