@@ -2,6 +2,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Update to Rubocop 1.0
 - Change to racially neutral terminology across library
   - blacklist->blocklist
   - master->main

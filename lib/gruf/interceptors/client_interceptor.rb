@@ -43,7 +43,7 @@ module Gruf
       # @param [Hash] metadata A hash of outgoing metadata
       # @return [Object] The response message
       #
-      def request_response(request: nil, call: nil, method: nil, metadata: nil)
+      def request_response(request: nil, call: nil, method: nil, metadata: nil, &block)
         rc = Gruf::Outbound::RequestContext.new(
           type: :request_response,
           requests: [request],
@@ -51,9 +51,7 @@ module Gruf
           method: method,
           metadata: metadata
         )
-        call(request_context: rc) do
-          yield
-        end
+        call(request_context: rc, &block)
       end
 
       ##
@@ -65,7 +63,7 @@ module Gruf
       # @param [Hash] metadata A hash of outgoing metadata
       # @return [Object] The response message
       #
-      def client_streamer(requests: nil, call: nil, method: nil, metadata: nil)
+      def client_streamer(requests: nil, call: nil, method: nil, metadata: nil, &block)
         rc = Gruf::Outbound::RequestContext.new(
           type: :client_streamer,
           requests: requests,
@@ -73,9 +71,7 @@ module Gruf
           method: method,
           metadata: metadata
         )
-        call(request_context: rc) do
-          yield
-        end
+        call(request_context: rc, &block)
       end
 
       ##
@@ -87,7 +83,7 @@ module Gruf
       # @param [Hash] metadata A hash of outgoing metadata
       # @return [Object] The response message
       #
-      def server_streamer(request: nil, call: nil, method: nil, metadata: nil)
+      def server_streamer(request: nil, call: nil, method: nil, metadata: nil, &block)
         rc = Gruf::Outbound::RequestContext.new(
           type: :server_streamer,
           requests: [request],
@@ -95,9 +91,7 @@ module Gruf
           method: method,
           metadata: metadata
         )
-        call(request_context: rc) do
-          yield
-        end
+        call(request_context: rc, &block)
       end
 
       ##
@@ -108,7 +102,7 @@ module Gruf
       # @param [Method] method The method being called
       # @param [Hash] metadata A hash of outgoing metadata
       #
-      def bidi_streamer(requests: nil, call: nil, method: nil, metadata: nil)
+      def bidi_streamer(requests: nil, call: nil, method: nil, metadata: nil, &block)
         rc = Gruf::Outbound::RequestContext.new(
           type: :bidi_streamer,
           requests: requests,
@@ -116,9 +110,7 @@ module Gruf
           method: method,
           metadata: metadata
         )
-        call(request_context: rc) do
-          yield
-        end
+        call(request_context: rc, &block)
       end
     end
   end

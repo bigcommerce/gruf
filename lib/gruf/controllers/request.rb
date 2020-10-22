@@ -99,21 +99,23 @@ module Gruf
       # @return [String] The parsed service method name
       #
       def method_name
-        "#{service_key}.#{method_key}"
+        "#{service_key}.#{@method_key}"
       end
 
       ##
       # Return all messages for this request, properly handling different request types
       #
-      # @return Enumerable<Object> All messages for this request
+      # @return [Enumerable<Object>] All messages for this request
       #
       def messages
         if client_streamer?
-          message.call { |msg| yield msg }
+          # rubocop:disable Style/ExplicitBlockArgument
+          @message.call { |msg| yield msg }
+          # rubocop:enable Style/ExplicitBlockArgument
         elsif bidi_streamer?
-          message
+          @message
         else
-          [message]
+          [@message]
         end
       end
     end

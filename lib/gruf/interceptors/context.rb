@@ -28,14 +28,14 @@ module Gruf
       #
       # @param [Array<Gruf::Interceptors::ServerInterceptor>] interceptors
       #
-      def initialize(interceptors = [])
-        @interceptors = interceptors
+      def initialize(interceptors = nil)
+        @interceptors = interceptors || []
       end
 
       ##
       # Intercept the given request and run interceptors in a FIFO execution order
       #
-      def intercept!
+      def intercept!(&block)
         return yield if @interceptors.none?
 
         i = @interceptors.pop
@@ -45,7 +45,7 @@ module Gruf
 
         i.call do
           if @interceptors.any?
-            intercept! { yield }
+            intercept!(&block)
           else
             yield
           end

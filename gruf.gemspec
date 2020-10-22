@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'pry-byebug', '>= 3.9'
   spec.add_development_dependency 'rspec', '>= 3.8'
   spec.add_development_dependency 'rspec_junit_formatter', '>= 0.4'
-  spec.add_development_dependency 'rubocop', '>= 0.68'
+  spec.add_development_dependency 'rubocop', '>= 1.0'
   spec.add_development_dependency 'simplecov', '>= 0.16'
 
   spec.add_runtime_dependency 'grpc', '~> 1.10'

@@ -126,7 +126,7 @@ module Gruf
     # @return [Hash] The newly set metadata
     #
     def metadata=(metadata)
-      @metadata = metadata.map { |k, str| [k, str.to_s] }.to_h
+      @metadata = metadata.transform_values(&:to_s)
     end
 
     ##
