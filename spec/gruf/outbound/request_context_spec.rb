@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -31,19 +33,18 @@ describe Gruf::Outbound::RequestContext do
     )
   end
 
-  describe '.method_name' do
+  describe '#method_name' do
     subject { request_context.method_name }
 
-    it 'should parse out the method name' do
+    it 'parses out the method name' do
       expect(subject).to eq 'GetThing'
     end
-
   end
 
-  describe '.route_key' do
+  describe '#route_key' do
     subject { request_context.route_key }
 
-    it 'should return a friendly routing key' do
+    it 'returns a friendly routing key' do
       expect(subject).to eq 'rpc.thing_service.get_thing'
     end
   end

@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -20,12 +21,12 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logsta
   let(:formatter) { described_class.new }
   let(:request) { build :controller_request }
   let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
-  let(:payload) { { message: 'foo', params: {one: 2} } }
+  let(:payload) { { message: 'foo', params: { one: 2 } } }
 
-  describe '.format' do
+  describe '#format' do
     subject { formatter.format(payload, request: request, result: result) }
 
-    it 'should return the payload as a JSON object' do
+    it 'returns the payload as a JSON object' do
       expect(subject).to eq payload.merge(format: 'json').to_json
     end
   end

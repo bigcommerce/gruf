@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,14 +24,14 @@ describe Gruf::Hooks::Executor do
   let(:hooks) { [hook1, hook2, hook3] }
   let(:executor) { described_class.new(hooks: hooks) }
 
-  describe '.call' do
+  describe '#call' do
+    subject { executor.call(cmd, arguments) }
+
     let(:cmd) { :before_server_start }
     let(:arguments) { { foo: :bar } }
 
-    subject { executor.call(cmd, arguments) }
-
-    context 'if the hook has the command' do
-      it 'should run the command for each hook' do
+    context 'when the hook has the command' do
+      it 'runs the command for each hook' do
         expect(hook1).to receive(:send).with(cmd, arguments).once
         expect(hook2).to receive(:send).with(cmd, arguments).once
         expect(hook3).to receive(:send).with(cmd, arguments).once
@@ -37,11 +39,11 @@ describe Gruf::Hooks::Executor do
       end
     end
 
-    context 'if the hook does not have the command' do
+    context 'when the hook does not have the command' do
       let(:cmd) { :a_fake_hook_point_that_never_exists }
 
-      it 'should not execute against hooks that do not have it defined' do
-        expect(hook1).to_not receive(:send).with(cmd, arguments)
+      it 'does not execute against hooks that do not have it defined' do
+        expect(hook1).not_to receive(:send).with(cmd, arguments)
         subject
       end
     end
@@ -49,15 +51,15 @@ describe Gruf::Hooks::Executor do
     context 'when some hooks have the method and others do not' do
       let(:cmd) { :after_server_stop }
 
-      it 'should run only against the appropriate hooks' do
+      it 'runs only against the appropriate hooks' do
         expect(hook1).to receive(:send).with(cmd, arguments).once
         expect(hook2).to receive(:send).with(cmd, arguments).once
-        expect(hook3).to_not receive(:send).with(cmd, arguments)
+        expect(hook3).not_to receive(:send).with(cmd, arguments)
         subject
       end
     end
 
-    context 'if the second hook raises an exception' do
+    context 'when the second hook raises an exception' do
       let(:exception) { StandardError.new('Failure') }
 
       before do
@@ -66,7 +68,7 @@ describe Gruf::Hooks::Executor do
 
       it 'the third hook should not execute, but the first should' do
         expect(hook1).to receive(:send).with(cmd, arguments).once
-        expect(hook3).to_not receive(:send).with(cmd, arguments)
+        expect(hook3).not_to receive(:send).with(cmd, arguments)
         expect { subject }.to raise_error(exception)
       end
     end

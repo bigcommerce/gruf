@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,28 +18,24 @@
 require 'spec_helper'
 require 'thwait'
 
-describe Gruf::SynchronizedClient do
-  let(:options) { {} }
+describe Gruf::SynchronizedClient, run_thing_server: true do
   subject { build_sync_client(options) }
 
-  around do |t|
-    @server = build_server
-    run_server(@server) { t.run }
-  end
+  let(:options) { {} }
 
   describe '#initialize' do
     context 'when no exclusion list is provided' do
-      it 'should default to an empty list' do
+      it 'defaults to an empty list' do
         expect(subject).to be_a(described_class)
         expect(subject.unsynchronized_methods).to eq []
       end
     end
 
-    context 'if exclusion list is passed' do
+    context 'when exclusion list is passed' do
       let(:excluded) { [:foo] }
       let(:options) { { unsynchronized_methods: excluded } }
 
-      it 'should remember them' do
+      it 'remembers them' do
         expect(subject).to be_a(described_class)
         expect(subject.unsynchronized_methods).to eq excluded
       end
@@ -50,8 +48,8 @@ describe Gruf::SynchronizedClient do
     let(:opts) { {} }
     let(:method_name) { :GetThing }
 
-    context 'multiple calls in parallel' do
-      it 'should make only one rpc and return the same response object' do
+    context 'with multiple calls in parallel' do
+      it 'makes only one rpc and return the same response object' do
         threads = []
         values = Concurrent::Map.new
         threads << Thread.new { values.put(:t1, subject.call(method_name, params, metadata, opts)) }
@@ -64,27 +62,27 @@ describe Gruf::SynchronizedClient do
       end
     end
 
-    context 'multiple calls in series' do
-      it 'should make an rpc for both calls and return different response objects' do
+    context 'with multiple calls in series' do
+      it 'makes an rpc for both calls and return different response objects' do
         result = subject.call(method_name, params, metadata, opts)
         result2 = subject.call(method_name, params, metadata, opts)
         expect(result.message).to be_truthy
         expect(result2.message).to be_truthy
-        expect(result).to_not eq(result2)
+        expect(result).not_to eq(result2)
       end
     end
 
     context 'when an exception occurs' do
-      it 'should release the lock, not stall future requests, and return the same exception' do
+      it 'releases the lock, not stall future requests, and return the same exception' do
         values = Concurrent::Map.new
         threads = []
         0.upto(10) do |i|
           threads << Thread.new do
             value = begin
-                      subject.call(:GetFail, params, {}, {})
-                    rescue StandardError => e
-                      e
-                    end
+              subject.call(:GetFail, params, {}, {})
+            rescue StandardError => e
+              e
+            end
             values.put("result#{i}", value)
           end
         end

@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -16,8 +17,8 @@
 #
 require 'spec_helper'
 
-describe Gruf::VERSION do
-  it 'should have a version' do
-    expect(Gruf::VERSION).to_not be_nil
+describe Gruf do
+  it 'has a version' do
+    expect(described_class::VERSION).not_to be_nil
   end
 end

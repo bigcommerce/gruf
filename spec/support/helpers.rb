@@ -46,8 +46,8 @@ module Gruf
         c.server_binding_url = HOST
         c.default_client_host = HOST
         c.use_default_interceptors = false
-        c.logger = NullLogger.new unless ENV.fetch('GRUF_DEBUG', false)
-        c.grpc_logger = NullLogger.new unless ENV.fetch('GRPC_DEBUG', false)
+        c.logger = ::Logger.new(File::NULL) unless ENV.fetch('GRUF_DEBUG', false)
+        c.grpc_logger = ::Logger.new(File::NULL) unless ENV.fetch('GRPC_DEBUG', false)
       end
       s = Gruf::Server.new(poll_period: 1)
       is.each do |k, opts|

@@ -1,14 +1,20 @@
 AllCops:
   TargetRubyVersion: 2.4
   Exclude:
-    - spec/**/*
     - .bundle/**/*
     - bin/**/*
     - vendor/**/*
     - tmp/**/*
     - log/**/*
-    - Rakefile
-    - gruf.gemspec
+    - spec/support/**/*
+    - spec/factories/**/*
+    - spec/fixtures/**/*
+    - spec/pb/**/*
+    - spec/demo_server
+require:
+  - rubocop-performance
+  - rubocop-rspec
+  - rubocop-thread_safety
 
 Layout/EndAlignment:
   Enabled: false
@@ -47,3 +53,55 @@ Metrics/BlockLength:
 # Disabling this allows base class stub methods to have keyword args.
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
+
+# This cop also affects hash keys, which is bad as we can't always control that. Disabling.
+Naming/VariableNumber:
+  Enabled: false
+
+# We're fine with this
+ThreadSafety/NewThread:
+  Enabled: false
+
+# Not necessary
+Layout/EmptyLineBetweenDefs:
+  Enabled: false
+
+####################################################################################################
+# RSpec Configurations
+####################################################################################################
+
+RSpec/MessageSpies:
+  EnforcedStyle: receive
+
+RSpec/MultipleExpectations:
+  Max: 30
+
+RSpec/NamedSubject:
+  Enabled: false
+
+RSpec/NestedGroups:
+  Enabled: false
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 50
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+# This does not work with RPC messages
+RSpec/VerifiedDoubles:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Exclude:
+    - spec/gruf/functional/**/*
+
+RSpec/IteratedExpectation:
+  Exclude:
+    - spec/gruf/functional/**/*

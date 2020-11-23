@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,20 +23,20 @@ describe Gruf::Interceptors::Instrumentation::OutputMetadataTimer do
   let(:errors) { build :error }
   let(:interceptor) { described_class.new(request, errors, options) }
 
-  describe '.call' do
+  describe '#call' do
     subject { interceptor.call { true } }
 
-    it 'should set the execution time to the output metadata' do
-      expect { subject }.to_not raise_error
-      expect(request.active_call.output_metadata[:timer]).to_not be_nil
+    it 'sets the execution time to the output metadata' do
+      expect { subject }.not_to raise_error
+      expect(request.active_call.output_metadata[:timer]).not_to be_nil
     end
 
     context 'with a custom key' do
       let(:options) { { metadata_key: :foo } }
 
-      it 'should set the execution time to the output metadata with the new key' do
-        expect { subject }.to_not raise_error
-        expect(request.active_call.output_metadata[:foo]).to_not be_nil
+      it 'sets the execution time to the output metadata with the new key' do
+        expect { subject }.not_to raise_error
+        expect(request.active_call.output_metadata[:foo]).not_to be_nil
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -23,95 +25,101 @@ describe Gruf::Client do
   describe '#initialize' do
     subject { client }
 
-    it 'should initialize a new client for the given service' do
-      expect(subject).to be_a(Gruf::Client)
+    it 'initializes a new client for the given service' do
+      expect(subject).to be_a(described_class)
     end
 
-    it 'should have the handlers' do
-      expect(subject.respond_to?(:get_thing)).to be_truthy
-      expect(subject.respond_to?(:get_fail)).to be_truthy
+    it 'has the RPC desc handlers' do
+      expect(subject).to respond_to(:get_thing)
+      expect(subject).to respond_to(:get_fail)
     end
 
     context 'when no hostname is provided' do
-      it 'should default to the default client host' do
+      let(:host) { 'test.dev' }
+
+      before do
         Gruf.configure do |c|
-          c.default_client_host = 'test.dev'
+          c.default_client_host = host
         end
-        expect(subject).to be_a(Gruf::Client)
-        expect(subject.opts[:hostname]).to eq 'test.dev'
+      end
+
+      it 'defaults to the default client host' do
+        expect(subject).to be_a(described_class)
+        expect(subject.opts[:hostname]).to eq host
       end
     end
-    
+
     context 'when no channel credentials options are passed' do
       let(:channel_credentials) { GRPC::Core::ChannelCredentials.new }
-      
+
       after do
         Gruf.configure do |config|
           config.default_channel_credentials = nil
         end
       end
-      
-      it 'should return nil' do
-        expect(subject).to be_a(Gruf::Client)
+
+      it 'returns nil' do
+        expect(subject).to be_a(described_class)
         expect(subject.opts[:channel_credentials]).to be_nil
       end
-      
-      it 'should use default channel credentials' do
+
+      it 'uses default channel credentials' do
         Gruf.configure do |config|
           config.default_channel_credentials = channel_credentials
         end
-        
-        expect(subject).to be_a(Gruf::Client)
+
+        expect(subject).to be_a(described_class)
         expect(subject.opts[:channel_credentials]).to eq(channel_credentials)
       end
     end
-    
+
     context 'when channel credentials options are passed' do
       let(:channel_credentials) { GRPC::Core::ChannelCredentials.new }
       let(:options) { { channel_credentials: channel_credentials } }
-      
+
       after do
         subject.opts[:channel_credentials] = nil
       end
-      
-      it 'should set channel credentials' do
-        expect(subject).to be_a(Gruf::Client)
+
+      it 'sets channel credentials' do
+        expect(subject).to be_a(described_class)
         expect(subject.opts[:channel_credentials]).to eq(channel_credentials)
       end
     end
 
-    context 'if client options are passed' do
+    context 'when client options are passed' do
       let(:timeout) { 30 }
       let(:client_options) { { timeout: timeout } }
 
-      it 'they should pass through to the client stub' do
-        expect(subject).to be_a(Gruf::Client)
+      it 'passes through to the client stub' do
+        expect(subject).to be_a(described_class)
         expect(subject.timeout).to eq timeout
       end
 
-      context 'if the timeout is passed as a string' do
+      context 'when the timeout is passed as a string' do
         let(:timeout) { '30' }
 
-        it 'should be cast as an int' do
-          expect(subject).to be_a(Gruf::Client)
+        it 'is cast as an int' do
+          expect(subject).to be_a(described_class)
           expect(subject.timeout).to eq 30
         end
       end
     end
   end
 
-  describe '.call' do
+  describe '#call' do
+    subject { client.call(method_name, params, metadata, opts) }
+
     let(:metadata) { { foo: 'bar' } }
     let(:params) { { id: 1 } }
     let(:opts) { {} }
     let(:op) { build_operation(metadata: metadata) }
-    subject { client.call(method_name, params, metadata, opts) }
 
-    context 'if the call is successful' do
+    context 'when the call is successful' do
       let(:req) { Rpc::GetThingRequest.new(params) }
       let(:method_name) { :GetThing }
 
-      it 'should call the appropriate method with the right signature' do
+      it 'calls the appropriate method with the right signature' do
         expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata).and_return(op)
         expect(subject).to be_truthy
       end
@@ -120,14 +128,15 @@ describe Gruf::Client do
         let(:deadline) { Time.now + 42 }
         let(:opts) { { deadline: deadline } }
 
-        it 'should pass the deadline into the call' do
-          expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata, deadline: deadline).and_return(op)
+        it 'passes the deadline into the call' do
+          expect(client).to receive(:get_thing)
+            .with(req, return_op: true, metadata: metadata, deadline: deadline).and_return(op)
           expect(subject).to be_truthy
         end
       end
     end
 
-    context 'if a GRPC::BadStatus is raised' do
+    context 'when a GRPC::BadStatus is raised' do
       let(:req) { Rpc::GetThingRequest.new(params) }
       let(:method_name) { :GetThing }
       let(:error_message) { 'Thing with ID 1 not found!' }
@@ -137,22 +146,18 @@ describe Gruf::Client do
       let(:metadata_response) { { Gruf.error_metadata_key.to_s => err_obj.serialize } }
       let(:grpc_error) { GRPC::NotFound.new(error_message, metadata_response) }
 
-      context 'if the serializer is the default' do
+      context 'when the serializer is the default' do
         before do
-          expect(client).to receive(:get_thing).and_raise(grpc_error)
+          allow(client).to receive(:get_thing).and_raise(grpc_error)
         end
 
-        it 'should raise the error' do
-          expect {
-            subject
-          }.to raise_error(Gruf::Client::Errors::NotFound)
+        it 'raises the error' do
+          expect { subject }.to raise_error(Gruf::Client::Errors::NotFound)
         end
 
-        context 'and has a serialized error payload' do
-          it 'should pass it through deserialized' do
-            expect {
-              subject
-            }.to raise_error(Gruf::Client::Error) do |e|
+        context 'when it has a serialized error payload' do
+          it 'passes it through deserialized' do
+            expect { subject }.to raise_error(Gruf::Client::Error) do |e|
               expect(e.error['code']).to eq error_code.to_s
               expect(e.error['app_code']).to eq app_error_code.to_s
               expect(e.error['message']).to eq error_message
@@ -160,32 +165,27 @@ describe Gruf::Client do
           end
         end
 
-        context 'and has no serialized error payload' do
+        context 'when it has no serialized error payload' do
           let(:metadata_response) { {} }
 
-          it 'should just passthrough the error object as-is' do
-            expect {
-              subject
-            }.to raise_error(Gruf::Client::Errors::NotFound)
+          it 'just passes through the error object as-is' do
+            expect { subject }.to raise_error(Gruf::Client::Errors::NotFound)
           end
         end
       end
 
-
-      context 'if the serializer is the proto serializer' do
+      context 'when the serializer is the proto serializer' do
         before do
           Gruf.error_serializer = Serializers::Proto
-          expect(client).to receive(:get_thing).and_raise(grpc_error)
+          allow(client).to receive(:get_thing).and_raise(grpc_error)
         end
 
         after do
           Gruf.error_serializer = nil
         end
 
-        it 'should pass it through deserialized' do
-          expect {
-            subject
-          }.to raise_error(Gruf::Client::Errors::NotFound) do |e|
+        it 'passes it through deserialized' do
+          expect { subject }.to raise_error(Gruf::Client::Errors::NotFound) do |e|
             expect(e.error.error_code).to eq app_error_code.to_s
             expect(e.error.error_message).to eq error_message.to_s
           end
@@ -193,64 +193,68 @@ describe Gruf::Client do
       end
     end
 
-    context 'if the method does not exist' do
+    context 'when the method does not exist' do
       let(:req) { Rpc::GetThingRequest.new(params) }
       let(:method_name) { :GetNonExistentMethodOnTheService }
 
-      it 'should raise a NotImplementedError' do
-        expect{ subject }.to raise_error(NotImplementedError)
+      it 'raises a NotImplementedError' do
+        expect { subject }.to raise_error(NotImplementedError)
       end
     end
   end
 
-  describe '.build_metadata' do
-    let(:metadata) { { foo: 'bar' } }
+  describe '#build_metadata' do
     subject { client.send(:build_metadata, metadata) }
+
+    let(:metadata) { { foo: 'bar' } }
 
     context 'with a password' do
       let(:options) { { username: 'grpc', password: 'abcd' } }
       let(:auth_string_encoded) { "Basic #{Base64.encode64("#{options[:username]}:#{options[:password]}")}".strip }
 
-      context 'and a passed metadata hash' do
-        it 'should return the merged hash with the authorization data' do
+      context 'when it has a passed metadata hash' do
+        it 'returns the merged hash with the authorization data' do
           expect(subject).to eq metadata.merge(authorization: auth_string_encoded)
         end
       end
 
-      context 'and no passed metadata hash' do
+      context 'when no passed metadata hash' do
         let(:metadata) { {} }
-        it 'should return a hash with only the authorization data' do
-          expect(subject).to eq({ authorization: auth_string_encoded })
+
+        it 'returns a hash with only the authorization data' do
+          expect(subject).to eq(authorization: auth_string_encoded)
         end
       end
     end
 
     context 'without a password' do
-      context 'and a passed hash' do
-        it 'should return the hash untouched' do
+      context 'when there is a a passed hash' do
+        it 'returns the hash untouched' do
           expect(subject).to eq metadata
         end
       end
 
-      context 'and nothing passed' do
+      context 'when there is nothing passed' do
         let(:options) { { username: '', password: '' } }
         let(:metadata) { {} }
-        it 'should return an empty hash' do
+
+        it 'returns an empty hash' do
           expect(subject).to be_empty
         end
       end
     end
   end
-end
 
-describe Gruf::Client::Error do
-  let(:err_obj) { Object.new }
-  let(:error) { described_class.new(err_obj) }
-  subject { error }
+  describe Gruf::Client::Error do
+    subject { error }
 
-  context '.initialize' do
-    it 'should set the error object on the class' do
-      expect(subject.error).to eq err_obj
+    let(:err_obj) { Object.new }
+    let(:error) { described_class.new(err_obj) }
+
+    describe '#initialize' do
+      it 'sets the error object on the class' do
+        expect(subject.error).to eq err_obj
+      end
     end
   end
 end

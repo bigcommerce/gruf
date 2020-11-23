@@ -2,7 +2,6 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
-- Update to Rubocop 1.0
 - Change to racially neutral terminology across library
   - blacklist->blocklist
   - master->main
@@ -10,6 +9,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 - Explicitly declare development dependencies
 - Add script/e2e test for full e2e test 
 - Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
+- Update to Rubocop 1.4, add in rubocop-rspec for spec tests
 
 ### 2.8.1
 

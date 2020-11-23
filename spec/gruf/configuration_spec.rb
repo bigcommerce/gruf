@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -19,52 +20,56 @@ require 'spec_helper'
 class TestConfiguration
   include Gruf::Configuration
 end
+
 describe Gruf::Configuration do
   let(:obj) { TestConfiguration.new }
 
-  describe '.reset' do
+  describe '#reset' do
     subject { obj.server_binding_url }
 
-    it 'should reset config vars to default' do
+    it 'resets config vars to default' do
       obj.configure do |c|
         c.server_binding_url = 'test.dev'
       end
       obj.reset
-      expect(subject).to_not eq 'test.dev'
+      expect(subject).not_to eq 'test.dev'
     end
   end
 
   describe '.environment' do
     subject { obj.send(:environment) }
 
-    context 'ENV RAILS_ENV' do
+    context 'with ENV RAILS_ENV' do
       before do
         allow(ENV).to receive(:[]).with('RACK_ENV').and_return nil
         allow(ENV).to receive(:[]).with('RAILS_ENV').and_return 'production'
       end
-      it 'should return the proper environment' do
+
+      it 'returns the proper environment' do
         expect(subject).to eq 'production'
       end
     end
 
-    context 'ENV RACK_ENV' do
+    context 'with ENV RACK_ENV' do
       before do
         allow(ENV).to receive(:[]).with('RACK_ENV').and_return 'production'
         allow(ENV).to receive(:[]).with('RAILS_ENV').and_return nil
       end
-      it 'should return the proper environment' do
+
+      it 'returns the proper environment' do
         expect(subject).to eq 'production'
       end
     end
   end
 
-  describe '.options' do
+  describe '#options' do
     subject { obj.options }
+
     before do
       obj.reset
     end
 
-    it 'should return the options hash' do
+    it 'returns the options hash' do
       expect(obj.options).to be_a(Hash)
       expect(obj.options[:server_binding_url]).to eq '0.0.0.0:9001'
     end

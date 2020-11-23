@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -32,14 +33,14 @@ describe ::Gruf::Errors::Helpers do
     )
   end
 
-  describe '.fail!' do
+  describe '#fail!' do
+    subject { controller.fail!(error_code, app_code, error_message, metadata) }
+
     let(:error_code) { :not_found }
     let(:error_message) { 'Thing 1 not found!' }
     let(:app_code) { :thing_not_found }
 
-    subject { controller.fail!(error_code, app_code, error_message, metadata) }
-
-    it 'should call fail! on the error and set the appropriate values' do
+    it 'calls fail! on the error and sets the appropriate values' do
       expect { subject }.to raise_error(GRPC::NotFound) do |e|
         expect(e.code).to eq GRPC::Core::StatusCodes::NOT_FOUND
         expect(e.message).to eq "#{GRPC::Core::StatusCodes::NOT_FOUND}:#{error_message}"
@@ -53,7 +54,7 @@ describe ::Gruf::Errors::Helpers do
     end
   end
 
-  describe '.has_field_errors?' do
+  describe '#has_field_errors?' do
     subject { controller.has_field_errors? }
 
     context 'when there are field errors' do
@@ -61,35 +62,35 @@ describe ::Gruf::Errors::Helpers do
         controller.add_field_error(:name, :invalid, 'Invalid name')
       end
 
-      it 'should return true' do
+      it 'returns true' do
         expect(subject).to be_truthy
       end
     end
 
     context 'when there are no field errors' do
-      it 'should return false' do
+      it 'returns false' do
         expect(subject).to be_falsey
       end
     end
   end
 
-  describe '.set_debug_info' do
+  describe '#set_debug_info' do
+    subject { controller.set_debug_info(detail, stack_trace) }
+
     let(:detail) { FFaker::Lorem.sentence }
     let(:stack_trace) { FFaker::Lorem.sentences(2) }
     let(:error) { controller.error }
 
-    subject { controller.set_debug_info(detail, stack_trace) }
-
-    it 'should pass through to the error call' do
+    it 'passes through to the error call' do
       expect(error).to receive(:set_debug_info).with(detail, stack_trace)
       subject
     end
   end
 
-  describe '.error' do
+  describe '#error' do
     subject { controller.error }
 
-    it 'should return a Gruf::Error object' do
+    it 'returns a Gruf::Error object' do
       expect(subject).to be_a(Gruf::Error)
     end
   end

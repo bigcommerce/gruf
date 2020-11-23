@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,10 +23,10 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Base d
   let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { {} }
 
-  describe '.format' do
+  describe '#format' do
     subject { formatter.format(payload, request: request, result: result) }
 
-    it 'should raise a NotImplementedError' do
+    it 'raises a NotImplementedError' do
       expect { subject }.to raise_error(NotImplementedError)
     end
   end

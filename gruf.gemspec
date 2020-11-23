@@ -15,7 +15,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-$:.push File.expand_path("../lib", __FILE__)
+$LOAD_PATH.push File.expand_path('lib', __dir__)
 require 'gruf/version'
 
 Gem::Specification.new do |spec|
@@ -30,31 +30,37 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/bigcommerce/gruf'
 
   spec.files         = Dir['README.md', 'CHANGELOG.md', 'CODE_OF_CONDUCT.md', 'lib/**/*', 'gruf.gemspec']
-  spec.executables   << 'gruf'
+  spec.executables << 'gruf'
   spec.require_paths = ['lib']
 
   spec.required_ruby_version = '~> 2.4'
 
   spec.add_development_dependency 'bundler', '~> 1.11'
   spec.add_development_dependency 'bundler-audit', '>= 0.6'
-  spec.add_development_dependency 'factory_bot', (Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5') ? '>= 6.1' : '~> 5.2')
+  # rubocop:disable Gemspec/RubyVersionGlobalsUsage
+  spec.add_development_dependency(
+    'factory_bot',
+    (Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5') ? '>= 6.1' : '~> 5.2')
+  )
+  # rubocop:enable Gemspec/RubyVersionGlobalsUsage
   spec.add_development_dependency 'ffaker', '>= 2.15'
-  spec.add_development_dependency 'rake', '>= 10.0'
-  spec.add_development_dependency 'null-logger', '>= 0.1'
   spec.add_development_dependency 'pry', '~> 0.12'
   spec.add_development_dependency 'pry-byebug', '>= 3.9'
+  spec.add_development_dependency 'rake', '>= 10.0'
   spec.add_development_dependency 'rspec', '>= 3.8'
   spec.add_development_dependency 'rspec_junit_formatter', '>= 0.4'
   spec.add_development_dependency 'rubocop', '>= 1.0'
+  spec.add_development_dependency 'rubocop-performance', '>= 0.0.1'
+  spec.add_development_dependency 'rubocop-rspec', '>= 2.0'
+  spec.add_development_dependency 'rubocop-thread_safety', '>= 0.3'
   spec.add_development_dependency 'simplecov', '>= 0.16'
 
+  spec.add_runtime_dependency 'activesupport', '> 4'
+  spec.add_runtime_dependency 'concurrent-ruby', '> 1'
+  spec.add_runtime_dependency 'e2mmap', '~> 0.1'
   spec.add_runtime_dependency 'grpc', '~> 1.10'
   spec.add_runtime_dependency 'grpc-tools', '~> 1.10'
-  spec.add_runtime_dependency 'activesupport', '> 4'
   spec.add_runtime_dependency 'json', '>= 2.3'
-
-  spec.add_runtime_dependency 'concurrent-ruby', '> 1'
   spec.add_runtime_dependency 'slop', '~> 4.6'
   spec.add_runtime_dependency 'thwait', '~> 0.1'
-  spec.add_runtime_dependency 'e2mmap', '~> 0.1'
 end

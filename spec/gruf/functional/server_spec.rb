@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -28,10 +29,10 @@ describe 'Functional server test' do
   describe 'request types' do
     let(:client) { TestClient.new }
 
-    context 'for a request/response call' do
+    context 'when it is a request/response call' do
       let(:id) { 1 }
 
-      it 'should return the thing', run_thing_server: true do
+      it 'returns the thing', run_thing_server: true do
         client = build_client
         resp = client.call(:GetThing, id: id)
         expect(resp.message).to be_a(Rpc::GetThingResponse)
@@ -40,18 +41,18 @@ describe 'Functional server test' do
       end
     end
 
-    context 'for a server streaming call' do
-      it 'should return the things in a stream from the server', run_thing_server: true do
+    context 'when it is a server streaming call' do
+      it 'returns the things in a stream from the server', run_thing_server: true do
         client = build_client
         resp = client.call(:GetThings)
-        resp.message.each do |r|
-          expect(r).to be_a(Rpc::Thing)
+        resp.message do |m|
+          expect(m).to be_a(Rpc::Thing)
         end
       end
     end
 
-    context 'for a client streaming call' do
-      it 'should return the things from the server', run_thing_server: true do
+    context 'when it is a client streaming call' do
+      it 'returns the things from the server', run_thing_server: true do
         things = []
         5.times do
           things << Rpc::Thing.new(
@@ -65,8 +66,9 @@ describe 'Functional server test' do
         expect(resp.message.things.first).to be_a(Rpc::Thing)
       end
     end
-    context 'for a bidi streaming call' do
-      it 'should return the things from the server', run_thing_server: true do
+
+    context 'when it is a bidi streaming call' do
+      it 'returns the things from the server', run_thing_server: true do
         things = []
         5.times do
           things << Rpc::Thing.new(

@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -36,7 +37,7 @@ describe Gruf::Interceptors::Authentication::Basic do
     }
   end
   let(:accepted_credentials) { [server_credentials1, server_credentials2] }
-  let(:request_credentials) { "Basic #{Base64.encode64(prefixed_req_username + request_password)}"}
+  let(:request_credentials) { "Basic #{Base64.encode64(prefixed_req_username + request_password)}" }
 
   let(:excluded_methods) { [] }
 
@@ -44,7 +45,14 @@ describe Gruf::Interceptors::Authentication::Basic do
   let(:active_call) { double(:active_call, metadata: metadata) }
   let(:request) { build :controller_request, active_call: active_call }
   let(:errors) { build :error }
-  let(:interceptor) { described_class.new(request, errors, credentials: accepted_credentials, excluded_methods: excluded_methods) }
+  let(:interceptor) do
+    described_class.new(
+      request,
+      errors,
+      credentials: accepted_credentials,
+      excluded_methods: excluded_methods
+    )
+  end
 
   describe '.valid?' do
     subject { interceptor.call { true } }
@@ -52,41 +60,43 @@ describe Gruf::Interceptors::Authentication::Basic do
     context 'with a server username and password only' do
       let(:accepted_credentials) { [server_credentials1] }
 
-      context 'if the credentials are correct' do
-        it 'should not raise an error' do
-          expect { subject }.to_not raise_error
+      context 'when the credentials are correct' do
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_error
         end
 
-        context 'if excluded_methods is specified' do
-          context 'and the call is in the list' do
+        context 'when excluded_methods is specified' do
+          context 'when the call is in the list' do
             let(:excluded_methods) { ['rpc.thing_service.get_thing'] }
 
-            it 'should allow the request to go through' do
-              expect { subject }.to_not raise_error
+            it 'allows the request to go through' do
+              expect { subject }.not_to raise_error
             end
           end
 
-          context 'and the call is not in the list' do
+          context 'when the call is not in the list' do
             let(:excluded_methods) { ['rpc.thing_service.create_things'] }
 
-            it 'should allow the request to go through' do
-              expect { subject }.to_not raise_error
+            it 'allows the request to go through' do
+              expect { subject }.not_to raise_error
             end
           end
         end
       end
 
-      context 'if the credentials are incorrect' do
-        context 'where the sent user is incorrect' do
+      context 'when the credentials are incorrect' do
+        context 'when the sent user is incorrect' do
           let(:request_username) { 'foo' }
-          it 'should raise a GRPC::Unauthenticated error' do
+
+          it 'raises a GRPC::Unauthenticated error' do
             expect { subject }.to raise_error GRPC::Unauthenticated
           end
         end
 
-        context 'where the sent password is incorrect' do
+        context 'when the sent password is incorrect' do
           let(:request_password) { 'foo' }
-          it 'should raise a GRPC::Unauthenticated error' do
+
+          it 'raises a GRPC::Unauthenticated error' do
             expect { subject }.to raise_error GRPC::Unauthenticated
           end
         end
@@ -94,25 +104,26 @@ describe Gruf::Interceptors::Authentication::Basic do
         context 'when neither are sent' do
           let(:metadata) { {} }
 
-          it 'should raise a GRPC::Unauthenticated error' do
+          it 'raises a GRPC::Unauthenticated error' do
             expect { subject }.to raise_error GRPC::Unauthenticated
           end
         end
 
-        context 'if excluded_methods is specified' do
+        context 'when excluded_methods is specified' do
           let(:request_password) { 'wrong' }
-          context 'and the call is in the list' do
+
+          context 'when the call is in the list' do
             let(:excluded_methods) { ['rpc.thing_service.get_thing'] }
 
-            it 'should allow the request to go through' do
-              expect { subject }.to_not raise_error
+            it 'allows the request to go through' do
+              expect { subject }.not_to raise_error
             end
           end
 
-          context 'and the call is not in the list' do
+          context 'when the call is not in the list' do
             let(:excluded_methods) { ['rpc.thing_service.create_things'] }
 
-            it 'should raise a GRPC::Unauthenticated error' do
+            it 'raises a GRPC::Unauthenticated error' do
               expect { subject }.to raise_error GRPC::Unauthenticated
             end
           end
@@ -125,46 +136,50 @@ describe Gruf::Interceptors::Authentication::Basic do
       let(:request_username) { '' }
       let(:server_username) { '' }
 
-      context 'if the password is correct' do
-        it 'should not raise an error' do
-          expect { subject }.to_not raise_error
+      context 'when the password is correct' do
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_error
         end
       end
 
-      context 'if the password is invalid' do
+      context 'when the password is invalid' do
         let(:request_password) { 'foo' }
-        it 'should raise a GRPC::Unauthenticated error' do
+
+        it 'raises a GRPC::Unauthenticated error' do
           expect { subject }.to raise_error GRPC::Unauthenticated
         end
       end
     end
 
     context 'with a server username and password _or_ only a password' do
-      context 'if the credentials are correct' do
-        it 'should not raise an error' do
-          expect { subject }.to_not raise_error
+      context 'when the credentials are correct' do
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_error
         end
       end
 
-      context 'if the credentials are incorrect' do
-        context 'where the sent user is incorrect' do
+      context 'when the credentials are incorrect' do
+        context 'when the sent user is incorrect' do
           let(:request_username) { 'foo' }
-          it 'should pass on the accepted password' do
-            expect { subject }.to_not raise_error
+
+          it 'passes on the accepted password' do
+            expect { subject }.not_to raise_error
           end
         end
 
-        context 'where the sent password is incorrect' do
+        context 'when the sent password is incorrect' do
           let(:request_password) { 'foo' }
-          it 'should raise a GRPC::Unauthenticated error' do
+
+          it 'raises a GRPC::Unauthenticated error' do
             expect { subject }.to raise_error GRPC::Unauthenticated
           end
         end
 
-        context 'where both the username and password are incorrect' do
+        context 'when both the username and password are incorrect' do
           let(:request_username) { 'foo' }
           let(:request_password) { 'bar' }
-          it 'should raise a GRPC::Unauthenticated error' do
+
+          it 'raises a GRPC::Unauthenticated error' do
             expect { subject }.to raise_error GRPC::Unauthenticated
           end
         end

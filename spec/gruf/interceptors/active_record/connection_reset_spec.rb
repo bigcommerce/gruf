@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -21,29 +22,31 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
   let(:errors) { build :error }
   let(:interceptor) { described_class.new(request, errors) }
 
-  subject { interceptor.call { true } }
+  describe '#call' do
+    subject { interceptor.call { true } }
 
-  context 'if ActiveRecord is loaded' do
-    before do
-      allow(interceptor).to receive(:enabled?).and_return(true)
+    context 'when ActiveRecord is loaded' do
+      before do
+        allow(interceptor).to receive(:enabled?).and_return(true)
+      end
+
+      it 'tries to clear any active connections' do
+        expect(::ActiveRecord::Base).to receive(:establish_connection).and_call_original
+        expect(::ActiveRecord::Base).to receive(:clear_active_connections!).and_call_original
+        subject
+      end
     end
 
-    it 'should try to clear any active connections' do
-      expect(::ActiveRecord::Base).to receive(:establish_connection).and_call_original
-      expect(::ActiveRecord::Base).to receive(:clear_active_connections!).and_call_original
-      subject
-    end
-  end
+    context 'when ActiveRecord is not loaded' do
+      before do
+        allow(interceptor).to receive(:enabled?).and_return(false)
+      end
 
-  context 'if ActiveRecord is not loaded' do
-    before do
-      allow(interceptor).to receive(:enabled?).and_return(false)
-    end
-
-    it 'should not try to clear any active connections' do
-      expect(::ActiveRecord::Base).to_not receive(:establish_connection)
-      expect(::ActiveRecord::Base).to_not receive(:clear_active_connections!)
-      subject
+      it 'does not try to clear any active connections' do
+        expect(::ActiveRecord::Base).not_to receive(:establish_connection)
+        expect(::ActiveRecord::Base).not_to receive(:clear_active_connections!)
+        subject
+      end
     end
   end
 end

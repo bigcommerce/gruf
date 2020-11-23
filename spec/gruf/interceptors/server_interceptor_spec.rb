@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -24,7 +25,7 @@ describe Gruf::Interceptors::ServerInterceptor do
   describe 'statelessness' do
     let(:interceptor) { TestServerInterceptorInstanceVar }
 
-    it 'should not persist interceptor instance variables across requests', run_thing_server: true do
+    it 'does not persist interceptor instance variables across requests', run_thing_server: true do
       client = build_client
       resp = client.call(:GetThing)
       expect(resp.message).to be_a(Rpc::GetThingResponse)
@@ -33,15 +34,16 @@ describe Gruf::Interceptors::ServerInterceptor do
     end
   end
 
-  describe '.call' do
-    let(:request) { build :controller_request }
-    let(:error) { build :error }
+  describe '#call' do
     subject { interceptor.new(request, error, {}).call }
 
-    context 'if it is not extended' do
-      let(:interceptor) { Gruf::Interceptors::ServerInterceptor }
+    let(:request) { build :controller_request }
+    let(:error) { build :error }
 
-      it 'should raise a NotImplementedError' do
+    context 'when it is not extended' do
+      let(:interceptor) { described_class }
+
+      it 'raises a NotImplementedError' do
         expect { subject }.to raise_error(NotImplementedError)
       end
     end

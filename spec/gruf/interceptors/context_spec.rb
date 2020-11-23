@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -25,9 +26,9 @@ describe Gruf::Interceptors::Context do
   let(:errors) { build :error }
   let(:interceptor_context) { described_class.new(interceptors) }
 
-  describe '.intercept!' do
+  describe '#intercept!' do
     context 'when an interceptor is added' do
-      it 'should execute it and yield the block' do
+      it 'executes it and yields the block' do
         expect_any_instance_of(interceptor_class).to receive(:call).once.and_call_original
 
         expect(Gruf.logger).to receive(:debug).once
@@ -44,7 +45,7 @@ describe Gruf::Interceptors::Context do
         ]
       end
 
-      it 'should execute each in the order it was added' do
+      it 'executes each in the order it was added' do
         expect_any_instance_of(TestServerInterceptor).to receive(:call).once.and_call_original
         expect_any_instance_of(TestServerInterceptor2).to receive(:call).once.and_call_original
         expect_any_instance_of(TestServerInterceptor3).to receive(:call).once.and_call_original

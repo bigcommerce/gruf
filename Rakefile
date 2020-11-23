@@ -24,16 +24,18 @@ require 'gruf'
 
 def gruf_rake_configure_rpc!
   require 'pry'
-  $LOAD_PATH.unshift File.expand_path('../spec/pb', __FILE__)
-  require File.realpath("#{File.dirname(__FILE__)}/spec/support/grpc.rb")
-  require File.realpath("#{File.dirname(__FILE__)}/spec/support/serializers/proto.rb")
-  require File.realpath("#{File.dirname(__FILE__)}/spec/support/interceptors.rb")
+  $LOAD_PATH.unshift File.expand_path('spec/pb', __dir__)
+  root = File.dirname(__FILE__)
+  require File.realpath("#{root}/spec/support/grpc.rb")
+  require File.realpath("#{root}/spec/support/serializers/proto.rb")
+  require File.realpath("#{root}/spec/support/interceptors.rb")
 
   Gruf.configure do |c|
     c.error_serializer = Serializers::Proto
   end
 end
 
+# Test enumerator
 class ThingCreatorEnumerator
   def initialize(num: 10)
     @num = num.to_i
@@ -60,7 +62,7 @@ namespace :gruf do
       begin
         rpc_client = gruf_demo_build_client
         op = rpc_client.call(:GetThing, id: rand(100_000))
-        Gruf.logger.info "#{op.message.inspect}"
+        Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Error => e
         Gruf.logger.info e.error.to_h
       end
@@ -87,7 +89,7 @@ namespace :gruf do
         rpc_client = gruf_demo_build_client
         enumerator = ThingCreatorEnumerator.new
         resp = rpc_client.call(:CreateThings, enumerator.each)
-        Gruf.logger.info "#{resp.message.inspect}"
+        Gruf.logger.info resp.message.inspect
       rescue Gruf::Client::Error => e
         Gruf.logger.error e.error.to_h
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -27,20 +29,21 @@ describe Gruf::Client::ErrorFactory do
     )
   end
 
-  describe '.from_exception' do
+  describe '#from_exception' do
+    subject { factory.from_exception(exception) }
+
     let(:error_message) { FFaker::Lorem.sentence }
     let(:exception) { GRPC::NotFound.new(error_message) }
 
-    subject { factory.from_exception(exception) }
-
-
     context 'when the exception is a BadStatus' do
-      Gruf::Client::Errors.constants.reject {|e| [:Error, :Validation, :Exception, :Base].include?(e) }.each do |error_class|
+      Gruf::Client::Errors.constants
+                          .reject { |e| %i[Error Validation Exception Base].include?(e) }
+                          .each do |error_class|
         context "and is a GRPC::#{error_class} exception" do
           let(:exception) { "GRPC::#{error_class}".constantize.new(error_message) }
           let(:expected_class) { "Gruf::Client::Errors::#{error_class}".constantize }
 
-          it "should wrap it with the Gruf::Client::Errors::#{error_class} class" do
+          it "wraps it with the Gruf::Client::Errors::#{error_class} class" do
             expect(subject).to be_a(expected_class)
             expect(subject.error).to eq exception
           end
@@ -51,7 +54,7 @@ describe Gruf::Client::ErrorFactory do
     context 'when the exception is a StandardError' do
       let(:exception) { StandardError.new(error_message) }
 
-      it 'should wrap it in the default exception class' do
+      it 'wraps it in the default exception class' do
         expect(subject).to be_a(default_class)
         expect(subject.error).to eq exception
       end
@@ -60,7 +63,7 @@ describe Gruf::Client::ErrorFactory do
     context 'when the exception is a GRPC::Core::CallError' do
       let(:exception) { GRPC::Core::CallError.new(error_message) }
 
-      it 'should wrap it in the default exception class' do
+      it 'wraps it in the default exception class' do
         expect(subject).to be_a(default_class)
         expect(subject.error).to eq exception
       end
@@ -69,7 +72,7 @@ describe Gruf::Client::ErrorFactory do
     context 'when the exception is a SignalException' do
       let(:exception) { SignalException.new('HUP') }
 
-      it 'should return the original exception' do
+      it 'returns the original exception' do
         expect(subject).to eq exception
       end
     end

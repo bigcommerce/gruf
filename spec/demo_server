@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -22,8 +23,8 @@ require 'bundler'
 Bundler.setup
 require 'active_support/all'
 require 'gruf'
-$LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
-$LOAD_PATH.unshift File.expand_path('../pb', __FILE__)
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
+$LOAD_PATH.unshift File.expand_path('pb', __dir__)
 require File.realpath("#{File.dirname(__FILE__)}/support/grpc.rb")
 require File.realpath("#{File.dirname(__FILE__)}/support/serializers/proto.rb")
 
@@ -85,9 +86,9 @@ Gruf.configure do |c|
   c.hooks.use(DemoHook)
 end
 
-Gruf.logger = Logger.new(STDOUT)
+Gruf.logger = Logger.new($stdout)
 Gruf.logger.level = Logger::Severity::DEBUG
-Gruf.grpc_logger = Logger.new(STDOUT)
+Gruf.grpc_logger = Logger.new($stdout)
 Gruf.grpc_logger.level = Logger::Severity::INFO
 Gruf.services << ::Rpc::ThingService::Service
 
