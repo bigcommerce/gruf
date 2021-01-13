@@ -65,7 +65,9 @@ module Gruf
       def self.bind(service)
         service_class = service.name.constantize
         Gruf.services << service_class
+        # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
         @bound_service = service_class
+        # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
         ServiceBinder.new(service_class).bind!(self)
       end
 

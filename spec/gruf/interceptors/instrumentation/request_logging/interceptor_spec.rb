@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -18,7 +19,7 @@ require 'spec_helper'
 
 class FakeRequestLogFormatter; end
 describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
-  let(:options) { { } }
+  let(:options) { {} }
   let(:service) { Rpc::ThingService.new }
   let(:id) { rand(1..1000) }
   let(:request) { Rpc::GetThingRequest.new(id: id) }
@@ -30,23 +31,23 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   let(:errors) { build :error }
   let(:interceptor) { described_class.new(controller_request, errors, options) }
   let(:call) { interceptor.call { true } }
-  let(:logger) { ::Logger.new('/dev/null') }
+  let(:logger) { ::Logger.new(File::NULL) }
 
   before do
     allow(interceptor).to receive(:logger).and_return(logger)
   end
 
-  describe '.call' do
+  describe '#call' do
     subject { call }
 
-    context 'and the request was an invalid argument that was not overwritten' do
+    context 'when the request was an invalid argument that was not overwritten' do
       let(:call) do
         interceptor.call do
           raise GRPC::InvalidArgument, 'invalid argument'
         end
       end
 
-      it 'should log the call properly as a DEBUG' do
+      it 'logs the call properly as a DEBUG' do
         expect(logger).to receive(:debug).once
         expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
           expect(e.details).to eq 'invalid argument'
@@ -54,7 +55,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       end
     end
 
-    context 'and the request was an invalid argument that was overwritten' do
+    context 'when the request was an invalid argument that was overwritten' do
       let(:options) { { log_levels: { 'GRPC::InvalidArgument' => :warn } } }
 
       let(:call) do
@@ -63,7 +64,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         end
       end
 
-      it 'should log the call properly as an WARN' do
+      it 'logs the call properly as an WARN' do
         expect(logger).to receive(:warn).once
         expect { subject }.to raise_error(GRPC::InvalidArgument) do |e|
           expect(e.details).to eq 'invalid argument'
@@ -71,8 +72,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       end
     end
 
-    context 'and the request was successful' do
-      it 'should log the call properly as a DEBUG' do
+    context 'when the request was successful' do
+      it 'log the call properly as a DEBUG' do
         expect(logger).to receive(:debug).once
         subject
       end
@@ -80,21 +81,21 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       context 'with ignore_methods set' do
         let(:options) { { ignore_methods: %w[rpc.thing_service.get_thing] } }
 
-        it 'shouldn\'t log the call' do
+        it 'does not log the call' do
           expect(logger).not_to receive(:debug)
           subject
         end
       end
     end
 
-    context 'and the request was a failure' do
+    context 'when the request was a failure' do
       let(:call) do
         interceptor.call do
           raise GRPC::NotFound, 'thing not found'
         end
       end
 
-      it 'should log the call properly as a DEBUG' do
+      it 'logs the call properly as a DEBUG' do
         expect(logger).to receive(:debug).once
         expect { subject }.to raise_error(GRPC::NotFound) do |e|
           expect(e.details).to eq 'thing not found'
@@ -104,11 +105,12 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   end
 
   describe '.sanitize' do
-    let(:params) { { foo: 'bar', one: 'two', data: { hello: 'world', array: [] }, hello: { one: 'one', two: 'two' } } }
     subject { interceptor.send(:sanitize, params) }
 
-    context 'vanilla' do
-      it 'should return all params' do
+    let(:params) { { foo: 'bar', one: 'two', data: { hello: 'world', array: [] }, hello: { one: 'one', two: 'two' } } }
+
+    context 'when using default options' do
+      it 'returns all params' do
         expect(subject).to eq params
       end
     end
@@ -117,7 +119,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
       let(:blocklist) { [:foo] }
       let(:options) { { blocklist: blocklist } }
 
-      it 'should return all params that are not filtered by the blocklist' do
+      it 'returns all params that are not filtered by the blocklist' do
         expected = params.dup
         expected[:foo] = 'REDACTED'
         expect(subject).to eq expected
@@ -127,18 +129,18 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         let(:str) { 'goodbye' }
         let(:options) { { blocklist: blocklist, redacted_string: str } }
 
-        it 'should return all params that are not filtered by the blocklist' do
+        it 'returns all params that are not filtered by the blocklist' do
           expected = params.dup
           expected[:foo] = str
           expect(subject).to eq expected
         end
       end
 
-      context 'with nested blocklist' do
+      context 'with a nested blocklist' do
         let(:blocklist) { %w[data.array hello] }
         let(:options) { { blocklist: blocklist } }
 
-        it 'should support nested filtering' do
+        it 'supports nested filtering' do
           expected = Marshal.load(Marshal.dump(params))
           expected[:data][:array] = 'REDACTED'
           expected[:hello].each do |key, _val|
@@ -150,8 +152,9 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
 
       context 'when params is nil' do
         let(:params) { nil }
-        it 'should return normally' do
-          expect { subject }.to_not raise_error
+
+        it 'returns normally' do
+          expect { subject }.not_to raise_error
         end
       end
     end
@@ -163,16 +166,16 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
     context 'when the formatter is a symbol' do
       let(:options) { { formatter: :logstash } }
 
-      context 'and exists' do
-        it 'should return the formatter' do
+      context 'when it exists' do
+        it 'returns the formatter' do
           expect(subject).to be_a(Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash)
         end
       end
 
-      context 'and is invalid' do
+      context 'when it is invalid' do
         let(:options) { { formatter: :bar } }
 
-        it 'should raise a NameError' do
+        it 'raises a NameError' do
           expect { subject }.to raise_error(NameError)
         end
       end
@@ -181,16 +184,16 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
     context 'when the formatter is a class' do
       let(:options) { { formatter: Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash } }
 
-      context 'and extends the base class' do
-        it 'should return the formatter' do
+      context 'when it extends the base class' do
+        it 'returns the formatter' do
           expect(subject).to be_a(Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash)
         end
       end
 
-      context 'and does not extend the base class' do
+      context 'when it does not extend the base class' do
         let(:options) { { formatter: FakeRequestLogFormatter } }
 
-        it 'should raise a InvalidFormatterError' do
+        it 'raises a InvalidFormatterError' do
           expect { subject }.to raise_error(Gruf::Interceptors::Instrumentation::RequestLogging::InvalidFormatterError)
         end
       end
@@ -199,16 +202,16 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
     context 'when the formatter is an instance' do
       let(:options) { { formatter: Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash.new } }
 
-      context 'and extends the base class' do
-        it 'should return the formatter' do
+      context 'when it extends the base class' do
+        it 'returns the formatter' do
           expect(subject).to be_a(Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash)
         end
       end
 
-      context 'and does not extend the base class' do
+      context 'when it does not extend the base class' do
         let(:options) { { formatter: FakeRequestLogFormatter.new } }
 
-        it 'should raise a InvalidFormatterError' do
+        it 'raises a InvalidFormatterError' do
           expect { subject }.to raise_error(Gruf::Interceptors::Instrumentation::RequestLogging::InvalidFormatterError)
         end
       end

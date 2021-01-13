@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -23,10 +25,11 @@ describe Gruf::Hooks::Registry do
   let(:hook_class4) { TestHook4 }
   let(:hook_options) { { one: 'two' } }
 
-  describe '.use' do
+  describe '#use' do
     subject { registry.use(hook_class, hook_options) }
-    it 'should add the hook to the registry' do
-      expect { subject }.to_not raise_error
+
+    it 'adds the hook to the registry' do
+      expect { subject }.not_to raise_error
       expect(registry.count).to eq 1
       expect(registry.instance_variable_get('@registry').first).to eq(
         klass: hook_class,
@@ -35,7 +38,7 @@ describe Gruf::Hooks::Registry do
     end
   end
 
-  describe '.insert_before' do
+  describe '#insert_before' do
     subject { registry.insert_before(hook_class3, hook_class4, hook_options) }
 
     context 'when the before hook exists in the registry' do
@@ -45,7 +48,7 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class3)
       end
 
-      it 'should insert the hook before it in the registry' do
+      it 'inserts the hook before it in the registry' do
         expect { subject }.not_to raise_error
 
         reg = registry.instance_variable_get('@registry')
@@ -60,13 +63,13 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class2)
       end
 
-      it 'should raise a HookNotFoundError' do
+      it 'raises a HookNotFoundError' do
         expect { subject }.to raise_error(described_class::HookNotFoundError)
       end
     end
   end
 
-  describe '.insert_after' do
+  describe '#insert_after' do
     subject { registry.insert_after(hook_class2, hook_class3, hook_options) }
 
     context 'when the before hook exists in the registry' do
@@ -76,7 +79,7 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class4)
       end
 
-      it 'should insert the hook before it in the registry' do
+      it 'inserts the hook before it in the registry' do
         expect { subject }.not_to raise_error
 
         reg = registry.instance_variable_get('@registry')
@@ -91,13 +94,13 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class4)
       end
 
-      it 'should raise a HookNotFoundError' do
+      it 'raises a HookNotFoundError' do
         expect { subject }.to raise_error(described_class::HookNotFoundError)
       end
     end
   end
 
-  describe '.remove' do
+  describe '#remove' do
     subject { registry.remove(hook_class) }
 
     before do
@@ -105,25 +108,25 @@ describe Gruf::Hooks::Registry do
       registry.use(hook_class3)
     end
 
-    context 'if the hook is in the registry' do
+    context 'when the hook is in the registry' do
       before do
         registry.use(hook_class)
       end
 
-      it 'should remove the hook from the registry' do
+      it 'removes the hook from the registry' do
         expect { subject }.not_to raise_error
         expect(registry.count).to eq 2
       end
     end
 
-    context 'if the hook is not in the registry' do
-      it 'should raise an HookNotFoundError exception' do
+    context 'when the hook is not in the registry' do
+      it 'raises an HookNotFoundError exception' do
         expect { subject }.to raise_error(described_class::HookNotFoundError)
       end
     end
   end
 
-  describe '.clear' do
+  describe '#clear' do
     subject { registry.clear }
 
     before do
@@ -131,17 +134,17 @@ describe Gruf::Hooks::Registry do
       registry.use(hook_class2)
     end
 
-    it 'should clear the registry of hooks' do
+    it 'clears the registry of hooks' do
       expect { subject }.not_to raise_error
       expect(registry.count).to be_zero
     end
   end
 
-  describe '.count' do
+  describe '#count' do
     subject { registry.count }
 
     context 'with no hooks' do
-      it 'should return 0' do
+      it 'returns 0' do
         expect(subject).to be_zero
       end
     end
@@ -151,7 +154,7 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class)
       end
 
-      it 'should return 1' do
+      it 'returns 1' do
         expect(subject).to eq 1
       end
     end
@@ -163,13 +166,13 @@ describe Gruf::Hooks::Registry do
         registry.use(hook_class3)
       end
 
-      it 'should return the number' do
+      it 'returns the number' do
         expect(subject).to eq 3
       end
     end
   end
 
-  describe '.prepare' do
+  describe '#prepare' do
     subject { registry.prepare }
 
     before do
@@ -178,7 +181,7 @@ describe Gruf::Hooks::Registry do
       registry.use(hook_class2)
     end
 
-    it 'should return all the hooks prepared by the request and maintain insertion order' do
+    it 'returns all the hooks prepared by the request and maintains insertion order' do
       prepped = subject
       expect(prepped.count).to eq 3
       expect(prepped[0]).to be_a(hook_class)

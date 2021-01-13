@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -32,30 +33,30 @@ describe ::Gruf::Controllers::Base do
   end
 
   describe '#bind' do
-    it 'should bind the controller to the service and generate the methods' do
+    it 'binds the controller to the service and generates the methods' do
       expect(Gruf.services).to include(rpc_service)
       expect(rpc_service.instance_methods).to include(:get_thing)
       expect(controller_class.instance_methods).to include(:get_thing)
     end
 
-    it 'should bind the service name to the service class' do
+    it 'binds the service name to the service class' do
       expect(controller_class.bound_service).to eq rpc_service
     end
 
-    it 'should not bind the service name to the base class' do
+    it 'does not bind the service name to the base class' do
       expect(Gruf::Controllers::Base.bound_service).to be_nil
     end
   end
 
-  describe '.call' do
+  describe '#call' do
     subject { controller.call(:get_thing) }
 
-    it 'should expose the methods properly' do
+    it 'exposes the methods properly' do
       expect(subject).to be_a(Rpc::GetThingResponse)
     end
 
     context 'when there are interceptors' do
-      it 'should pass the request to interceptors' do
+      it 'passes the request to interceptors' do
         Gruf.interceptors.use(TestServerInterceptor)
         expect(subject).to be_a(Rpc::GetThingResponse)
       end
@@ -68,7 +69,7 @@ describe ::Gruf::Controllers::Base do
         allow(controller).to receive(:get_thing).and_raise(GRPC::NotFound, error_message)
       end
 
-      it 'should passthrough the error' do
+      it 'passes through the error' do
         expect { subject }.to raise_error(GRPC::NotFound) do |e|
           expect(e.message).to eq "#{GRPC::Core::StatusCodes::NOT_FOUND}:#{error_message}"
         end
@@ -83,7 +84,7 @@ describe ::Gruf::Controllers::Base do
         allow(controller).to receive(:get_thing).and_raise(StandardError, error_message)
       end
 
-      it 'should raise a GRPC::Internal error' do
+      it 'raises a GRPC::Internal error' do
         expect { subject }.to raise_error(GRPC::Internal) do |e|
           expect(e.code).to eq GRPC::Core::StatusCodes::INTERNAL
           expect(e.message).to eq "#{GRPC::Core::StatusCodes::INTERNAL}:#{error_message}"
@@ -96,11 +97,11 @@ describe ::Gruf::Controllers::Base do
           Gruf.backtrace_on_error = true
         end
 
-        it 'should attach a backtrace' do
+        it 'attaches a backtrace' do
           expect { subject }.to raise_error(GRPC::Internal) do |e|
             parsed_error = JSON.parse(e.metadata[:'error-internal-bin'])
-            expect(parsed_error['debug_info']).to_not be_empty
-            expect(parsed_error['debug_info']['stack_trace']).to_not be_empty
+            expect(parsed_error['debug_info']).not_to be_empty
+            expect(parsed_error['debug_info']['stack_trace']).not_to be_empty
           end
         end
       end
@@ -113,7 +114,7 @@ describe ::Gruf::Controllers::Base do
           Gruf.internal_error_message = error_message
         end
 
-        it 'should raise a GRPC::Internal error with the correct message' do
+        it 'raises a GRPC::Internal error with the correct message' do
           expect { subject }.to raise_error(GRPC::Internal) do |e|
             expect(e).to be_a(GRPC::Internal)
             expect(e.code).to eq GRPC::Core::StatusCodes::INTERNAL
@@ -127,7 +128,7 @@ describe ::Gruf::Controllers::Base do
           Gruf.use_exception_message = false
         end
 
-        it 'should raise a GRPC::Internal error and use e.message' do
+        it 'raises a GRPC::Internal error and uses e.message' do
           expect { subject }.to raise_error(GRPC::Internal) do |e|
             expect(e).to be_a(GRPC::Internal)
             expect(e.code).to eq GRPC::Core::StatusCodes::INTERNAL

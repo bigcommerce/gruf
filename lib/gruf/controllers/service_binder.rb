@@ -38,7 +38,7 @@ module Gruf
       ##
       # Bind all methods on the service to the passed controller
       #
-      # @param [Gruf::Controllers::Base] controller
+      # @param [Class<Gruf::Controllers::Base>] controller
       #
       def bind!(controller)
         rpc_methods.each { |name, desc| bind_method(controller, name, desc) }

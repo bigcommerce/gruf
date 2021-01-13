@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -23,7 +24,7 @@ describe Gruf::Serializers::Errors::Base do
   describe '.initialize' do
     subject { serializer }
 
-    it 'should set the error on the object' do
+    it 'sets the error on the object' do
       expect(subject.error).to eq error
     end
   end
@@ -34,7 +35,7 @@ describe Gruf::Serializers::Errors::Base do
     describe '.serialize' do
       subject { serializer.serialize }
 
-      it 'should raise NotImplementedError' do
+      it 'raises NotImplementedError' do
         expect { subject }.to raise_error NotImplementedError
       end
     end
@@ -42,7 +43,7 @@ describe Gruf::Serializers::Errors::Base do
     describe '.deserialize' do
       subject { serializer.deserialize }
 
-      it 'should raise NotImplementedError' do
+      it 'raises NotImplementedError' do
         expect { subject }.to raise_error NotImplementedError
       end
     end

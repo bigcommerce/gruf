@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -34,8 +36,8 @@ describe Gruf::Interceptors::ClientInterceptor do
   end
 
   describe 'interception' do
-    context 'for a request_response call' do
-      it 'should route appropriately and yield control' do
+    context 'when it is a request_response call' do
+      it 'routes appropriately and yields control' do
         expect(Gruf.logger).to receive(:info).once
         test = false
         interceptor.request_response(request: requests.first, call: call, method: grpc_method, metadata: metadata) do
@@ -45,8 +47,8 @@ describe Gruf::Interceptors::ClientInterceptor do
       end
     end
 
-    context 'for a client_streamer call' do
-      it 'should route appropriately and yield control' do
+    context 'when it is a client_streamer call' do
+      it 'routes appropriately and yields control' do
         expect(Gruf.logger).to receive(:info).once
         test = false
         interceptor.client_streamer(requests: requests, call: call, method: grpc_method, metadata: metadata) do
@@ -56,8 +58,8 @@ describe Gruf::Interceptors::ClientInterceptor do
       end
     end
 
-    context 'for a server_streamer call' do
-      it 'should route appropriately and yield control' do
+    context 'when it is a server_streamer call' do
+      it 'routes appropriately and yields control' do
         expect(Gruf.logger).to receive(:info).once
         test = false
         interceptor.server_streamer(request: requests.first, call: call, method: grpc_method, metadata: metadata) do
@@ -67,8 +69,8 @@ describe Gruf::Interceptors::ClientInterceptor do
       end
     end
 
-    context 'for a bidi_streamer call' do
-      it 'should route appropriately and yield control' do
+    context 'when it is a bidi_streamer call' do
+      it 'routes appropriately and yields control' do
         expect(Gruf.logger).to receive(:info).once
         test = false
         interceptor.bidi_streamer(requests: requests, call: call, method: grpc_method, metadata: metadata) do
@@ -79,10 +81,10 @@ describe Gruf::Interceptors::ClientInterceptor do
     end
   end
 
-  describe '.call' do
-    let(:interceptor) { Gruf::Interceptors::ClientInterceptor.new }
+  describe '#call' do
+    let(:interceptor) { described_class.new }
 
-    it 'should yield control' do
+    it 'yields control' do
       expect(Gruf.logger).to receive(:debug).once
       expect { |r| interceptor.call(request_context: request_context, &r) }.to yield_control.once
     end

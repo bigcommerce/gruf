@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -27,19 +28,21 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Plain 
   let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { { message: message, status: status, method: route_key, duration: execution_time, params: params } }
 
-  describe '.format' do
+  describe '#format' do
     subject { formatter.format(payload, request: request, result: result) }
 
     context 'when params are sent to the formatter' do
-      it 'should return the message, without params' do
-        expect(subject).to eq "[#{status}] (#{route_key}) [#{execution_time}ms] #{message} Parameters: #{params.to_h}".strip
+      it 'returns the message, without params' do
+        expect(subject).to eq(
+          "[#{status}] (#{route_key}) [#{execution_time}ms] #{message} Parameters: #{params.to_h}".strip
+        )
       end
     end
 
     context 'when params are not sent to the formatter' do
       let(:payload) { super().except(:params) }
 
-      it 'should return the message' do
+      it 'returns the message' do
         expect(subject).to eq "[#{status}] (#{route_key}) [#{execution_time}ms] #{message}".strip
       end
     end

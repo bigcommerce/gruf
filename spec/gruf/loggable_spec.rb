@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -21,10 +22,11 @@ class TestLoggable
 end
 
 describe Gruf::Loggable do
-  let(:cls) { TestLoggable.new }
   subject { cls.logger }
 
-  it 'should add a logger method when included' do
+  let(:cls) { TestLoggable.new }
+
+  it 'adds a logger method when included' do
     expect(subject).to eq Gruf.logger
   end
 end

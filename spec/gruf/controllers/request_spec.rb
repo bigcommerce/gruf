@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -33,98 +34,98 @@ describe ::Gruf::Controllers::Request do
     )
   end
 
-  describe '.service_key' do
+  describe '#service_key' do
     subject { request.service_key }
 
-    it 'should return the translated name' do
+    it 'returns the translated name' do
       expect(subject).to eq 'rpc.thing_service'
     end
   end
 
-  describe '.service' do
+  describe '#service' do
     subject { request.service }
 
-    it 'should return the service class name' do
+    it 'returns the service class name' do
       expect(subject).to eq service
     end
   end
 
-  describe '.method_name' do
+  describe '#method_name' do
     subject { request.method_name }
 
-    it 'should return the translated service and method name' do
+    it 'returns the translated service and method name' do
       expect(subject).to eq 'rpc.thing_service.get_thing'
     end
   end
 
-  describe '.request_class' do
+  describe '#request_class' do
     subject { request.request_class }
 
-    it 'should return the gRPC request class' do
+    it 'returns the gRPC request class' do
       expect(subject).to eq Rpc::GetThingRequest
     end
   end
 
-  describe '.response_class' do
+  describe '#response_class' do
     subject { request.response_class }
 
-    it 'should return the gRPC response class' do
+    it 'returns the gRPC response class' do
       expect(subject).to eq Rpc::GetThingResponse
     end
   end
 
-  describe '.messages' do
+  describe '#messages' do
     subject { request.messages }
 
-    context 'for a request/response type' do
-      it 'should return the message in an array' do
+    context 'when it is a request/response type' do
+      it 'returns the message in an array' do
         expect(subject).to eq [message]
       end
     end
 
-    context 'for a client streamer type' do
+    context 'when it is a client streamer type' do
       let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs[:CreateThings] }
       let(:messages) { [Rpc::Thing.new(id: 1), Rpc::Thing.new(id: 2)] }
       let(:message) { proc { messages } }
 
-      it 'should return the messages' do
+      it 'returns the messages' do
         expect(subject).to eq messages
       end
     end
 
-    context 'for a server streamer type' do
+    context 'when it is a server streamer type' do
       let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs[:GetThings] }
       let(:message) { Rpc::GetThingsRequest.new }
 
-      it 'should return the request message in an array' do
+      it 'returns the request message in an array' do
         expect(subject).to eq [message]
       end
     end
 
-    context 'for a bidi streamer type' do
+    context 'when it is a bidi streamer type' do
       let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs[:CreateThingsInStream] }
-      let(:messages) { [Rpc::Thing.new(id: 1), Rpc::Thing.new(id: 2)]  }
+      let(:messages) { [Rpc::Thing.new(id: 1), Rpc::Thing.new(id: 2)] }
       let(:message) { messages }
 
-      it 'should return the messages' do
+      it 'returns the messages' do
         expect(subject).to eq messages
       end
     end
   end
 
-  describe '.metadata' do
+  describe '#metadata' do
     subject { request.metadata }
 
-    it 'should delegate to the call' do
+    it 'delegates to the active call' do
       expect(subject).to eq active_call.metadata
     end
   end
 
-  describe '.metadata=' do
+  describe '#metadata=' do
     subject { request.metadata[:foo] = 'bar' }
 
-    it 'should delegate to the call' do
-      expect { subject }.to_not raise_error
+    it 'delegates to the active call' do
+      expect { subject }.not_to raise_error
       expect(request.metadata[:foo]).to eq 'bar'
     end
   end

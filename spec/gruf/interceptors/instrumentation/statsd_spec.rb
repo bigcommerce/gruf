@@ -1,4 +1,5 @@
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -27,11 +28,11 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
 
   let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}rpc.thing_service.get_thing" }
 
-  describe '.call' do
+  describe '#call' do
     subject { interceptor.call { true } }
 
     context 'with a valid client' do
-      it 'should send the metrics to statsd' do
+      it 'sends the metrics to statsd' do
         expect(client).to receive(:increment).with(expected_route_key).once
         expect(client).to receive(:timing).with(expected_route_key, kind_of(Float)).once
         subject
@@ -41,7 +42,7 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
     context 'with no client specified' do
       let(:options) { {} }
 
-      it 'should noop and log an error' do
+      it 'no-ops and logs an error' do
         expect(Gruf.logger).to receive(:error)
         subject
       end
@@ -51,15 +52,16 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
   describe '.key_prefix' do
     subject { interceptor.send(:key_prefix) }
 
-    context 'if a prefix is specified' do
-      it 'should postfix a dot to it' do
+    context 'when a prefix is specified' do
+      it 'postfixes a dot to it' do
         expect(subject).to eq "#{prefix}."
       end
     end
 
-    context 'if no prefix is specified' do
+    context 'when no prefix is specified' do
       let(:prefix) { '' }
-      it 'should return an empty string' do
+
+      it 'returns an empty string' do
         expect(subject).to eq ''
       end
     end
@@ -68,7 +70,7 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
   describe '.route_key' do
     subject { interceptor.send(:route_key) }
 
-    it 'should build the proper route key based on the prefix, service, and call signature' do
+    it 'builds the proper route key based on the prefix, service, and call signature' do
       expect(subject).to eq expected_route_key
     end
   end
@@ -76,16 +78,16 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
   describe '.client' do
     subject { interceptor.send(:client) }
 
-    context 'if a client is specified' do
-      it 'should return it' do
+    context 'when a client is specified' do
+      it 'returns it' do
         expect(subject).to eq client
       end
     end
 
-    context 'if no client is specified' do
+    context 'when no client is specified' do
       let(:client) { nil }
 
-      it 'should return nil' do
+      it 'returns nil' do
         expect(subject).to be_nil
       end
     end
