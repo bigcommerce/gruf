@@ -2,15 +2,16 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.9.0
+
 - Change to racially neutral terminology across library
   - blacklist->blocklist
-  - master->main
-- Add Ruby 2.7 support
-- Explicitly declare development dependencies
-- Add script/e2e test for full e2e test 
+  - master->main branch
+- Explicitly declare development dependencies in gemspec
+- Add script/e2e test for full e2e test in regression suite
 - Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
 - Update to Rubocop 1.4, add in rubocop-rspec for spec tests
-- Add Ruby 3.0 support
+- Add Ruby 2.7, 3.0 support
 
 ### 2.8.1
 
