@@ -10,6 +10,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 - Add script/e2e test for full e2e test 
 - Explicitly declare [json gem](https://rubygems.org/gems/json) dependency
 - Update to Rubocop 1.4, add in rubocop-rspec for spec tests
+- Add Ruby 3.0 support
 
 ### 2.8.1
 
