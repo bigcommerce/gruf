@@ -13,18 +13,6 @@ ruby_env: &ruby_env
     - image: circleci/ruby:<<parameters.ruby-version>>
 
 executors:
-  ruby_2_4:
-    <<: *ruby_env
-    parameters:
-      ruby-version:
-        type: string
-        default: "2.4.9"
-  ruby_2_5:
-    <<: *ruby_env
-    parameters:
-      ruby-version:
-        type: string
-        default: "2.5.8"
   ruby_2_6:
     <<: *ruby_env
     parameters:
@@ -145,34 +133,6 @@ jobs:
 
 workflows:
   version: 2
-  ruby_2_4:
-    jobs:
-      - bundle-audit:
-          name: "ruby-2_4-bundle_audit"
-          e: "ruby_2_4"
-      - rubocop:
-          name: "ruby-2_4-rubocop"
-          e: "ruby_2_4"
-      - rspec-unit:
-          name: "ruby-2_4-rspec"
-          e: "ruby_2_4"
-      - e2e:
-          name: "ruby-2_4-e2e"
-          e: "ruby_2_4"
-  ruby_2_5:
-    jobs:
-      - bundle-audit:
-          name: "ruby-2_5-bundle_audit"
-          e: "ruby_2_5"
-      - rubocop:
-          name: "ruby-2_5-rubocop"
-          e: "ruby_2_5"
-      - rspec-unit:
-          name: "ruby-2_5-rspec"
-          e: "ruby_2_5"
-      - e2e:
-          name: "ruby-2_5-e2e"
-          e: "ruby_2_5"
   ruby_2_6:
     jobs:
       - bundle-audit:

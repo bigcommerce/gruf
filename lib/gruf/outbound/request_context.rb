@@ -64,7 +64,7 @@ module Gruf
       # @return [String]
       #
       def route_key
-        @method[1..-1].underscore.tr('/', '.')
+        @method[1..].underscore.tr('/', '.')
       end
     end
   end

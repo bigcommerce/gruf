@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.6
   Exclude:
     - .bundle/**/*
     - bin/**/*
@@ -39,6 +39,7 @@ Metrics/ModuleLength:
 
 Metrics/ParameterLists:
   Max: 9
+  MaxOptionalParameters: 5
 
 Metrics/PerceivedComplexity:
   Max: 12

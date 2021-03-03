@@ -16,9 +16,10 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 require 'spec_helper'
+require 'gruf/version'
 
-describe Gruf do
+describe 'Gruf::VERSION' do
   it 'has a version' do
-    expect(described_class::VERSION).not_to be_nil
+    expect(Gruf::VERSION).not_to be_nil
   end
 end
