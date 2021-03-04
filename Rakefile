@@ -177,15 +177,13 @@ namespace :gruf do
       call_divisor = ENV.fetch('CLIENT_CALL_SLEEP_DIVISOR', 1000).to_i
       args[:times].to_i.times do |idx|
         threads << Thread.new do
-          begin
-            sleep((idx / call_divisor).ceil)
-            rpc_client = gruf_demo_build_client
-            Gruf.logger.info "- #{idx}: Making call"
-            op = rpc_client.call(:GetThing, id: idx, sleep: args[:sleep].to_i)
-            Gruf.logger.info "-- #{idx}: #{op.message.inspect}"
-          rescue Gruf::Client::Error => e
-            Gruf.logger.error e.error.to_h
-          end
+          sleep((idx / call_divisor).ceil)
+          rpc_client = gruf_demo_build_client
+          Gruf.logger.info "- #{idx}: Making call"
+          op = rpc_client.call(:GetThing, id: idx, sleep: args[:sleep].to_i)
+          Gruf.logger.info "-- #{idx}: #{op.message.inspect}"
+        rescue Gruf::Client::Error => e
+          Gruf.logger.error e.error.to_h
         end
       end
       threads.each(&:join)

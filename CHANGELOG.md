@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Drop support for Ruby 2.4/2.5 to align with Ruby EOL schedule, supporting 2.6+ only
+
 ### 2.9.0
 
 - Change to racially neutral terminology across library
