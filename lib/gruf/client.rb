@@ -62,7 +62,7 @@ module Gruf
       @opts[:hostname] = @opts.fetch(:hostname, Gruf.default_client_host)
       @opts[:channel_credentials] = @opts.fetch(:channel_credentials, Gruf.default_channel_credentials)
       @error_factory = Gruf::Client::ErrorFactory.new
-      client_options[:timeout] = client_options[:timeout].to_i if client_options.key?(:timeout)
+      client_options[:timeout] = parse_timeout(client_options[:timeout]) if client_options.key?(:timeout)
       client = "#{service}::Stub".constantize.new(@opts[:hostname], build_ssl_credentials, **client_options)
       super(client)
     end
@@ -214,6 +214,28 @@ module Gruf
         Gruf.error_serializer.is_a?(Class) ? Gruf.error_serializer : Gruf.error_serializer.to_s.constantize
       else
         Gruf::Serializers::Errors::Json
+      end
+    end
+
+    ##
+    # Handle various timeout values and prevent improper value setting
+    #
+    # @see GRPC::Core::TimeConsts#from_relative_time
+    # @param [mixed] timeout
+    # @return [Float]
+    # @return [GRPC::Core::TimeSpec]
+    #
+    def parse_timeout(timeout)
+      if timeout.nil?
+        GRPC::Core::TimeConsts::ZERO
+      elsif timeout.is_a?(GRPC::Core::TimeSpec)
+        timeout
+      elsif timeout.is_a?(Numeric)
+        timeout
+      elsif timeout.respond_to?(:to_f)
+        timeout.to_f
+      else
+        raise ArgumentError, 'timeout is not a valid value: does not respond to to_f'
       end
     end
   end
