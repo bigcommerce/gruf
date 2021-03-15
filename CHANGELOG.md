@@ -7,6 +7,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 - Drop support for Ruby 2.4/2.5 to align with Ruby EOL schedule, supporting 2.6+ only
 - Allow for float/TimeSpec timeout values on clients
 
+### 2.9.1
+
+- Allow for float/TimeSpec timeout values on clients (backport from 2.10.0)
+
 ### 2.9.0
 
 - Change to racially neutral terminology across library
