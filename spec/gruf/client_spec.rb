@@ -99,9 +99,34 @@ describe Gruf::Client do
       context 'when the timeout is passed as a string' do
         let(:timeout) { '30' }
 
-        it 'is cast as an int' do
+        it 'is cast as a float' do
           expect(subject).to be_a(described_class)
-          expect(subject.timeout).to eq 30
+          expect(subject.timeout).to eq 30.0
+        end
+      end
+
+      context 'when the timeout is nil' do
+        let(:timeout) { nil }
+
+        it 'is reset as a GRPC::Core::TimeConsts::ZERO' do
+          expect(subject.timeout).to eq ::GRPC::Core::TimeConsts::ZERO
+        end
+      end
+
+      context 'when the timeout is a GRPC::Core::TimeSpec' do
+        let(:timeout) { GRPC::Core::TimeConsts::INFINITE_FUTURE }
+
+        it 'preserves the value' do
+          expect(subject.timeout).to be_a(GRPC::Core::TimeSpec)
+          expect(subject.timeout).to eq timeout
+        end
+      end
+
+      context 'when the timeout is an invalid value that is not castable to a float' do
+        let(:timeout) { Object.new }
+
+        it 'raises an ArgumentError' do
+          expect { subject }.to raise_error(ArgumentError, 'timeout is not a valid value: does not respond to to_f')
         end
       end
     end
