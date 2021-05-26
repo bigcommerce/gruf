@@ -12,25 +12,28 @@ ruby_env: &ruby_env
   docker:
     - image: circleci/ruby:<<parameters.ruby-version>>
 
+gem_cache_key: &gem_cache_key
+  gem_cache_key: "gem-cache-v2"
+
 executors:
   ruby_2_6:
     <<: *ruby_env
     parameters:
       ruby-version:
         type: string
-        default: "2.6.6"
+        default: "2.6"
   ruby_2_7:
     <<: *ruby_env
     parameters:
       ruby-version:
         type: string
-        default: "2.7.1"
+        default: "2.7"
   ruby_3_0:
     <<: *ruby_env
     parameters:
       ruby-version:
         type: string
-        default: "3.0.0"
+        default: "3.0"
 
 commands:
   pre-setup:
@@ -38,21 +41,24 @@ commands:
       - add_ssh_keys
       - checkout
   bundle-install:
+    parameters:
+      gem_cache_key:
+        type: string
+        default: "gem-cache-v2"
     steps:
-      - run:
-          name: "Install bundler 1.17.3"
-          command: |
-            echo 'export BUNDLER_VERSION=1.17.3' >> $BASH_ENV
-            source $BASH_ENV
-            gem install bundler:1.17.3
       - restore_cache:
           keys:
-            - gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
-            - gem-cache-{{ arch }}-{{ .Branch }}
-            - gem-cache
-      - run: bundle check --path vendor/bundle || bundle install --path vendor/bundle
+            - <<parameters.gem_cache_key>>-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+            - <<parameters.gem_cache_key>>-{{ arch }}-{{ .Branch }}
+            - <<parameters.gem_cache_key>>
+      - run:
+          name: "bundle install"
+          command: |
+            bundle config set --local path 'vendor/bundle'
+            bundle lock --add-platform x86_64-linux
+            bundle check || bundle install
       - save_cache:
-          key: gem-cache-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
+          key: <<parameters.gem_cache_key>>-{{ arch }}-{{ .Branch }}-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
   rspec-unit:
@@ -98,7 +104,8 @@ jobs:
         default: "ruby_2_6"
     steps:
       - pre-setup
-      - bundle-install
+      - bundle-install:
+          <<: *gem_cache_key
       - bundle-audit
   rubocop:
     executor: <<parameters.e>>
@@ -108,7 +115,8 @@ jobs:
         default: "ruby_2_6"
     steps:
       - pre-setup
-      - bundle-install
+      - bundle-install:
+          <<: *gem_cache_key
       - bundle-audit
   rspec-unit:
     executor: <<parameters.e>>
@@ -118,7 +126,8 @@ jobs:
         default: "ruby_2_6"
     steps:
       - pre-setup
-      - bundle-install
+      - bundle-install:
+          <<: *gem_cache_key
       - rspec-unit
   e2e:
     executor: <<parameters.e>>
@@ -128,7 +137,8 @@ jobs:
         default: "ruby_2_6"
     steps:
       - pre-setup
-      - bundle-install
+      - bundle-install:
+          <<: *gem_cache_key
       - e2e
 
 workflows:
