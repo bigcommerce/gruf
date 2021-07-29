@@ -54,7 +54,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'rubocop-thread_safety', '>= 0.3'
   spec.add_development_dependency 'simplecov', '>= 0.16'
 
-  spec.add_runtime_dependency 'activesupport', '> 4'
   spec.add_runtime_dependency 'concurrent-ruby', '> 1'
   spec.add_runtime_dependency 'e2mmap', '>= 0.1'
   spec.add_runtime_dependency 'grpc', '~> 1.10'
