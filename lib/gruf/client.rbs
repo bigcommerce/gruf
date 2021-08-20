@@ -1,0 +1,38 @@
+# Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+# persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+# Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+# WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+module Gruf
+  class Client < ::SimpleDelegator
+    attr_reader base_klass: ::Class
+    attr_reader service_klass: ::Class
+    attr_reader opts: ::Hash[::Symbol, ::Object]
+
+    def initialize: (service: ::Module service, ?options: ::Hash[::Symbol, ::Object] options, ?client_options: ::Hash[::Symbol, ::Object] client_options) -> void
+    def call: (::Symbol request_method, ?::Hash[::Symbol, ::Object] params, ?::Hash[::Symbol, ::Object] metadata, ?::Hash[::Symbol, ::Object] opts) { () -> ::Object } -> ::Gruf::Response
+    def timeout: () -> ( Integer | Float | Numeric | ::GRPC::Core::TimeSpec | nil )
+
+    private
+
+    def streaming_request?: (Symbol request_method) -> bool
+    def execute: (::Symbol call_sig, ?Object req, ?Hash[::Symbol, ::Object] metadata, ?::Hash[::Symbol, ::Object] opts) { () -> Object } -> ::Array[::Gruf::Timer::Result, ::GRPC::ActiveCall::Operation]
+    def rpc_desc: (::Symbol request_method) -> ::GRPC::RpcDesc
+    def request_object: (::Symbol request_method, ?::Hash[::Symbol, ::Object] params) -> ( ::Class | nil )
+    def call_signature: (::Symbol request_method) -> ( ::Symbol | nil )
+    def build_metadata: (?::Hash[::Symbol, ::Object] metadata) -> ::Hash[::Symbol, ::Object]
+    def build_ssl_credentials: () -> ( Symbol | GRPC::Core::ChannelCredentials)
+    def error_deserializer_class: () -> ::Class
+    def parse_timeout: (untyped timeout) -> ( ::Float | ::Numeric | ::Integer | ::GRPC::Core::TimeSpec )
+  end
+end

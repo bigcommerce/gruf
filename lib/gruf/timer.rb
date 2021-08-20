@@ -29,15 +29,12 @@ module Gruf
     #   result.time # => 1.10123
     #   result.result # => 'my_thing_is_done'
     #
-    # @property [Object] result The result of the block that was called
-    # @property [Float] time The time, in ms, of the block execution
-    #
     class Result
       # @!attribute [r] result
-      #   @return [mixed]
+      #   @return [Object] The result of the block that was called
       attr_reader :result
       # @!attribute [r] time
-      #   @return [Float]
+      #   @return [Float] The time, in ms, of the block execution
       attr_reader :time
 
       ##

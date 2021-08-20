@@ -12,6 +12,7 @@ AllCops:
     - spec/fixtures/**/*
     - spec/pb/**/*
     - spec/demo_server
+    - ./**/*.rbs
 require:
   - rubocop-performance
   - rubocop-rspec

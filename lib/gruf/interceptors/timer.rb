@@ -24,9 +24,6 @@ module Gruf
       ##
       # Represents a timed result for an interceptor
       #
-      # @property [Object] message The protobuf message
-      # @property [Float] elapsed The elapsed time of the request
-      #
       class Result
         # @!attribute [r] message
         #   @return [Object] The returned protobuf message

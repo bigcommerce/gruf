@@ -180,7 +180,7 @@ module Gruf
     # gRPC BadStatus code.
     #
     # @param [GRPC::ActiveCall] active_call The marshalled gRPC call
-    # @return [GRPC::BadStatus] The gRPC BadStatus code this error is mapped to
+    # @raise [GRPC::BadStatus] The gRPC BadStatus code this error is mapped to
     #
     def fail!(active_call)
       raise attach_to_call(active_call).grpc_error

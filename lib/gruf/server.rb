@@ -248,7 +248,7 @@ module Gruf
     # @param [String]
     #
     def controllers_path
-      options.fetch(:controllers_path, Gruf.controllers_path)
+      options.fetch(:controllers_path, Gruf.controllers_path).to_s
     end
 
     ##

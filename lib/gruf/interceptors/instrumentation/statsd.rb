@@ -70,6 +70,7 @@ module Gruf
 
         ##
         # @return [::Statsd] Return the given StatsD client
+        # @return [NilClass]
         #
         def client
           @client ||= options.fetch(:client, nil)
