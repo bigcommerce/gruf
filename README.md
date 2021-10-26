@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/bigcommerce/gruf/tree/main.svg?style=svg)](https://circleci.com/gh/bigcommerce/gruf/tree/main) [![Gem Version](https://badge.fury.io/rb/gruf.svg)](https://badge.fury.io/rb/gruf) [![Documentation](https://inch-ci.org/github/bigcommerce/gruf.svg?branch=main)](https://inch-ci.org/github/bigcommerce/gruf?branch=main)
 
-gruf is a Ruby framework that wraps the [gRPC Ruby library](https://github.com/grpc/grpc/tree/main/src/ruby) to
+gruf is a Ruby framework that wraps the [gRPC Ruby library](https://github.com/grpc/grpc/tree/master/src/ruby) to
 provide a more streamlined integration into Ruby and Ruby on Rails applications.
 
 It provides an abstracted server and client for gRPC services, along with other tools to help get gRPC services in Ruby
