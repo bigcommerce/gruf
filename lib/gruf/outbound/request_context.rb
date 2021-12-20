@@ -21,15 +21,20 @@ module Gruf
     # Encapsulates the context of an outbound client request
     #
     class RequestContext
-      # @var [Symbol]
+      # @!attribute [r] type
+      #   @return [Symbol]
       attr_reader :type
-      # @var [Enumerable] requests
+      # @!attribute [r] requests
+      #   @return [Enumerable] requests
       attr_reader :requests
-      # @var [GRPC::ActiveCall]
+      # @!attribute [r] call
+      #   @return [GRPC::ActiveCall]
       attr_reader :call
-      # @var [Method] method
+      # @!attribute [r] method
+      #   @return [Method] method
       attr_reader :method
-      # @var [Hash] metadata
+      # @!attribute [r] metadata
+      #   @return [Hash] metadata
       attr_reader :metadata
 
       ##
@@ -55,7 +60,7 @@ module Gruf
       # @return [String]
       #
       def method_name
-        @method.to_s.split('/').last
+        @method.to_s.split('/').last.to_s
       end
 
       ##
@@ -64,7 +69,7 @@ module Gruf
       # @return [String]
       #
       def route_key
-        @method[1..].underscore.tr('/', '.')
+        @method[1..].to_s.underscore.tr('/', '.')
       end
     end
   end

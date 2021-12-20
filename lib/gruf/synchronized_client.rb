@@ -23,6 +23,8 @@ module Gruf
   # to mitigate thundering herds.
   #
   class SynchronizedClient < Gruf::Client
+    # @!attribute [r] unsynchronized_methods
+    #   @return [Array]
     attr_reader :unsynchronized_methods
 
     ##

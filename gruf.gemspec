@@ -35,6 +35,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.6', '< 3.1'
 
+  spec.metadata['rubygems_mfa_required'] = 'true'
+
   spec.add_development_dependency 'bundler-audit', '>= 0.6'
   # rubocop:disable Gemspec/RubyVersionGlobalsUsage
   spec.add_development_dependency(
@@ -57,8 +59,8 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'activesupport', '> 4'
   spec.add_runtime_dependency 'concurrent-ruby', '> 1'
   spec.add_runtime_dependency 'e2mmap', '>= 0.1'
-  spec.add_runtime_dependency 'grpc', '~> 1.10'
-  spec.add_runtime_dependency 'grpc-tools', '~> 1.10'
+  spec.add_runtime_dependency 'grpc', '~> 1.10', '<= 1.41.0'
+  spec.add_runtime_dependency 'grpc-tools', '~> 1.10', '<= 1.41.0'
   spec.add_runtime_dependency 'json', '>= 2.3'
   spec.add_runtime_dependency 'slop', '>= 4.6'
   spec.add_runtime_dependency 'thwait', '>= 0.1'

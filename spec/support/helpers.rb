@@ -63,18 +63,30 @@ module Gruf
     # @param [Gruf::Server] server
     #
     def run_server(server)
+      grpc_server = nil
       grpc_server = server.server
 
       t = Thread.new { grpc_server.run }
       grpc_server.wait_till_running
 
+      timeout = ::ENV.fetch('GRUF_RSPEC_SERVER_TIMEOUT_SEC', 2)
+      poll_period = ::ENV.fetch('GRPC_RSPEC_SERVER_POLL_PERIOD_SEC', 0.01).to_f
       begin
         yield
       ensure
         grpc_server.stop
-        sleep(0.1) until grpc_server.stopped?
+        current_execution = 0.0
+        until grpc_server.stopped?
+          break if timeout.to_f > current_execution
+
+          sleep(poll_period)
+          current_execution += poll_period
+        end
         t.join
       end
+    rescue StandardError, RuntimeError, Exception => e
+      grpc_server&.stop
+      nil
     end
 
     ##

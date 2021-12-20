@@ -1,6 +1,19 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
-### Pending release
+### Pending release (2.11.x)
+
+- Restrict grpc gem to <= 1.41.0 due to regressions in grpc 1.42.x 
+- Fallback to stdout logger at INFO if no logger is setup
+- Better handling of namespace collisions with Rails
+- Add `GRPC_SERVER_HOST` and `GRPC_SERVER_PORT` for ENV configuration of the server host+port
+- Add `GRPC_BACKTRACE_ON_ERROR` as available ENV configuration
+- Add default ENV-based configuration of the GRPC server pool
+  - `GRPC_SERVER_POOL_SIZE` - sets the size of the GRPC server pool
+  - `GRPC_SERVER_POOL_KEEP_ALIVE` - keep alive time for threads spawned by the server pool
+  - `GRPC_SERVER_POLL_PERIOD` - period in seconds to poll for workers in the gRPC server pool
+- Improve Yardoc support across the library
+- Added attribute-based documentation for Gruf configuration options
+- Add mfa required for gemspec metadata
 
 ### 2.10.0
 

@@ -21,11 +21,14 @@ module Gruf
     # Represents a field-specific error
     #
     class Field
-      # @return [Symbol] The name of the field as a Symbol
+      # @!attribute [r] field_name
+      #   @return [Symbol] The name of the field as a Symbol
       attr_reader :field_name
-      # @return [Symbol] The application error code for the field, e.g. :job_not_found
+      # @!attribute [r] error_code
+      #   @return [Symbol] The application error code for the field, e.g. :job_not_found
       attr_reader :error_code
-      # @return [String] The error message for the field, e.g. "Job with ID 123 not found"
+      # @!attribute [r] message
+      #   @return [String] The error message for the field, e.g. "Job with ID 123 not found"
       attr_reader :message
 
       ##

@@ -21,15 +21,20 @@ module Gruf
     # Encapsulates a request for a controller
     #
     class Request
-      # @var [Object] message
+      # @!attribute [r] message
+      #   @return [Object] The protobuf message in the request
       attr_reader :message
-      # @var [GRPC::ActiveCall] active_call
+      # @!attribute [r] active_call
+      #   @return [GRPC::ActiveCall] The active call object used for this request
       attr_reader :active_call
-      # @var [Symbol] method_key
+      # @!attribute [r] method_key
+      #   @return [Symbol] The method name being requested
       attr_reader :method_key
-      # @var [Gruf::Controllers::Request::Type] type
+      # @!attribute [r] type
+      #   @return [Gruf::Controllers::Request::Type] The type of request
       attr_reader :type
-      # @var [Class] service
+      # @!attribute [r] service
+      #   @return [Class] The GRPC service class for this request
       attr_reader :service
 
       delegate :metadata, to: :active_call
@@ -76,7 +81,7 @@ module Gruf
       # @return [String] The mapped service key
       #
       def service_key
-        @service.name.underscore.tr('/', '.').gsub('.service', '')
+        @service.name.to_s.underscore.tr('/', '.').gsub('.service', '')
       end
 
       ##
@@ -106,6 +111,7 @@ module Gruf
       # Return all messages for this request, properly handling different request types
       #
       # @return [Enumerable<Object>] All messages for this request
+      # @return [Object] If a bidi streamed request, will return the message object
       #
       def messages
         if client_streamer?

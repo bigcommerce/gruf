@@ -1,5 +1,6 @@
 AllCops:
   TargetRubyVersion: 2.6
+  NewCops: enable
   Exclude:
     - .bundle/**/*
     - bin/**/*

@@ -36,8 +36,9 @@ describe Gruf::Client::ErrorFactory do
     let(:exception) { GRPC::NotFound.new(error_message) }
 
     context 'when the exception is a BadStatus' do
+      rejected_exceptions = %i[Error Validation Exception Base].freeze
       Gruf::Client::Errors.constants
-                          .reject { |e| %i[Error Validation Exception Base].include?(e) }
+                          .reject { |e| rejected_exceptions.include?(e) }
                           .each do |error_class|
         context "and is a GRPC::#{error_class} exception" do
           let(:exception) { "GRPC::#{error_class}".constantize.new(error_message) }

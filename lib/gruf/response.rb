@@ -20,17 +20,23 @@ module Gruf
   # Wraps the active call operation to provide metadata and timing around the request
   #
   class Response
-    # @return [GRPC::ActiveCall::Operation] The operation that was executed for the given request
+    # @!attribute [r] operation
+    #   @return [GRPC::ActiveCall::Operation] The operation that was executed for the given request
     attr_reader :operation
-    # @return [Hash] The metadata that was attached to the operation
+    # @!attribute [r] metadata
+    #   @return [Hash] The metadata that was attached to the operation
     attr_reader :metadata
-    # @return [Hash] The trailing metadata that the service returned
+    # @!attribute [r] trailing_metadata
+    #   @return [Hash] The trailing metadata that the service returned
     attr_reader :trailing_metadata
-    # @return [Time] The set deadline on the call
+    # @!attribute [r] deadline
+    #   @return [Time] The set deadline on the call
     attr_reader :deadline
-    # @return [Boolean] Whether or not the operation was cancelled
+    # @!attribute [r] cancelled
+    #   @return [Boolean] Whether or not the operation was cancelled
     attr_reader :cancelled
-    # @return [Float] The time that the request took to execute
+    # @!attribute [r] execution_time
+    #   @return [Float] The time that the request took to execute
     attr_reader :execution_time
 
     ##

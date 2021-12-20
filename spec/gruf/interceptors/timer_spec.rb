@@ -69,8 +69,9 @@ describe Gruf::Interceptors::Timer do
       end
 
       describe '#elapsed_rounded' do
+        subject { result.elapsed_rounded(precision: precision) }
+
         let(:precision) { 2 }
-        let(:subject) { result.elapsed_rounded(precision: precision) }
 
         it 'rounds the elapsed time' do
           expect(subject).to eq result.elapsed.round(precision)

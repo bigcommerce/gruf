@@ -25,9 +25,11 @@ module Gruf
 
     include Gruf::Loggable
 
-    # @return [Integer] The port the server is bound to
+    # @!attribute [r] port
+    #   @return [Integer] The port the server is bound to
     attr_reader :port
-    # @return [Hash] Hash of options passed into the server
+    # @!attribute [r] options
+    #   @return [Hash] Hash of options passed into the server
     attr_reader :options
 
     ##
