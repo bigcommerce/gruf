@@ -10,7 +10,7 @@ ruby_env: &ruby_env
     RAILS_ENV: test
     RUBY_VERSION: <<parameters.ruby-version>>
   docker:
-    - image: circleci/ruby:<<parameters.ruby-version>>
+    - image: cimg/ruby:<<parameters.ruby-version>>
 
 gem_cache_key: &gem_cache_key
   gem_cache_key: "gem-cache-v2"

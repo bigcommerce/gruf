@@ -33,8 +33,12 @@ module Gruf
     # @property [Float] time The time, in ms, of the block execution
     #
     class Result
-      attr_reader :result,
-                  :time
+      # @!attribute [r] result
+      #   @return [mixed]
+      attr_reader :result
+      # @!attribute [r] time
+      #   @return [Float]
+      attr_reader :time
 
       ##
       # Initialize the result object

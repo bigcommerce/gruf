@@ -134,7 +134,7 @@ describe Gruf::Error do
   end
 
   describe '#fail!' do
-    let(:subject) { error.fail!(call) }
+    subject { error.fail!(call) }
 
     it 'fails with the proper grpc error code' do
       expect { subject }.to raise_error(GRPC::NotFound)

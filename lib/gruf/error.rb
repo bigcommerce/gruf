@@ -59,20 +59,28 @@ module Gruf
     METADATA_SIZE_EXCEEDED_CODE = 'metadata_size_exceeded'
     METADATA_SIZE_EXCEEDED_MSG = 'Metadata too long, risks exceeding http2 trailing metadata limit.'
 
-    # @return [Symbol] The given internal gRPC code for the error
+    # @!attribute code
+    #   @return [Symbol] The given internal gRPC code for the error
     attr_accessor :code
-    # @return [Symbol] An arbitrary application code that can be used for logical processing of the error by the client
+    # @!attribute app_code
+    #   @return [Symbol] An arbitrary application code that can be used for logical processing of the error
+    #     by the client
     attr_accessor :app_code
-    # @return [String] The error message returned by the server
+    # @!attribute message
+    #   @return [String] The error message returned by the server
     attr_accessor :message
-    # @return [Array] An array of field errors that can be returned by the server
+    # @!attribute field_errors
+    #   @return [Array] An array of field errors that can be returned by the server
     attr_accessor :field_errors
-    # @return [Errors::DebugInfo] A object containing debugging information, such as a stack trace and exception name,
-    # that can be used to debug an given error response. This is sent by the server over the trailing metadata.
+    # @!attribute debug_info
+    #   @return [Errors::DebugInfo] A object containing debugging information, such as a stack trace and exception name,
+    #     that can be used to debug an given error response. This is sent by the server over the trailing metadata.
     attr_accessor :debug_info
-    # @return [GRPC::BadStatus] The gRPC BadStatus error object that was generated
+    # @!attribute [w] grpc_error
+    #   @return [GRPC::BadStatus] The gRPC BadStatus error object that was generated
     attr_writer :grpc_error
-    # @return [Hash] The trailing metadata that was attached to the error
+    # @!attribute [r] metadata
+    #   @return [Hash] The trailing metadata that was attached to the error
     attr_reader :metadata
 
     ##

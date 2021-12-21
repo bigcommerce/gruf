@@ -21,11 +21,14 @@ module Gruf
     # Base class for interception requests
     #
     class Base
-      # @var [Gruf::Controllers::Request] request
+      # @!attribute [r] request
+      #   @return [Gruf::Controllers::Request] request
       attr_reader :request
-      # @var [Gruf::Error] error
+      # @!attribute [r] error
+      #   @return [Gruf::Error] error
       attr_reader :error
-      # @var [Hash] options
+      # @!attribute [r] options
+      #   @return [Hash] options
       attr_reader :options
 
       ##

@@ -23,7 +23,8 @@ module Gruf
     # GRPC::BadStatus error
     #
     class Error < StandardError
-      # @return [Object] error The deserialized error
+      # @!attribute [r] error
+      #   @return [Object] error The deserialized error
       attr_reader :error
 
       ##

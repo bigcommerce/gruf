@@ -22,7 +22,8 @@ module Gruf
       # Base class for serialization of errors for transport across the grpc protocol
       #
       class Base
-        # @return [Gruf::Error|String] The error being serialized
+        # @!attribute [r] error
+        #   @return [Gruf::Error|String] The error being serialized
         attr_reader :error
 
         ##

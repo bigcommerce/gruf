@@ -38,11 +38,14 @@ module Gruf
   class Client < SimpleDelegator
     include Gruf::Loggable
 
-    # @return [Class] The base, friendly name of the service being requested
+    # @!attribute [r] base_klass
+    #   @return [Class] The base, friendly name of the service being requested
     attr_reader :base_klass
-    # @return [Class] The class name of the gRPC service being requested
+    # @!attribute [r] service_klass
+    #   @return [Class] The class name of the gRPC service being requested
     attr_reader :service_klass
-    # @return [Hash] A hash of options for the client
+    # @!attribute [r] opts
+    #   @return [Hash] A hash of options for the client
     attr_reader :opts
 
     ##
@@ -230,7 +233,7 @@ module Gruf
         GRPC::Core::TimeConsts::ZERO
       elsif timeout.is_a?(GRPC::Core::TimeSpec)
         timeout
-      elsif timeout.is_a?(Numeric)
+      elsif timeout.is_a?(Numeric) # rubocop:disable Lint/DuplicateBranch
         timeout
       elsif timeout.respond_to?(:to_f)
         timeout.to_f
