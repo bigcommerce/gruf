@@ -1,6 +1,8 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
-### Pending release (2.11.x)
+### Pending release
+
+### 2.11.0
 
 - Restrict grpc gem to <= 1.41.0 due to regressions in grpc 1.42.x 
 - Fallback to stdout logger at INFO if no logger is setup
