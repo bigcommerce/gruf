@@ -34,6 +34,12 @@ executors:
       ruby-version:
         type: string
         default: "3.0"
+  ruby_3_1:
+    <<: *ruby_env
+    parameters:
+      ruby-version:
+        type: string
+        default: "3.1"
 
 commands:
   pre-setup:
@@ -185,3 +191,17 @@ workflows:
       - e2e:
           name: "ruby-3_0-e2e"
           e: "ruby_3_0"
+  ruby_3_1:
+    jobs:
+      - bundle-audit:
+          name: "ruby-3_1-bundle_audit"
+          e: "ruby_3_1"
+      - rubocop:
+          name: "ruby-3_1-rubocop"
+          e: "ruby_3_1"
+      - rspec-unit:
+          name: "ruby-3_1-rspec"
+          e: "ruby_3_1"
+      - e2e:
+          name: "ruby-3_1-e2e"
+          e: "ruby_3_1"
