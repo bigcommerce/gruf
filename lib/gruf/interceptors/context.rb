@@ -38,7 +38,7 @@ module Gruf
       def intercept!(&block)
         return yield if @interceptors.none?
 
-        i = @interceptors.pop
+        i = @interceptors.shift
         return yield unless i
 
         logger.debug "Intercepting request with interceptor: #{i.class}"

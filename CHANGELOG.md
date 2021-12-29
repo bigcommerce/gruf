@@ -1,6 +1,8 @@
 Changelog for the gruf gem. This includes internal history before the gem was made.
 
-### Pending release
+### Pending release (2.12.x)
+
+- Fixed interceptor order to be FIFO as documented, instead of FILO (fixes #139)
 
 ### 2.11.0
 

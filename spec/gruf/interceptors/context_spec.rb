@@ -45,11 +45,17 @@ describe Gruf::Interceptors::Context do
         ]
       end
 
-      it 'executes each in the order it was added' do
+      it 'executes each as added' do
         expect_any_instance_of(TestServerInterceptor).to receive(:call).once.and_call_original
         expect_any_instance_of(TestServerInterceptor2).to receive(:call).once.and_call_original
         expect_any_instance_of(TestServerInterceptor3).to receive(:call).once.and_call_original
+        expect { |b| interceptor_context.intercept!(&b) }.to yield_control.once
+      end
 
+      it 'executes each in the order it was added' do
+        expect(Math).to receive(:sqrt).ordered.with(4)
+        expect(Math).to receive(:sqrt).ordered.with(16)
+        expect(Math).to receive(:sqrt).ordered.with(256)
         expect(Gruf.logger).to receive(:debug).thrice
         expect { |b| interceptor_context.intercept!(&b) }.to yield_control.once
       end
