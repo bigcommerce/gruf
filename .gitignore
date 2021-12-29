@@ -9,3 +9,4 @@
 /tmp/
 *.gem
 /vendor/bundle
+bundler.lock
