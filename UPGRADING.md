@@ -3,7 +3,7 @@ This document guides on how to upgrade between significant versions of Gruf.
 ## Upgrading to 2.12
 
 Gruf 2.12.x fixes a bug in prior versions where interceptors were executed in FILO order, rather than FIFO order, which
-was the documented behavior. If uou are using interceptors, and you believed the order of their execution was in FILO
+was the documented behavior. If you are using interceptors, and you believed the order of their execution was in FILO
 order purposefully, you will need to adjust the order of adding interceptors to continue your desired behavior after
 upgrading.
 
