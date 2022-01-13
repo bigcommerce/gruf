@@ -72,9 +72,15 @@ commands:
       glob:
         type: string
         default: ""
+      code-climate:
+        type: boolean
+        default: false
     steps:
       - run: mkdir ~/rspec
-      - code-climate/setup
+      - when:
+          condition: <<parameters.code-climate>>
+          steps:
+            - code-climate/setup
       - run:
           name: "Run rspec tests"
           command: |
@@ -82,11 +88,14 @@ commands:
             echo "Running: ${TESTFILES}"
             bundle exec rspec --format progress --format RspecJunitFormatter -o ~/rspec/rspec.xml <<parameters.additional_args>> -- ${TESTFILES}
           when: always
-      - code-climate/store-report:
-          coverage-format: "simplecov"
-      - code-climate/sum-coverage
-      - code-climate/after-build:
-          coverage-format: "simplecov"
+      - when:
+          condition: <<parameters.code-climate>>
+          steps:
+            - code-climate/store-report:
+                coverage-format: "simplecov"
+            - code-climate/sum-coverage
+            - code-climate/after-build:
+                coverage-format: "simplecov"
       - store_test_results:
           path: ~/rspec
   bundle-audit:
@@ -133,11 +142,15 @@ jobs:
       e:
         type: executor
         default: "ruby_2_6"
+      code-climate:
+        type: boolean
+        default: false
     steps:
       - pre-setup
       - bundle-install:
           <<: *gem_cache_key
-      - rspec-unit
+      - rspec-unit:
+          code-climate: <<parameters.code-climate>>
   e2e:
     executor: <<parameters.e>>
     parameters:
@@ -191,6 +204,7 @@ workflows:
       - rspec-unit:
           name: "ruby-3_0-rspec"
           e: "ruby_3_0"
+          code-climate: true
       - e2e:
           name: "ruby-3_0-e2e"
           e: "ruby_3_0"
