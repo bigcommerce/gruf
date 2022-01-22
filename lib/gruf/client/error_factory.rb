@@ -43,7 +43,9 @@ module Gruf
       # coalesce them.
       #
       # @param [Exception] exception
-      # @return [Gruf::Client::Errors::Base|SignalException]
+      # @return [Gruf::Client::Errors::Base]
+      # @return [SignalException]
+      # @return [Exception]
       #
       def from_exception(exception)
         # passthrough on Signals, we don't want to mess with these
@@ -78,7 +80,7 @@ module Gruf
 
       ##
       # @param [Exception] exception
-      # @return [Gruf::Client::Errors::Base]
+      # @return [::Class]
       #
       def determine_class(exception)
         error_class = Gruf::Client::Errors.const_get(exception.class.name.demodulize)

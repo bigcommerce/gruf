@@ -1,0 +1,47 @@
+# Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+# documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+# persons to whom the Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+# Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+# WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+# COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+# OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+#
+module Gruf
+  class Error
+    TYPES: Hash[Symbol, Class]
+    MAX_METADATA_SIZE: ::Integer
+    METADATA_SIZE_EXCEEDED_CODE: ::String
+    METADATA_SIZE_EXCEEDED_MSG: ::String
+
+    attr_accessor code: ::Symbol
+    attr_accessor app_code: ::Symbol
+    attr_accessor message: ::String
+    attr_accessor field_errors: ::Array[::Symbol, ::Gruf::Errors::Field]
+    attr_accessor debug_info: ::Gruf::Errors::DebugInfo
+    attr_writer grpc_error: ::GRPC::BadStatus
+    attr_reader metadata: ::Hash
+
+    def initialize: (?::Hash[::Symbol, ::Object] args) -> void
+    def add_field_error: (::Symbol field_name, ::Symbol error_code, ?::String message) -> void
+    def has_field_errors?: () -> bool
+    def set_debug_info: (::Symbol detail, ?Array[String] stack_trace) -> void
+    def metadata=: (::Hash metadata) -> void
+    def serialize: () -> ::String
+    def attach_to_call: (::GRPC::ActiveCall active_call) -> self
+    def fail!: (::GRPC::ActiveCall active_call) -> void
+    def to_h: () -> { code: ::Symbol, app_code: ::Symbol, message: ::String, field_errors: ::Array[::Symbol, ::Hash], debug_info: ::Hash }
+    def grpc_error: () -> ::GRPC::BadStatus
+
+    private
+
+    def serializer_class: () -> ::Gruf::Serializers::Errors::Base
+    def grpc_class: () -> ::Class
+  end
+end

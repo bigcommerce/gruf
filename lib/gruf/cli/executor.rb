@@ -25,6 +25,10 @@ module Gruf
     class Executor
       ##
       # @param [Hash|ARGV]
+      # @param [::Gruf::Server|NilClass] server
+      # @param [::Array|NilClass] services
+      # @param [::Gruf::Hooks::Executor|NilClass] hook_executor
+      # @param [::Logger|NilClass] logger
       #
       def initialize(
         args = ARGV,

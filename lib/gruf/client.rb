@@ -154,7 +154,8 @@ module Gruf
     #
     # @param [Symbol] request_method The method name being called on the remote service
     # @param [Hash] params (Optional) A hash of parameters that will populate the request object
-    # @return [Class] The request object that corresponds to the method being called
+    # @return [Object] The request object that corresponds to the method being called
+    # @return [NilClass]
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
@@ -165,6 +166,7 @@ module Gruf
     # Properly find the appropriate call signature for the GRPC::GenericService given the request method name
     #
     # @return [Symbol]
+    # @return [NilClass]
     #
     def call_signature(request_method)
       desc = rpc_desc(request_method)
@@ -227,6 +229,8 @@ module Gruf
     # @param [mixed] timeout
     # @return [Float]
     # @return [GRPC::Core::TimeSpec]
+    # @return [Numeric]
+    # @return [Integer]
     #
     def parse_timeout(timeout)
       if timeout.nil?

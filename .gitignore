@@ -10,3 +10,4 @@
 *.gem
 /vendor/bundle
 bundler.lock
+/.gem_rbs_collection/

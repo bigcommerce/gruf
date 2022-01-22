@@ -59,7 +59,7 @@ module Gruf
           ###
           # Log the request, sending it to the appropriate formatter
           #
-          # @return [String]
+          # @return [::Object]
           #
           def call(&block)
             return yield if options.fetch(:ignore_methods, [])&.include?(request.method_name)
@@ -132,7 +132,7 @@ module Gruf
           #
           # @param [Object] response The response object
           # @param [Boolean] successful If the response was successful
-          # @return [Boolean] The proper status code
+          # @return [Integer] The proper status code
           #
           def status(response, successful)
             successful ? GRPC::Core::StatusCodes::OK : response.code

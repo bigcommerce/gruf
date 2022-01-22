@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add RBS support for Ruby 3.0
+- 
 ### 2.12.0
 
 - Fixed interceptor order to be FIFO as documented, instead of FILO (fixes #139)
