@@ -31,7 +31,7 @@ describe Gruf::Hooks::Registry do
     it 'adds the hook to the registry' do
       expect { subject }.not_to raise_error
       expect(registry.count).to eq 1
-      expect(registry.instance_variable_get('@registry').first).to eq(
+      expect(registry.instance_variable_get(:@registry).first).to eq(
         klass: hook_class,
         options: hook_options
       )
@@ -51,7 +51,7 @@ describe Gruf::Hooks::Registry do
       it 'inserts the hook before it in the registry' do
         expect { subject }.not_to raise_error
 
-        reg = registry.instance_variable_get('@registry')
+        reg = registry.instance_variable_get(:@registry)
         expect(reg[2][:klass]).to eq(hook_class4)
         expect(reg[3][:klass]).to eq(hook_class3)
       end
@@ -82,7 +82,7 @@ describe Gruf::Hooks::Registry do
       it 'inserts the hook before it in the registry' do
         expect { subject }.not_to raise_error
 
-        reg = registry.instance_variable_get('@registry')
+        reg = registry.instance_variable_get(:@registry)
         expect(reg[2][:klass]).to eq(hook_class3)
         expect(reg[1][:klass]).to eq(hook_class2)
       end

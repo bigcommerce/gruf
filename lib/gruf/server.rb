@@ -23,6 +23,8 @@ module Gruf
   class Server
     class ServerAlreadyStartedError < StandardError; end
 
+    KILL_SIGNALS = %w[INT TERM QUIT].freeze
+
     include Gruf::Loggable
 
     # @!attribute [r] port
@@ -43,10 +45,6 @@ module Gruf
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
       @services = []
       @started = false
-      @stop_server = false
-      @stop_server_cv = ConditionVariable.new
-      @stop_server_mu = Monitor.new
-      @server_mu = Monitor.new
       @hostname = opts.fetch(:hostname, Gruf.server_binding_url)
       @event_listener_proc = opts.fetch(:event_listener_proc, Gruf.event_listener_proc)
       setup
@@ -56,30 +54,28 @@ module Gruf
     # @return [GRPC::RpcServer] The GRPC server running
     #
     def server
-      @server_mu.synchronize do
-        @server ||= begin
-          # For backward compatibility, we allow these options to be passed directly
-          # in the Gruf::Server options, or via Gruf.rpc_server_options.
-          server_options = {
-            pool_size: options.fetch(:pool_size, Gruf.rpc_server_options[:pool_size]),
-            max_waiting_requests: options.fetch(:max_waiting_requests, Gruf.rpc_server_options[:max_waiting_requests]),
-            poll_period: options.fetch(:poll_period, Gruf.rpc_server_options[:poll_period]),
-            pool_keep_alive: options.fetch(:pool_keep_alive, Gruf.rpc_server_options[:pool_keep_alive]),
-            connect_md_proc: options.fetch(:connect_md_proc, Gruf.rpc_server_options[:connect_md_proc]),
-            server_args: options.fetch(:server_args, Gruf.rpc_server_options[:server_args])
-          }
+      @server ||= begin
+        # For backward compatibility, we allow these options to be passed directly
+        # in the Gruf::Server options, or via Gruf.rpc_server_options.
+        server_options = {
+          pool_size: options.fetch(:pool_size, Gruf.rpc_server_options[:pool_size]),
+          max_waiting_requests: options.fetch(:max_waiting_requests, Gruf.rpc_server_options[:max_waiting_requests]),
+          poll_period: options.fetch(:poll_period, Gruf.rpc_server_options[:poll_period]),
+          pool_keep_alive: options.fetch(:pool_keep_alive, Gruf.rpc_server_options[:pool_keep_alive]),
+          connect_md_proc: options.fetch(:connect_md_proc, Gruf.rpc_server_options[:connect_md_proc]),
+          server_args: options.fetch(:server_args, Gruf.rpc_server_options[:server_args])
+        }
 
-          server = if @event_listener_proc
-                     server_options[:event_listener_proc] = @event_listener_proc
-                     Gruf::InstrumentableGrpcServer.new(**server_options)
-                   else
-                     GRPC::RpcServer.new(**server_options)
-                   end
+        server = if @event_listener_proc
+                   server_options[:event_listener_proc] = @event_listener_proc
+                   Gruf::InstrumentableGrpcServer.new(**server_options)
+                 else
+                   GRPC::RpcServer.new(**server_options)
+                 end
 
-          @port = server.add_http2_port(@hostname, ssl_credentials)
-          @services.each { |s| server.handle(s) }
-          server
-        end
+        @port = server.add_http2_port(@hostname, ssl_credentials)
+        @services.each { |s| server.handle(s) }
+        server
       end
     end
 
@@ -92,23 +88,11 @@ module Gruf
 
       server_thread = Thread.new do
         logger.info { "Starting gruf server at #{@hostname}..." }
-        server.run
+        server.run_till_terminated_or_interrupted(KILL_SIGNALS)
       end
-
-      stop_server_thread = Thread.new do
-        loop do
-          break if @stop_server
-
-          @stop_server_mu.synchronize { @stop_server_cv.wait(@stop_server_mu, 10) }
-        end
-        logger.info { 'Shutting down...' }
-        server.stop
-      end
-
       server.wait_till_running
       @started = true
       update_proc_title(:serving)
-      stop_server_thread.join
       server_thread.join
       @started = false
 
@@ -204,25 +188,7 @@ module Gruf
     #
     # :nocov:
     def setup
-      setup_signal_handlers
       load_controllers
-    end
-    # :nocov:
-
-    ##
-    # Register signal handlers
-    #
-    # :nocov:
-    def setup_signal_handlers
-      Signal.trap('INT') do
-        @stop_server = true
-        @stop_server_cv.broadcast
-      end
-
-      Signal.trap('TERM') do
-        @stop_server = true
-        @stop_server_cv.broadcast
-      end
     end
     # :nocov:
 

@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Remove server mutex handling in deference to core grpc signal handling
+- Relax grpc pin as upstream regression is fixed
+
 ### 2.12.0
 
 - Fixed interceptor order to be FIFO as documented, instead of FILO (fixes #139)

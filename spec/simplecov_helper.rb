@@ -26,8 +26,12 @@ end
 SimpleCov.command_name 'Unit Tests'
 SimpleCov.minimum_coverage 90
 SimpleCov.start do
+  add_filter '/.gem_rbs_collection/'
+  add_filter '/.github/'
   add_filter '/bin/'
   add_filter '/coverage/'
   add_filter '/spec/'
+  add_filter '/script/'
+  add_filter '/tmp/'
   add_filter '/vendor/'
 end

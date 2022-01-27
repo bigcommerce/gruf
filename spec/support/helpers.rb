@@ -66,7 +66,7 @@ module Gruf
       grpc_server = nil
       grpc_server = server.server
 
-      t = Thread.new { grpc_server.run }
+      t = Thread.new { grpc_server.run_till_terminated_or_interrupted(%w[INT TERM QUIT]) }
       grpc_server.wait_till_running
 
       timeout = ::ENV.fetch('GRUF_RSPEC_SERVER_TIMEOUT_SEC', 2)
@@ -83,9 +83,17 @@ module Gruf
           current_execution += poll_period
         end
         t.join
+        t.kill
       end
     rescue StandardError, RuntimeError, Exception => e
       grpc_server&.stop
+      t&.join
+      t&.kill
+      nil
+    ensure
+      grpc_server&.stop
+      t&.join
+      t&.kill
       nil
     end
 
