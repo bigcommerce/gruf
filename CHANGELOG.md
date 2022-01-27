@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.13.0
+
 - Remove server mutex handling in deference to core grpc signal handling
 - Relax grpc pin as upstream regression is fixed
 
