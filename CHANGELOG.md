@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Relax pin on grpc gem
+
 ### 2.12.0
 
 - Fixed interceptor order to be FIFO as documented, instead of FILO (fixes #139)
