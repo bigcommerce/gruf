@@ -202,7 +202,7 @@ namespace :gruf do
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),
         client_options: {
-          timeout: ENV.fetch('CLIENT_TIMEOUT', 10).to_i,
+          timeout: ENV.fetch('CLIENT_TIMEOUT', 30).to_i,
           interceptors: [TestClientInterceptor.new]
         }.merge(client_options)
       )

@@ -18,7 +18,7 @@
 require 'spec_helper'
 
 describe Gruf::Client do
-  let(:options) { {} }
+  let(:options) { { hostname: 'test.dev' } } # must set at least a hostname otherwise grpc hangs
   let(:client_options) { {} }
   let(:client) { described_class.new(service: Rpc::ThingService, options: options, client_options: client_options) }
 

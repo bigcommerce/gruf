@@ -31,8 +31,15 @@ RSpec.configure do |config|
   config.color = true
 
   config.before do
-    Gruf.logger = Logger.new(File::NULL) unless ENV.fetch('GRUF_DEBUG', false)
-    Gruf.grpc_logger = Logger.new(File::NULL) unless ENV.fetch('GRPC_DEBUG', false)
+    if ENV.fetch('GRUF_DEBUG', 0).to_i.positive?
+      logger = ::Logger.new($stdout)
+      logger.level = ::Logger::Severity::DEBUG
+      Gruf.logger = logger
+      Gruf.grpc_logger = logger
+    else
+      Gruf.logger = Logger.new(File::NULL)
+      Gruf.grpc_logger = Logger.new(File::NULL)
+    end
   end
   config.around(:example, run_thing_server: true) do |t|
     @server = build_server

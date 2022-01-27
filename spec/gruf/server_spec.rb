@@ -32,7 +32,16 @@ describe Gruf::Server do
   end
 
   describe '#start!' do
-    let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil, run: nil, wait_till_running: nil) }
+    let(:server_mock) do
+      double(
+        GRPC::RpcServer,
+        add_http2_port: nil,
+        run_till_terminated_or_interrupted: nil,
+        run: nil,
+        wait_till_running: nil,
+        stopped?: true
+      )
+    end
 
     context 'when valid options passed' do
       include_context 'with stop thread mocked'
@@ -103,15 +112,15 @@ describe Gruf::Server do
 
     context 'when the service is not yet in the registry' do
       it 'adds a service to the registry' do
-        expect { subject }.to(change { gruf_server.instance_variable_get('@services').count }.by(1))
-        expect(gruf_server.instance_variable_get('@services')).to eq [service]
+        expect { subject }.to(change { gruf_server.instance_variable_get(:@services).count }.by(1))
+        expect(gruf_server.instance_variable_get(:@services)).to eq [service]
       end
     end
 
     context 'when the service is already in the registry' do
       it 'does not add the service' do
         gruf_server.add_service(service)
-        expect { subject }.not_to(change { gruf_server.instance_variable_get('@services').count })
+        expect { subject }.not_to(change { gruf_server.instance_variable_get(:@services).count })
       end
     end
 
@@ -137,8 +146,8 @@ describe Gruf::Server do
     end
 
     it 'adds the interceptor to the registry' do
-      expect { subject }.to(change { gruf_server.instance_variable_get('@interceptors').count }.by(1))
-      is = gruf_server.instance_variable_get('@interceptors').prepare(nil, nil)
+      expect { subject }.to(change { gruf_server.instance_variable_get(:@interceptors).count }.by(1))
+      is = gruf_server.instance_variable_get(:@interceptors).prepare(nil, nil)
       i = is.first
       expect(i).to be_a(interceptor_class)
       expect(i.options).to eq interceptor_options

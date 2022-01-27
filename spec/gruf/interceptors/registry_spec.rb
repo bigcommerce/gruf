@@ -31,7 +31,7 @@ describe Gruf::Interceptors::Registry do
     it 'adds the interceptor to the registry' do
       expect { subject }.not_to raise_error
       expect(registry.count).to eq 1
-      expect(registry.instance_variable_get('@registry').first).to eq(
+      expect(registry.instance_variable_get(:@registry).first).to eq(
         klass: interceptor_class,
         options: interceptor_options
       )
@@ -51,7 +51,7 @@ describe Gruf::Interceptors::Registry do
       it 'inserts the interceptor before it in the registry' do
         expect { subject }.not_to raise_error
 
-        reg = registry.instance_variable_get('@registry')
+        reg = registry.instance_variable_get(:@registry)
         expect(reg[2][:klass]).to eq(interceptor_class4)
         expect(reg[3][:klass]).to eq(interceptor_class3)
       end
@@ -82,7 +82,7 @@ describe Gruf::Interceptors::Registry do
       it 'inserts the interceptor before it in the registry' do
         expect { subject }.not_to raise_error
 
-        reg = registry.instance_variable_get('@registry')
+        reg = registry.instance_variable_get(:@registry)
         expect(reg[2][:klass]).to eq(interceptor_class3)
         expect(reg[1][:klass]).to eq(interceptor_class2)
       end
