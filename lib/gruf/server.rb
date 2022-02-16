@@ -90,7 +90,6 @@ module Gruf
         logger.info { "Starting gruf server at #{@hostname}..." }
         server.run_till_terminated_or_interrupted(KILL_SIGNALS)
       end
-      server.wait_till_running
       @started = true
       update_proc_title(:serving)
       server_thread.join
