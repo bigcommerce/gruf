@@ -145,7 +145,10 @@ describe Gruf::Client do
       let(:method_name) { :GetThing }
 
       it 'calls the appropriate method with the right signature' do
-        expect(client).to receive(:get_thing).with(req, return_op: true, metadata: metadata).and_return(op)
+        expect(client).to receive(:get_thing).with(
+          an_instance_of(::Rpc::GetThingRequest),
+          { return_op: true, metadata: metadata }
+        ).and_return(op)
         expect(subject).to be_truthy
       end
 
@@ -155,7 +158,10 @@ describe Gruf::Client do
 
         it 'passes the deadline into the call' do
           expect(client).to receive(:get_thing)
-            .with(req, return_op: true, metadata: metadata, deadline: deadline).and_return(op)
+            .with(
+              an_instance_of(::Rpc::GetThingRequest),
+              { return_op: true, metadata: metadata, deadline: deadline }
+            ).and_return(op)
           expect(subject).to be_truthy
         end
       end

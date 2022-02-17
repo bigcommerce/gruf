@@ -21,17 +21,12 @@ describe Gruf::Server do
   subject { gruf_server }
 
   let(:options) { {} }
-  let(:gruf_server) { described_class.new(options) }
-
-  shared_context 'with stop thread mocked' do
-    let(:thread_mock) { double(Thread, join: nil) }
-
-    before do
-      allow(Thread).to receive(:new) { thread_mock }
-    end
-  end
+  let(:derived_options) { Gruf.rpc_server_options.merge(options) }
+  let(:gruf_server) { described_class.new(derived_options) }
 
   describe '#start!' do
+    subject { gruf_server.start! }
+
     let(:server_mock) do
       double(
         GRPC::RpcServer,
@@ -42,51 +37,40 @@ describe Gruf::Server do
         stopped?: true
       )
     end
+    let(:options) { {} }
 
     context 'when valid options passed' do
-      include_context 'with stop thread mocked'
-
-      let(:options) { { pool_size: Random.rand(10) } }
+      let(:options) { super().merge(pool_size: Random.rand(10)) }
 
       it 'runs server with given overrides' do
-        expect(GRPC::RpcServer).to receive(:new)
-          .with(Gruf.rpc_server_options.merge(options)).and_return(server_mock)
-        gruf_server.start!
+        expect(::GRPC::RpcServer).to receive(:new).with(**derived_options).and_return(server_mock)
+        subject
       end
     end
 
     context 'when invalid options passed' do
-      include_context 'with stop thread mocked'
+      let(:options) { super().merge(random_option: Random.rand(10)) }
 
-      let(:options) { { random_option: Random.rand(10) } }
-
-      it 'runs server with default configuration' do
-        expect(GRPC::RpcServer).to receive(:new)
-          .with(Gruf.rpc_server_options).and_return(server_mock)
-        gruf_server.start!
+      it 'runs server with default configuration, ignoring invalid argument' do
+        core_options = derived_options.reject! { |k| k == :random_option }
+        expect(GRPC::RpcServer).to receive(:new).with(**core_options).and_return(server_mock)
+        subject
       end
     end
 
     context 'when some valid and some invalid options passed' do
-      include_context 'with stop thread mocked'
-
-      let(:options) { { random_option: Random.rand(10), pool_size: Random.rand(10) } }
+      let(:options) { super().merge(pool_size: Random.rand(10)) }
 
       it 'runs server with valid overrides only' do
-        valid_options = { pool_size: options[:pool_size] }
-        expect(GRPC::RpcServer).to receive(:new)
-          .with(Gruf.rpc_server_options.merge(valid_options)).and_return(server_mock)
-        gruf_server.start!
+        expect(GRPC::RpcServer).to receive(:new).with(**derived_options).and_return(server_mock)
+        subject
       end
     end
 
     context 'when no options passed' do
-      include_context 'with stop thread mocked'
-
       it 'runs server with default configuration' do
-        expect(GRPC::RpcServer).to receive(:new)
-          .with(Gruf.rpc_server_options).and_return(server_mock)
-        gruf_server.start!
+        expect(GRPC::RpcServer).to receive(:new).with(**derived_options).and_return(server_mock)
+        subject
       end
     end
 
