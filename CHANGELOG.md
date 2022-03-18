@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add support for Ruby 3.1
+
 ### 2.13.1
 
 - Fix issue with race condition in server starts where servers may fail to bind connections and never reach  
