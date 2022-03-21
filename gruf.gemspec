@@ -33,7 +33,7 @@ Gem::Specification.new do |spec|
   spec.executables << 'gruf'
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.6', '< 3.1'
+  spec.required_ruby_version = '>= 2.6', '< 3.2'
 
   spec.metadata['rubygems_mfa_required'] = 'true'
 

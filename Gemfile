@@ -17,4 +17,6 @@
 #
 source 'https://rubygems.org'
 
+gem 'grpc', '>= 1.44.0.pre2'
+
 gemspec
