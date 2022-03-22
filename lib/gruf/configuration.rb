@@ -84,7 +84,7 @@ module Gruf
       interceptors: nil,
       hooks: nil,
       default_channel_credentials: nil,
-      default_client_host: '',
+      default_client_host: '0.0.0.0:9001',
       use_ssl: false,
       ssl_crt_file: '',
       ssl_key_file: '',
