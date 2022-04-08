@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.14.0
+
 - Set default client host to 0.0.0.0:9001 (same as default server host)
 - Add support for Ruby 3.1
 
