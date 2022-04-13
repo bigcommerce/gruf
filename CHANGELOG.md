@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Fix issue where the server object hits thread contention in certain race conditions
+
 ### 2.14.0
 
 - Set default client host to 0.0.0.0:9001 (same as default server host)
