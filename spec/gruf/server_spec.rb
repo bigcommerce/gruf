@@ -89,6 +89,17 @@ describe Gruf::Server do
     end
   end
 
+  describe '#server' do
+    it 'accesses the server in a thread-safe manner' do
+      gruf_server.send(:server_mutex) { true }
+      expect(gruf_server.instance_variable_get(:@server_mutex)).to receive(:synchronize).and_yield.twice
+      threads = []
+      threads << Thread.new { gruf_server.server }
+      threads << Thread.new { gruf_server.server }
+      threads.each(&:join)
+    end
+  end
+
   describe '#add_service' do
     subject { gruf_server.add_service(service) }
 
