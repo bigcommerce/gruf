@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.14.1
+
 - Fix issue where the server object hits thread contention in certain race conditions
 
 ### 2.14.0
