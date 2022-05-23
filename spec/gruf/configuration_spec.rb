@@ -39,11 +39,14 @@ describe Gruf::Configuration do
   describe '.environment' do
     subject { obj.send(:environment) }
 
+    let(:env_vars) { {} }
+
+    before do
+      stub_const('ENV', env_vars)
+    end
+
     context 'with ENV RAILS_ENV' do
-      before do
-        allow(ENV).to receive(:[]).with('RACK_ENV').and_return nil
-        allow(ENV).to receive(:[]).with('RAILS_ENV').and_return 'production'
-      end
+      let(:env_vars) { { 'RAILS_ENV' => 'production' } }
 
       it 'returns the proper environment' do
         expect(subject).to eq 'production'
@@ -51,10 +54,7 @@ describe Gruf::Configuration do
     end
 
     context 'with ENV RACK_ENV' do
-      before do
-        allow(ENV).to receive(:[]).with('RACK_ENV').and_return 'production'
-        allow(ENV).to receive(:[]).with('RAILS_ENV').and_return nil
-      end
+      let(:env_vars) { { 'RACK_ENV' => 'production' } }
 
       it 'returns the proper environment' do
         expect(subject).to eq 'production'

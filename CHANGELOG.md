@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Update `Gruf:Configuration#environment` to use `ENV.fetch`
+
 ### 2.14.1
 
 - Fix issue where the server object hits thread contention in certain race conditions

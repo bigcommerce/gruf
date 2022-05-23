@@ -148,7 +148,7 @@ jobs:
       - pre-setup
       - bundle-install:
           <<: *gem_cache_key
-      - bundle-audit
+      - rubocop
   rspec-unit:
     executor: <<parameters.e>>
     parameters:

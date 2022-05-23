@@ -194,7 +194,7 @@ module Gruf
       if defined?(::Rails)
         ::Rails.env.to_s
       else
-        (ENV['RACK_ENV'] || ENV['RAILS_ENV'] || 'development').to_s
+        ENV.fetch('RACK_ENV') { ENV.fetch('RAILS_ENV', 'development') }.to_s
       end
     end
 
