@@ -39,10 +39,18 @@ describe Gruf::Configuration do
   describe '.environment' do
     subject { obj.send(:environment) }
 
+    let!(:previous_rack_env) { ENV.fetch('RACK_ENV', nil) }
+    let!(:previous_rails_env) { ENV.fetch('RAILS_ENV', nil) }
+
+    after do
+      ENV['RACK_ENV'] = previous_rack_env
+      ENV['RAILS_ENV'] = previous_rails_env
+    end
+
     context 'with ENV RAILS_ENV' do
       before do
-        allow(ENV).to receive(:[]).with('RACK_ENV').and_return nil
-        allow(ENV).to receive(:[]).with('RAILS_ENV').and_return 'production'
+        ENV['RACK_ENV'] = nil
+        ENV['RAILS_ENV'] = 'production'
       end
 
       it 'returns the proper environment' do
@@ -52,8 +60,8 @@ describe Gruf::Configuration do
 
     context 'with ENV RACK_ENV' do
       before do
-        allow(ENV).to receive(:[]).with('RACK_ENV').and_return 'production'
-        allow(ENV).to receive(:[]).with('RAILS_ENV').and_return nil
+        ENV['RACK_ENV'] = 'production'
+        ENV['RAILS_ENV'] = nil
       end
 
       it 'returns the proper environment' do
