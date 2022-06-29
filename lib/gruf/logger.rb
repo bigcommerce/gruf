@@ -29,25 +29,4 @@ module Gruf
       Gruf.logger
     end
   end
-
-  ##
-  # Handles grpc internal logging requests
-  #
-  module GrpcLogger
-    ##
-    # Return the current Gruf gRPC core logger
-    #
-    # @return [Logger]
-    #
-    def logger
-      Gruf.grpc_logger
-    end
-  end
-end
-
-##
-# Implements gruf's gRPC logger into the gRPC library logger
-#
-module GRPC
-  extend Gruf::GrpcLogger
 end

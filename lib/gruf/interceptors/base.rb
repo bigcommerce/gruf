@@ -44,13 +44,3 @@ module Gruf
     end
   end
 end
-
-require_relative 'client_interceptor'
-require_relative 'server_interceptor'
-require_relative 'context'
-require_relative 'timer'
-require_relative 'active_record/connection_reset'
-require_relative 'authentication/basic'
-require_relative 'instrumentation/statsd'
-require_relative 'instrumentation/output_metadata_timer'
-require_relative 'instrumentation/request_logging/interceptor'

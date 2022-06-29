@@ -15,8 +15,7 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-$LOAD_PATH.push File.expand_path('lib', __dir__)
-require 'gruf/version'
+require_relative 'lib/gruf/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'gruf'
@@ -35,7 +34,14 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.6', '< 3.2'
 
-  spec.metadata['rubygems_mfa_required'] = 'true'
+  spec.metadata = {
+    'bug_tracker_uri' => 'https://github.com/bigcommerce/gruf/issues',
+    'changelog_uri' => 'https://github.com/bigcommerce/gruf/CHANGELOG.md',
+    'homepage_uri' => 'https://github.com/bigcommerce/gruf',
+    'rubygems_mfa_required' => 'true',
+    'source_code_uri' => 'https://github.com/bigcommerce/gruf',
+    'wiki_uri' => 'https://github.com/bigcommerce/gruf/wiki'
+  }
 
   spec.add_development_dependency 'bundler-audit', '>= 0.6'
   # rubocop:disable Gemspec/RubyVersionGlobalsUsage
@@ -64,4 +70,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'json', '>= 2.3'
   spec.add_runtime_dependency 'slop', '>= 4.6'
   spec.add_runtime_dependency 'thwait', '>= 0.1'
+  spec.add_runtime_dependency 'zeitwerk', '>= 2'
 end

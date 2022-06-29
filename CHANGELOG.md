@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.15.x
+
+- Use zeitwerk for autoloading
+- Update gem metadata
 - Update `Gruf:Configuration#environment` to use `ENV.fetch`
 
 ### 2.14.1
@@ -15,9 +19,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.13.1
 
-- Fix issue with race condition in server starts where servers may fail to bind connections and never reach  
+- Fix issue with race condition in server starts where servers may fail to bind connections and never reach
   serving state (fixes #147)
- 
+
 ### 2.13.0
 
 - Remove server mutex handling in deference to core grpc signal handling
@@ -29,7 +33,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.11.0
 
-- Restrict grpc gem to <= 1.41.0 due to regressions in grpc 1.42.x 
+- Restrict grpc gem to <= 1.41.0 due to regressions in grpc 1.42.x
 - Fallback to stdout logger at INFO if no logger is setup
 - Better handling of namespace collisions with Rails
 - Add `GRPC_SERVER_HOST` and `GRPC_SERVER_PORT` for ENV configuration of the server host+port
@@ -69,7 +73,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.8.0
 
-- Pass the controller request object into the request logging formatters [#92]  
+- Pass the controller request object into the request logging formatters [#92]
 
 ### 2.7.1
 
@@ -82,12 +86,12 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 ### 2.6.1
 
 - Add frozen_string_literal: true to files, update rubocop to 0.68
-  
+
 ### 2.6.0
 
 - Drop Ruby 2.2 support
-- Abstract gruf controller's send to make it usable in filters 
-- Adjusts configuration reset into a Railtie for Rails systems to ensure proper OOE 
+- Abstract gruf controller's send to make it usable in filters
+- Adjusts configuration reset into a Railtie for Rails systems to ensure proper OOE
 - Bump rubocop to 0.64, address violations, update activesupport/concurrent-ruby dependencies to have a min version
 
 ### 2.5.2
