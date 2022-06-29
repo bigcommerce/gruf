@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
+# Copyright (c) 2022-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 # documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
@@ -15,26 +15,38 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-module Gruf
-  module Integrations
-    module Rails
-      ##
-      # Rails integration for Gruf, that currently only manages code autoloading in a Rails context
-      #
-      class Railtie < ::Rails::Railtie
-        initializer 'gruf.initializer' do |app|
-          config.before_configuration do
-            # Remove autoloading of the controllers path from Rails' zeitwerk, so that we ensure Gruf's zeitwerk
-            # properly manages them itself. This allows us to manage code reloading and logging in Gruf specifically
-            app.config.eager_load_paths -= [::Gruf.controllers_path] if app.config.respond_to?(:eager_load_paths)
-            if ::Rails.respond_to?(:autoloaders) # if we're on a late enough version of rails
-              ::Rails.autoloaders.each do |autoloader|
-                autoloader.ignore(Gruf.controllers_path)
-              end
-            end
-          end
-        end
-      end
+require 'spec_helper'
+
+describe Gruf::Autoloaders do
+  let(:autoloaders) { ::Gruf.autoloaders }
+  let(:controllers_path) { 'spec/pb' }
+
+  describe '#load!' do
+    subject { autoloaders.load!(controllers_path: controllers_path) }
+
+    it 'creates a controller autoloader for the passed path' do
+      subject
+      expect(autoloaders.controllers).to be_a(::Gruf::Controllers::Autoloader)
+      expect(autoloaders.controllers.path).to eq controllers_path
+    end
+  end
+
+  describe '#each' do
+    it 'yields the configured autoloaders' do
+      expect { |a| autoloaders.each(&a) }.to yield_control.once
+    end
+  end
+
+  describe '#reload' do
+    subject { autoloaders.reload }
+
+    before do
+      autoloaders.load!(controllers_path: controllers_path)
+    end
+
+    it 'runs reload on all autoloaders' do
+      expect(autoloaders.controllers).to receive(:reload).once
+      subject
     end
   end
 end

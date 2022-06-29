@@ -43,11 +43,10 @@ module Gruf
       @options = opts || {}
       @interceptors = opts.fetch(:interceptor_registry, Gruf.interceptors)
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
-      @services = []
+      @services = nil
       @started = false
       @hostname = opts.fetch(:hostname, Gruf.server_binding_url)
       @event_listener_proc = opts.fetch(:event_listener_proc, Gruf.event_listener_proc)
-      setup
     end
 
     ##
@@ -75,7 +74,12 @@ module Gruf
                    end
 
           @port = server.add_http2_port(@hostname, ssl_credentials)
-          @services.each { |s| server.handle(s) }
+          # do not reference `services` any earlier than this method, as it allows autoloading to take effect
+          # and load services into `Gruf.services` as late as possible, which gives us flexibility with different
+          # execution paths (such as vanilla ruby, grape, multiple Rails versions, etc). The autoloaders are
+          # initially loaded in `Gruf::Cli::Executor` _directly_ before the gRPC services are loaded into the gRPC
+          # server, to allow for loading services as late as possible in the execution chain.
+          services.each { |s| server.handle(s) }
           server
         end
       end
@@ -89,7 +93,7 @@ module Gruf
       update_proc_title(:starting)
 
       server_thread = Thread.new do
-        logger.info { "Starting gruf server at #{@hostname}..." }
+        logger.info { "[gruf] Starting gruf server at #{@hostname}..." }
         server.run_till_terminated_or_interrupted(KILL_SIGNALS)
       end
       @started = true
@@ -98,7 +102,7 @@ module Gruf
       @started = false
 
       update_proc_title(:stopped)
-      logger.info { 'Goodbye!' }
+      logger.info { '[gruf] Goodbye!' }
     end
     # :nocov:
 
@@ -111,7 +115,7 @@ module Gruf
     def add_service(klass)
       raise ServerAlreadyStartedError if @started
 
-      @services << klass unless @services.include?(klass)
+      @services << klass unless services.include?(klass)
     end
 
     ##
@@ -185,31 +189,11 @@ module Gruf
     private
 
     ##
-    # Setup server
+    # @return [Array<Class>]
     #
-    # :nocov:
-    def setup
-      load_controllers
+    def services
+      @services ||= (::Gruf.services || (options.fetch(:services, nil) || []))
     end
-    # :nocov:
-
-    ##
-    # Auto-load all gRPC handlers
-    #
-    # :nocov:
-    def load_controllers
-      return unless File.directory?(controllers_path)
-
-      path = File.realpath(controllers_path)
-      $LOAD_PATH.unshift(path)
-      Dir["#{path}/**/*.rb"].each do |f|
-        next if f.include?('_pb') # exclude if people include proto generated files in app/rpc
-
-        logger.info "- Loading gRPC service file: #{f}"
-        load File.realpath(f)
-      end
-    end
-    # :nocov:
 
     ##
     # @param [String]

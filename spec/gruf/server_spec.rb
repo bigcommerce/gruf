@@ -24,6 +24,10 @@ describe Gruf::Server do
   let(:derived_options) { Gruf.rpc_server_options.merge(options) }
   let(:gruf_server) { described_class.new(derived_options) }
 
+  before do
+    ::Gruf.services = []
+  end
+
   describe '#start!' do
     subject { gruf_server.start! }
 
@@ -34,6 +38,7 @@ describe Gruf::Server do
         run_till_terminated_or_interrupted: nil,
         run: nil,
         wait_till_running: nil,
+        handle: nil,
         stopped?: true
       )
     end
@@ -78,7 +83,7 @@ describe Gruf::Server do
       it 'stops gracefully' do
         server_thread = Thread.new do
           srv = described_class.new
-          srv.server.handle(::Rpc::ThingService::Service)
+          srv.add_service(::Rpc::ThingService::Service)
           srv.start!
         end
         sleep 3 # wait for a server to boot up
@@ -106,16 +111,24 @@ describe Gruf::Server do
     let(:service) { Rpc::ThingService }
 
     context 'when the service is not yet in the registry' do
+      before do
+        gruf_server.send(:services)
+        gruf_server.instance_variable_set(:@services, [])
+      end
+
       it 'adds a service to the registry' do
-        expect { subject }.to(change { gruf_server.instance_variable_get(:@services).count }.by(1))
-        expect(gruf_server.instance_variable_get(:@services)).to eq [service]
+        expect { subject }.to(change { gruf_server.send(:services).count }.by(1))
+        expect(gruf_server.send(:services)).to eq [service]
       end
     end
 
     context 'when the service is already in the registry' do
-      it 'does not add the service' do
+      before do
         gruf_server.add_service(service)
-        expect { subject }.not_to(change { gruf_server.instance_variable_get(:@services).count })
+      end
+
+      it 'does not add the service' do
+        expect { subject }.not_to(change { gruf_server.send(:services).count })
       end
     end
 

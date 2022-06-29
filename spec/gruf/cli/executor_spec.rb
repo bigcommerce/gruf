@@ -21,13 +21,14 @@ describe Gruf::Cli::Executor do
   let(:args) { [] }
   let(:server) { double(:server, add_service: true, start!: true) }
   let(:services) { [Rpc::ThingService::Service] }
+  let(:options_services) { services }
   let(:hook_executor) { double(:hook_executor, call: true) }
   let(:logger) { Gruf.logger }
   let(:executor) do
     described_class.new(
       args,
       server: server,
-      services: services,
+      services: options_services,
       hook_executor: hook_executor,
       logger: logger
     )
@@ -45,6 +46,64 @@ describe Gruf::Cli::Executor do
       expect(logger).not_to receive(:fatal)
       expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
       subject
+    end
+
+    context 'when services are set via the Gruf.services accessor' do
+      let(:options_services) { [] }
+      let(:global_services) { [Rpc::ThingService::Service] }
+
+      before do
+        global_services.each do |svc|
+          ::Gruf.services << svc
+        end
+      end
+
+      after do
+        ::Gruf.services = []
+      end
+
+      it 'adds each specified service to the server' do
+        expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
+        expect(server).to receive(:start!).once
+        global_services.each do |svc|
+          expect(server).to receive(:add_service).with(svc).ordered
+        end
+        expect(logger).not_to receive(:fatal)
+        expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
+        subject
+      end
+    end
+
+    context 'when services are set via options accessor' do
+      let(:options_services) { services }
+      let(:global_services) { [Rpc::ThingService::Service] }
+
+      before do
+        ::Gruf.services = []
+      end
+
+      it 'adds each specified service to the server' do
+        expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
+        expect(server).to receive(:start!).once
+        services.each do |svc|
+          expect(server).to receive(:add_service).with(svc).ordered
+        end
+        expect(logger).not_to receive(:fatal)
+        expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
+        subject
+      end
+    end
+
+    context 'when no services are set in either Gruf.services or passed in as options' do
+      let(:options_services) { [] }
+
+      before do
+        Gruf.services = []
+      end
+
+      it 'raises a NoServicesBoundError exception' do
+        expect { subject }.to raise_error(Gruf::Cli::Executor::NoServicesBoundError)
+      end
     end
 
     context 'when the server raises an exception' do

@@ -89,7 +89,7 @@ Gruf.logger = Logger.new($stdout)
 Gruf.logger.level = Logger::Severity::DEBUG
 Gruf.grpc_logger = Logger.new($stdout)
 Gruf.grpc_logger.level = Logger::Severity::INFO
-Gruf.services << ::Rpc::ThingService::Service
+Gruf.controllers_path = "#{__dir__}/pb"
 
 cli = Gruf::Cli::Executor.new
 cli.run

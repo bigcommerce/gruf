@@ -165,7 +165,8 @@ module Gruf
       determine_loggers
       self.ssl_crt_file = "#{root_path}config/ssl/#{environment}.crt"
       self.ssl_key_file = "#{root_path}config/ssl/#{environment}.key"
-      self.controllers_path = root_path.to_s.empty? ? 'app/rpc' : "#{root_path}/app/rpc"
+      cp = ::ENV.fetch('GRUF_CONTROLLERS_PATH', 'app/rpc').to_s
+      self.controllers_path = root_path.to_s.empty? ? cp : "#{root_path}/#{cp}"
       self.backtrace_on_error = ::ENV.fetch('GRPC_BACKTRACE_ON_ERROR', 0).to_i.positive?
       self.rpc_server_options = {
         max_waiting_requests: ::ENV.fetch('GRPC_SERVER_MAX_WAITING_REQUESTS',
@@ -181,6 +182,13 @@ module Gruf
         interceptors.use(::Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
       end
       options
+    end
+
+    ##
+    # @return [Boolean]
+    #
+    def development?
+      environment == 'development'
     end
 
     private
