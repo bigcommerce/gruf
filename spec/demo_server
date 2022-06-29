@@ -23,7 +23,6 @@ require 'bundler'
 Bundler.setup
 require 'active_support/all'
 require 'gruf'
-$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 $LOAD_PATH.unshift File.expand_path('pb', __dir__)
 require File.realpath("#{File.dirname(__FILE__)}/support/grpc.rb")
 require File.realpath("#{File.dirname(__FILE__)}/support/serializers/proto.rb")

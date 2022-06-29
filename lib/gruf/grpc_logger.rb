@@ -1,5 +1,5 @@
-#!/usr/bin/env ruby
-# coding: utf-8
+# frozen_string_literal: true
+
 # Copyright (c) 2017-present, BigCommerce Pty. Ltd. All rights reserved
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
@@ -15,11 +15,25 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'bundler/setup'
-require 'gruf'
+module Gruf
+  ##
+  # Handles grpc internal logging requests
+  #
+  module GrpcLogger
+    ##
+    # Return the current Gruf gRPC core logger
+    #
+    # @return [Logger]
+    #
+    def logger
+      Gruf.grpc_logger
+    end
+  end
+end
 
-$LOAD_PATH.unshift File.expand_path('../../spec/pb', __FILE__)
-require File.realpath("#{File.dirname(File.dirname(__FILE__))}/spec/support/grpc.rb")
-
-require 'irb'
-IRB.start
+##
+# Implements gruf's gRPC logger into the gRPC library logger
+#
+module GRPC
+  extend Gruf::GrpcLogger
+end

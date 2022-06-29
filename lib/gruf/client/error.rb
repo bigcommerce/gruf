@@ -37,33 +37,5 @@ module Gruf
         super
       end
     end
-
-    ##
-    # See https://github.com/grpc/grpc-go/blob/master/codes/codes.go for a detailed summary of each error type
-    #
-    module Errors
-      class Base < Gruf::Client::Error; end
-      class Error < Base; end
-      class Validation < Base; end
-
-      class Ok < Base; end
-
-      class InvalidArgument < Validation; end
-      class NotFound < Validation; end
-      class AlreadyExists < Validation; end
-      class OutOfRange < Validation; end
-
-      class Cancelled < Error; end
-      class DataLoss < Error; end
-      class DeadlineExceeded < Error; end
-      class FailedPrecondition < Error; end
-      class Internal < Error; end
-      class PermissionDenied < Error; end
-      class ResourceExhausted < Error; end
-      class Unauthenticated < Error; end
-      class Unavailable < Error; end
-      class Unimplemented < Error; end
-      class Unknown < Error; end
-    end
   end
 end
