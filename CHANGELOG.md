@@ -4,6 +4,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### 2.15.x
 
+- Autoload Gruf Controllers with zeitwerk, allowing for code reloading in development environments
+- Add `GRUF_CONTROLLERS_PATH` ENV to allow ENV-based runtime configuration of path to gruf controller files
+- Move `ServiceBinder` from instance to static class for performance improvements
 - Use zeitwerk for autoloading
 - Update gem metadata
 - Update `Gruf:Configuration#environment` to use `ENV.fetch`

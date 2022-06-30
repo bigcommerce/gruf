@@ -64,11 +64,12 @@ module Gruf
       #
       def self.bind(service)
         service_class = service.name.constantize
-        Gruf.services << service_class
+        ::Gruf.logger.debug "[gruf] Binding #{service_class} to #{name}"
+        ::Gruf.services << service_class
         # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
         @bound_service = service_class
         # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
-        ServiceBinder.new(service_class).bind!(self)
+        ServiceBinder.bind!(service: service_class, controller: self)
       end
 
       ##
@@ -89,6 +90,7 @@ module Gruf
       # @param [block] &block The passed block for executing the method
       #
       def call(method_key, &block)
+        ::Gruf.autoloaders.reload if ::Gruf.development?
         Interceptors::Context.new(@interceptors).intercept! do
           process_action(method_key, &block)
         end

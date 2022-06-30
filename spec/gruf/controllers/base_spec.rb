@@ -55,6 +55,28 @@ describe ::Gruf::Controllers::Base do
       expect(subject).to be_a(Rpc::GetThingResponse)
     end
 
+    context 'when in development' do
+      before do
+        allow(::Gruf).to receive(:development?).and_return(true)
+      end
+
+      it 'reloads the autoloaders' do
+        expect(Gruf.autoloaders).to receive(:reload)
+        subject
+      end
+    end
+
+    context 'when not in development' do
+      before do
+        allow(::Gruf).to receive(:development?).and_return(false)
+      end
+
+      it 'does not reload the autoloaders' do
+        expect(Gruf.autoloaders).not_to receive(:reload)
+        subject
+      end
+    end
+
     context 'when there are interceptors' do
       it 'passes the request to interceptors' do
         Gruf.interceptors.use(TestServerInterceptor)

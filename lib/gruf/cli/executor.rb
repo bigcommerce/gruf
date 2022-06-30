@@ -23,8 +23,14 @@ module Gruf
     # Handles execution of the gruf binstub, along with command-line arguments
     #
     class Executor
+      class NoServicesBoundError < StandardError; end
+
       ##
       # @param [Hash|ARGV]
+      # @param [::Gruf::Server|NilClass] server
+      # @param [Array<Class>|NilClass] services
+      # @param [Gruf::Hooks::Executor|NilClass] hook_executor
+      # @param [Logger|NilClass] logger
       #
       def initialize(
         args = ARGV,
@@ -35,7 +41,7 @@ module Gruf
       )
         @args = args
         setup! # ensure we set some defaults from CLI here so we can allow configuration
-        @services = services || Gruf.services
+        @services = services.is_a?(Array) ? services : []
         @hook_executor = hook_executor || Gruf::Hooks::Executor.new(hooks: Gruf.hooks&.prepare)
         @server = server || Gruf::Server.new(Gruf.server_options)
         @logger = logger || Gruf.logger || ::Logger.new($stderr)
@@ -46,6 +52,17 @@ module Gruf
       #
       def run
         exception = nil
+        # wait to load controllers until last possible second to allow late configuration
+        ::Gruf.autoloaders.load!(controllers_path: Gruf.controllers_path)
+        # allow lazy registering globally as late as possible, this allows more flexible binstub injections
+        @services = ::Gruf.services unless @services&.any?
+
+        unless @services.any?
+          raise NoServicesBoundError,
+                'No services bound to this gruf process; please bind a service to a Gruf controller ' \
+                'to start the server successfully'
+        end
+
         begin
           @services.each { |s| @server.add_service(s) }
           @hook_executor.call(:before_server_start, server: @server)

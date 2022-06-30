@@ -37,4 +37,10 @@ require_relative 'gruf/integrations/rails/railtie' if defined?(::Rails)
 #
 module Gruf
   extend Configuration
+
+  class << self
+    def autoloaders
+      Autoloaders
+    end
+  end
 end
