@@ -2,7 +2,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
-### 2.15.x
+### 2.15.0
 
 - Autoload Gruf Controllers with zeitwerk, allowing for code reloading in development environments
 - Add `GRUF_CONTROLLERS_PATH` ENV to allow ENV-based runtime configuration of path to gruf controller files
