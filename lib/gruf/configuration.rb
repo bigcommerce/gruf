@@ -172,8 +172,8 @@ module Gruf
         max_waiting_requests: ::ENV.fetch('GRPC_SERVER_MAX_WAITING_REQUESTS',
                                           GRPC::RpcServer::DEFAULT_MAX_WAITING_REQUESTS).to_i,
         pool_size: ::ENV.fetch('GRPC_SERVER_POOL_SIZE', GRPC::RpcServer::DEFAULT_POOL_SIZE).to_i,
-        pool_keep_alive: ::ENV.fetch('GRPC_SERVER_POOL_KEEP_ALIVE', GRPC::Pool::DEFAULT_KEEP_ALIVE),
-        poll_period: ::ENV.fetch('GRPC_SERVER_POLL_PERIOD', GRPC::RpcServer::DEFAULT_POLL_PERIOD),
+        pool_keep_alive: ::ENV.fetch('GRPC_SERVER_POOL_KEEP_ALIVE', GRPC::Pool::DEFAULT_KEEP_ALIVE).to_i,
+        poll_period: ::ENV.fetch('GRPC_SERVER_POLL_PERIOD', GRPC::RpcServer::DEFAULT_POLL_PERIOD).to_i,
         connect_md_proc: nil,
         server_args: {}
       }
