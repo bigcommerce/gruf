@@ -1,5 +1,19 @@
 This document guides on how to upgrade between significant versions of Gruf.
 
+## Upgrading to 2.15.x
+
+In 2.15.x, autoloading of Gruf controllers via Zeitwerk was added. This, however, means that if you had Gruf controllers
+in your controllers path (default of app/rpc) that did not follow the standard autoloading structure, you will get
+loading errors on instantiation of gruf. A common example of this is naming the class a different name than the file
+(when underscored). It is recommended to follow [Zeitwerk's naming structure](https://github.com/fxn/zeitwerk#the-idea-file-paths-match-constant-paths)
+when creating controller files.
+
+For example, the following Gruf controller named `::MyService::Rpc::ProductsController` should be in the path:
+`app/rpc/my_service/rpc/products_controller.rb`.
+
+Upgrading to Gruf 2.15 when you are not in compliance with the standard Zeitwerk/Rails file and class naming structures
+will require getting your service into compliance to do so properly.
+
 ## Upgrading to 2.12
 
 Gruf 2.12.x fixes a bug in prior versions where interceptors were executed in FILO order, rather than FIFO order, which
@@ -19,7 +33,7 @@ These closely map with their `GRPC::BadStatus` counterparts, and each subclass `
 fully backwards compatible with your existing client error handling code, as the original exception through is still
 available via `.error` on the raised exception.
 
-However, one change is that Gruf will now catch `StandardError` and `GRPC::Core::CallError` exceptions at the client 
+However, one change is that Gruf will now catch `StandardError` and `GRPC::Core::CallError` exceptions at the client
 boundary, and translate them into `Gruf::Client::Errors::Internal` exceptions in the client. If you have code that
 does not expect this case, you will need to adjust accordingly.
 

@@ -2,10 +2,13 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.15.1
+
 - Fix issue where GRPC_SERVER_POOL_KEEP_ALIVE and GRPC_SERVER_POLL_PERIOD when set via ENV are not cast to int
 
 ### 2.15.0
 
+- NOTE: This changes the way that gruf controllers are autoloaded. See [UPGRADING.md] for more details.
 - Autoload Gruf Controllers with zeitwerk, allowing for code reloading in development environments
 - Add `GRUF_CONTROLLERS_PATH` ENV to allow ENV-based runtime configuration of path to gruf controller files
 - Move `ServiceBinder` from instance to static class for performance improvements
