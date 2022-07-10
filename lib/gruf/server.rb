@@ -23,8 +23,6 @@ module Gruf
   class Server
     class ServerAlreadyStartedError < StandardError; end
 
-    KILL_SIGNALS = %w[INT TERM QUIT].freeze
-
     include Gruf::Loggable
 
     # @!attribute [r] port
@@ -44,7 +42,6 @@ module Gruf
       @interceptors = opts.fetch(:interceptor_registry, Gruf.interceptors)
       @interceptors = Gruf::Interceptors::Registry.new unless @interceptors.is_a?(Gruf::Interceptors::Registry)
       @services = nil
-      @started = false
       @hostname = opts.fetch(:hostname, Gruf.server_binding_url)
       @event_listener_proc = opts.fetch(:event_listener_proc, Gruf.event_listener_proc)
     end
@@ -89,22 +86,46 @@ module Gruf
     # Start the gRPC server
     #
     # :nocov:
-    def start!
-      update_proc_title(:starting)
+    def start
+      return if running?
 
-      server_thread = Thread.new do
-        logger.info { "[gruf] Starting gruf server at #{@hostname}..." }
-        server.run_till_terminated_or_interrupted(KILL_SIGNALS)
-      end
-      @started = true
-      update_proc_title(:serving)
-      server_thread.join
-      @started = false
+      raise 'Cannot re-start stopped server' if stopped?
 
-      update_proc_title(:stopped)
-      logger.info { '[gruf] Goodbye!' }
+      logger.info "[gruf] Starting gruf server at #{@hostname}..."
+
+      @server_thread = Thread.new { server.run }
+
+      server.wait_till_running
     end
+
     # :nocov:
+
+    def wait_till_terminated
+      raise 'Server is not running' unless running?
+
+      server_thread.join
+    end
+
+    # Stop gRPC server if it's running
+    def stop
+      return unless running?
+
+      server.stop
+
+      logger.info '[gruf] gRPC server stopped'
+    end
+
+    def running?
+      return false if @server.nil?
+
+      server.running_state == :running
+    end
+
+    def stopped?
+      return false if @server.nil?
+
+      server.running_state == :stopped
+    end
 
     ##
     # Add a gRPC service stub to be served by gruf
@@ -113,7 +134,7 @@ module Gruf
     # @raise [ServerAlreadyStartedError] if the server is already started
     #
     def add_service(klass)
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @services << klass unless services.include?(klass)
     end
@@ -126,7 +147,7 @@ module Gruf
     # @raise [ServerAlreadyStartedError] if the server is already started
     #
     def add_interceptor(klass, opts = {})
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @interceptors.use(klass, opts)
     end
@@ -139,7 +160,7 @@ module Gruf
     # @param [Hash] opts A hash of options for the interceptor
     #
     def insert_interceptor_before(before_class, interceptor_class, opts = {})
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @interceptors.insert_before(before_class, interceptor_class, opts)
     end
@@ -152,7 +173,7 @@ module Gruf
     # @param [Hash] opts A hash of options for the interceptor
     #
     def insert_interceptor_after(after_class, interceptor_class, opts = {})
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @interceptors.insert_after(after_class, interceptor_class, opts)
     end
@@ -172,7 +193,7 @@ module Gruf
     # @param [Class] klass
     #
     def remove_interceptor(klass)
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @interceptors.remove(klass)
     end
@@ -181,12 +202,14 @@ module Gruf
     # Clear the interceptor registry of interceptors
     #
     def clear_interceptors
-      raise ServerAlreadyStartedError if @started
+      raise ServerAlreadyStartedError if running?
 
       @interceptors.clear
     end
 
     private
+
+    attr_reader :server_thread
 
     ##
     # @return [Array<Class>]
@@ -216,19 +239,8 @@ module Gruf
       certs = [nil, [{ private_key: private_key, cert_chain: cert_chain }], false]
       GRPC::Core::ServerCredentials.new(*certs)
     end
-    # :nocov:
 
-    ##
-    # Updates proc name/title
-    #
-    # @param [Symbol] state
-    #
     # :nocov:
-    def update_proc_title(state)
-      Process.setproctitle("gruf #{Gruf::VERSION} -- #{state}")
-    end
-    # :nocov:
-    #
 
     ##
     # Handle thread-safe access to the server

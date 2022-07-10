@@ -25,5 +25,12 @@ end
 load 'config/environment.rb' if defined?(Rails)
 require 'gruf'
 
-cli = Gruf::Cli::Executor.new
-cli.run
+begin
+  cli = Gruf::Cli::Executor.new
+  cli.run(ARGV)
+rescue => e
+  raise e if $DEBUG
+  STDERR.puts e.message
+  STDERR.puts e.backtrace.join("\n")
+  exit 1
+end
