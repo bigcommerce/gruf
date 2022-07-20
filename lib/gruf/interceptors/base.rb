@@ -31,6 +31,16 @@ module Gruf
       #   @return [Hash] options
       attr_reader :options
 
+      DEFAULT_FAILURE_CLASSES = %w[
+        GRPC::Unknown
+        GRPC::Internal
+        GRPC::DataLoss
+        GRPC::FailedPrecondition
+        GRPC::Unavailable
+        GRPC::DeadlineExceeded
+        GRPC::Cancelled
+      ].freeze
+
       ##
       # @param [Gruf::Controllers::Request] request
       # @param [Gruf::Error] error
@@ -40,6 +50,24 @@ module Gruf
         @request = request
         @error = error
         @options = options || {}
+      end
+
+      ##
+      # @return [Boolean]
+      #
+      def failure?
+        return false unless @error.is_a?(GRPC::BadStatus)
+
+        failure_classes.include?(@error.to_s)
+      end
+
+      private
+
+      ##
+      # @return [Array]
+      #
+      def failure_classes
+        @failure_classes ||= (@options&.fetch(:failure_classes, nil) || DEFAULT_FAILURE_CLASSES)
       end
     end
   end
