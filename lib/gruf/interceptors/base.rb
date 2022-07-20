@@ -58,7 +58,7 @@ module Gruf
       def failure?
         return false unless @error.is_a?(GRPC::BadStatus)
 
-        failure_classes.include?(@error.to_s)
+        failure_classes.include?(@error.class.to_s)
       end
 
       private
