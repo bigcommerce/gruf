@@ -113,6 +113,26 @@ describe ::Gruf::Controllers::Request do
     end
   end
 
+  describe '#context' do
+    subject { request.context }
+
+    it 'allows access to the context' do
+      expect(subject).to eq({})
+
+      subject[:foo] = 'bar'
+      expect(subject[:foo]).to eq 'bar'
+    end
+
+    it 'accesses values indifferently' do
+      subject[:foo] = 'bar'
+      expect(subject['foo']).to eq 'bar'
+
+      subject['foo'] = 'baz'
+      expect(subject['foo']).to eq 'baz'
+      expect(subject[:foo]).to eq 'baz'
+    end
+  end
+
   describe '#metadata' do
     subject { request.metadata }
 

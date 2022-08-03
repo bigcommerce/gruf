@@ -36,6 +36,11 @@ module Gruf
       # @!attribute [r] service
       #   @return [Class] The GRPC service class for this request
       attr_reader :service
+      # @!attribute [r] context
+      #   @return [::ActiveSupport::HashWithIndifferentAccess] An arbitrary hash of key/value entries that are
+      #     accessible for interceptors, that can be used to shared information between interceptors and pass down into
+      #     the controller.
+      attr_reader :context
 
       delegate :metadata, to: :active_call
       delegate :messages, :client_streamer?, :server_streamer?, :bidi_streamer?, :request_response?, to: :type
@@ -72,6 +77,7 @@ module Gruf
         @message = message
         @rpc_desc = rpc_desc
         @type = Type.new(rpc_desc)
+        @context = ::ActiveSupport::HashWithIndifferentAccess.new
       end
 
       ##

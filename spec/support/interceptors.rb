@@ -21,6 +21,11 @@
 ##########################################################################################
 class TestServerInterceptor < ::Gruf::Interceptors::ServerInterceptor
   def call
+    cs = options.fetch(:context_setting, nil)
+    if cs
+      request.context[:setting] = cs # shared key
+      request.context[:setting1] = cs
+    end
     Math.sqrt(4)
     yield
   end
@@ -28,6 +33,11 @@ end
 
 class TestServerInterceptor2 < ::Gruf::Interceptors::ServerInterceptor
   def call
+    cs = options.fetch(:context_setting, nil)
+    if cs
+      request.context[:setting] = cs # shared key
+      request.context[:setting2] = cs
+    end
     Math.sqrt(16)
     yield
   end
