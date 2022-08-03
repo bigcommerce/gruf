@@ -4,25 +4,27 @@
 require 'google/protobuf'
 
 Google::Protobuf::DescriptorPool.generated_pool.build do
-  add_message "gruf.ErrorHeader" do
-    optional :error_code, :string, 1
-    optional :error_message, :string, 2
-    repeated :field_errors, :message, 3, "gruf.FieldError"
-    optional :debug_info, :message, 4, "gruf.DebugInfo"
-  end
-  add_message "gruf.FieldError" do
-    optional :field_name, :string, 1
-    optional :error_code, :string, 2
-    optional :error_message, :string, 3
-  end
-  add_message "gruf.DebugInfo" do
-    optional :detail, :string, 1
-    repeated :stack_trace, :string, 2
+  add_file("rpc/Error.proto", :syntax => :proto3) do
+    add_message "gruf.ErrorHeader" do
+      optional :error_code, :string, 1
+      optional :error_message, :string, 2
+      repeated :field_errors, :message, 3, "gruf.FieldError"
+      optional :debug_info, :message, 4, "gruf.DebugInfo"
+    end
+    add_message "gruf.FieldError" do
+      optional :field_name, :string, 1
+      optional :error_code, :string, 2
+      optional :error_message, :string, 3
+    end
+    add_message "gruf.DebugInfo" do
+      optional :detail, :string, 1
+      repeated :stack_trace, :string, 2
+    end
   end
 end
 
 module Gruf
-  ErrorHeader = Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.ErrorHeader").msgclass
-  FieldError = Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.FieldError").msgclass
-  DebugInfo = Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.DebugInfo").msgclass
+  ErrorHeader = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.ErrorHeader").msgclass
+  FieldError = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.FieldError").msgclass
+  DebugInfo = ::Google::Protobuf::DescriptorPool.generated_pool.lookup("gruf.DebugInfo").msgclass
 end

@@ -20,25 +20,34 @@ require 'spec_helper'
 describe Gruf::Cli::Executor do
   let(:args) { [] }
   let(:server) { double(:server, add_service: true, start!: true) }
-  let(:services) { [Rpc::ThingService::Service] }
-  let(:options_services) { services }
+  let(:initializer_services) { [::Rpc::Test::Service1::Service] }
+  let(:cli_services) { [] }
+  let(:global_services) { [] }
   let(:hook_executor) { double(:hook_executor, call: true) }
   let(:logger) { Gruf.logger }
   let(:executor) do
     described_class.new(
       args,
       server: server,
-      services: options_services,
+      services: initializer_services,
       hook_executor: hook_executor,
       logger: logger
     )
+  end
+
+  before do
+    ::Gruf.services = global_services
+  end
+
+  after do
+    ::Gruf.services = []
   end
 
   describe '#run' do
     subject { executor.run }
 
     it 'adds each specified service to the server' do
-      services.each do |svc|
+      initializer_services.each do |svc|
         expect(server).to receive(:add_service).ordered.with(svc)
       end
       expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
@@ -48,19 +57,59 @@ describe Gruf::Cli::Executor do
       subject
     end
 
-    context 'when services are set via the Gruf.services accessor' do
-      let(:options_services) { [] }
-      let(:global_services) { [Rpc::ThingService::Service] }
+    context 'when services are set via the initializer args' do
+      let(:initializer_services) { [Rpc::Test::Service1::Service] }
+      let(:cli_services) { [Rpc::Test::Service2::Service] }
+      let(:global_services) { [Rpc::Test::Service3::Service] }
 
-      before do
-        global_services.each do |svc|
-          ::Gruf.services << svc
+      it 'adds only initializer args services to the server' do
+        expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
+        expect(server).to receive(:start!).once
+        initializer_services.each do |svc|
+          expect(server).to receive(:add_service).with(svc).ordered
+        end
+        expect(logger).not_to receive(:fatal)
+        expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
+        subject
+      end
+    end
+
+    context 'when services are set via the CLI argument' do
+      let(:initializer_services) { [] }
+      let(:cli_services) { [Rpc::Test::Service2::Service] }
+      let(:global_services) { [Rpc::Test::Service3::Service] }
+      let(:args) { %w[--services Rpc::Test::Service2::Service] }
+
+      it 'adds each specified service to the server' do
+        expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
+        expect(server).to receive(:start!).once
+        cli_services.each do |svc|
+          expect(server).to receive(:add_service).with(svc).ordered
+        end
+        expect(logger).not_to receive(:fatal)
+        expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
+        subject
+      end
+
+      context 'when the CLI argument has a service that does not exist' do
+        let(:args) { %w[--services FakeServiceThatIsNotReal::AtAll] }
+
+        it 'does not run the server' do
+          expect(server).not_to receive(:start!)
+          expect(hook_executor).not_to receive(:call).with(:before_server_start, server: server)
+          expect(hook_executor).not_to receive(:call).with(:after_server_stop, server: server)
+          expect(logger).to receive(:fatal).with(
+            /FATAL ERROR: Could not start server; passed services to run are not loaded or valid constants:/
+          )
+          expect { subject }.to raise_error(SystemExit)
         end
       end
+    end
 
-      after do
-        ::Gruf.services = []
-      end
+    context 'when services are set via the Gruf.services global accessor' do
+      let(:initializer_services) { [] }
+      let(:cli_services) { [] }
+      let(:global_services) { [Rpc::Test::Service3::Service] }
 
       it 'adds each specified service to the server' do
         expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
@@ -74,35 +123,20 @@ describe Gruf::Cli::Executor do
       end
     end
 
-    context 'when services are set via options accessor' do
-      let(:options_services) { services }
-      let(:global_services) { [Rpc::ThingService::Service] }
+    context 'when no services are set in either the initializer, ARGV, or Gruf.services' do
+      let(:initializer_services) { [] }
+      let(:cli_services) { [] }
+      let(:global_services) { [] }
 
-      before do
-        ::Gruf.services = []
-      end
-
-      it 'adds each specified service to the server' do
-        expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
-        expect(server).to receive(:start!).once
-        services.each do |svc|
-          expect(server).to receive(:add_service).with(svc).ordered
-        end
-        expect(logger).not_to receive(:fatal)
-        expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
-        subject
-      end
-    end
-
-    context 'when no services are set in either Gruf.services or passed in as options' do
-      let(:options_services) { [] }
-
-      before do
-        Gruf.services = []
-      end
-
-      it 'raises a NoServicesBoundError exception' do
-        expect { subject }.to raise_error(Gruf::Cli::Executor::NoServicesBoundError)
+      it 'exits and fails cleanly' do
+        expect(server).not_to receive(:start!)
+        expect(hook_executor).not_to receive(:call).with(:before_server_start, server: server)
+        expect(hook_executor).not_to receive(:call).with(:after_server_stop, server: server)
+        expect(logger).to receive(:fatal).with(
+          'FATAL ERROR: No services bound to this gruf process; please bind a service to a Gruf ' \
+          'controller to start the server successfully'
+        )
+        expect { subject }.to raise_error(SystemExit)
       end
     end
 

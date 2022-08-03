@@ -15,39 +15,14 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require_relative '../pb/thing_controller'
-require_relative '../pb/service1_controller'
-require_relative '../pb/service2_controller'
-require_relative '../pb/service3_controller'
+require 'rpc/test/Service2_services_pb'
+require 'rpc/Error_pb'
+require 'ffaker'
 
-module Rpc
-  module Test
-    class Call
-      attr_reader :metadata
+class Service2Controller < ::Gruf::Controllers::Base
+  bind ::Rpc::Test::Service2::Service
 
-      def initialize(md = nil)
-        @metadata = md || { 'authorization' => "Basic #{Base64.encode64('grpc:magic')}" }
-      end
-
-      def output_metadata
-        @output_metadata ||= {}
-      end
-    end
-  end
-end
-
-class TestClient
-  def get_thing(id: 1)
-    request = ::Rpc::GetThingRequest.new(id: id)
-    rpc_client = ::ThingService.new
-
-    c = Rpc::Test::Call.new('authorization' => "Basic #{Base64.encode64('grpc:magic')}")
-    begin
-      thing = rpc_client.get_thing(request, c)
-    rescue Gruf::Client::Error => e
-      puts e.error.inspect
-    end
-    thing
+  def get2
+    ::Rpc::Test::Product2.new(id: request.message.id, name: FFaker::Name.first_name)
   end
 end

@@ -17,7 +17,7 @@
 #
 module Gruf
   module Helpers
-    HOST = ENV.fetch('GRPC_HOSTNAME', '0.0.0.0:0').to_s
+    HOST = ENV.fetch('GRPC_HOSTNAME', '127.0.0.1:0').to_s
     USERNAME = ENV.fetch('GRPC_USERNAME', 'gruf').to_s
     PASSWORD = ENV.fetch('GRPC_PASSWORD', 'furg').to_s
 
@@ -104,7 +104,7 @@ module Gruf
       Gruf::Client.new(
         service: ::Rpc::ThingService,
         options: {
-          hostname: "0.0.0.0:#{@server.port}",
+          hostname: "127.0.0.1:#{@server.port}",
           username: USERNAME,
           password: PASSWORD
         }.merge(options)
@@ -118,7 +118,7 @@ module Gruf
       Gruf::SynchronizedClient.new(
         service: ::Rpc::ThingService,
         options: {
-          hostname: "0.0.0.0:#{@server.port}",
+          hostname: "127.0.0.1:#{@server.port}",
           username: USERNAME,
           password: PASSWORD
         }.merge(options)

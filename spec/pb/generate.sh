@@ -19,3 +19,6 @@ set -e
 
 grpc_tools_ruby_protoc --ruby_out=./ --grpc_out=./ ./rpc/Error.proto
 grpc_tools_ruby_protoc --ruby_out=./ --grpc_out=./ ./rpc/ThingService.proto
+grpc_tools_ruby_protoc --ruby_out=./ --grpc_out=./ ./rpc/test/Service1.proto
+grpc_tools_ruby_protoc --ruby_out=./ --grpc_out=./ ./rpc/test/Service2.proto
+grpc_tools_ruby_protoc --ruby_out=./ --grpc_out=./ ./rpc/test/Service3.proto

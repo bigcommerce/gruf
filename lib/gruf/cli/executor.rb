@@ -52,19 +52,11 @@ module Gruf
       #
       def run
         exception = nil
-        # wait to load controllers until last possible second to allow late configuration
-        ::Gruf.autoloaders.load!(controllers_path: Gruf.controllers_path)
-        # allow lazy registering globally as late as possible, this allows more flexible binstub injections
-        @services = ::Gruf.services unless @services&.any?
 
-        unless @services.any?
-          raise NoServicesBoundError,
-                'No services bound to this gruf process; please bind a service to a Gruf controller ' \
-                'to start the server successfully'
-        end
+        # allow lazy registering globally as late as possible, this allows more flexible binstub injections
+        register_services!
 
         begin
-          @services.each { |s| @server.add_service(s) }
           @hook_executor.call(:before_server_start, server: @server)
           @server.start!
         rescue StandardError => e
@@ -84,14 +76,14 @@ module Gruf
       # Setup options for CLI execution and configure Gruf based on inputs
       #
       def setup!
-        opts = parse_options
+        @options = parse_options
 
-        Gruf.server_binding_url = opts[:host] if opts[:host]
-        if opts.suppress_default_interceptors?
+        Gruf.server_binding_url = @options[:host] if @options[:host]
+        if @options.suppress_default_interceptors?
           Gruf.interceptors.remove(Gruf::Interceptors::ActiveRecord::ConnectionReset)
           Gruf.interceptors.remove(Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
         end
-        Gruf.backtrace_on_error = true if opts.backtrace_on_error?
+        Gruf.backtrace_on_error = true if @options.backtrace_on_error?
       end
 
       ##
@@ -106,6 +98,7 @@ module Gruf
             exit(0)
           end
           o.string '--host', 'Specify the binding url for the gRPC service'
+          o.string '--services', 'Optional. Run gruf with only the passed gRPC service classes (comma-separated)'
           o.bool '--suppress-default-interceptors', 'Do not use the default interceptors'
           o.bool '--backtrace-on-error', 'Push backtraces on exceptions to the error serializer'
           o.null '-v', '--version', 'print gruf version' do
@@ -113,6 +106,46 @@ module Gruf
             exit(0)
           end
         end
+      end
+
+      ##
+      # Register services; note that this happens after gruf is initialized, and right before the server is run.
+      # This will interpret the services to run in the following precedence:
+      # 1. initializer arguments to the executor
+      # 2. ARGV options (the --services option)
+      # 3. services set to the global gruf configuration (Gruf.services)
+      #
+      def register_services!
+        # wait to load controllers until last possible second to allow late configuration
+        ::Gruf.autoloaders.load!(controllers_path: Gruf.controllers_path)
+
+        # first check initializer arguments
+        unless @services.any?
+          # next check CLI arguments
+          @services = @options[:services].to_s.split(',').map(&:strip).uniq
+          # finally, if none, use global gruf autoloaded services
+          @services = ::Gruf.services unless @services.any?
+        end
+
+        @services.map! { |s| s.is_a?(Class) ? s : s.constantize }
+
+        if @services.any?
+          @services.each { |s| @server.add_service(s) }
+          return
+        end
+
+        raise NoServicesBoundError
+      rescue NoServicesBoundError
+        @logger.fatal 'FATAL ERROR: No services bound to this gruf process; please bind a service to a Gruf ' \
+                      'controller to start the server successfully'
+        exit(1)
+      rescue NameError => e
+        @logger.fatal 'FATAL ERROR: Could not start server; passed services to run are not loaded or valid ' \
+                      "constants: #{e.message}"
+        exit(1)
+      rescue StandardError => e
+        @logger.fatal "FATAL ERROR: Could not start server: #{e.message}"
+        exit(1)
       end
     end
   end

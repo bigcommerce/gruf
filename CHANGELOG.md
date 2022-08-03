@@ -2,6 +2,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- [#156] Allow passing a specific list of services to run via the gruf binstub
 - [#163] Add `context` hash attribute to `Gruf::Controllers::Request` to allow interceptors to pass information down
   to a gruf controller
 - Drop Ruby 2.6 support (EOL'ed on March 31st, 2022)
