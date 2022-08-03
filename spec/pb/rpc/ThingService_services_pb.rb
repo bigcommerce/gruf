@@ -26,7 +26,7 @@ module Rpc
     # Demonstration service
     class Service
 
-      include GRPC::GenericService
+      include ::GRPC::GenericService
 
       self.marshal_class_method = :encode
       self.unmarshal_class_method = :decode
@@ -34,24 +34,24 @@ module Rpc
 
       # Request calls
       # For testing a request/response call
-      rpc :GetThing, GetThingRequest, GetThingResponse
+      rpc :GetThing, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
       # For testing a server streaming call
-      rpc :GetThings, GetThingsRequest, stream(Thing)
+      rpc :GetThings, ::Rpc::GetThingsRequest, stream(::Rpc::Thing)
       # For testing a client streaming call
-      rpc :CreateThings, stream(Thing), CreateThingsResponse
+      rpc :CreateThings, stream(::Rpc::Thing), ::Rpc::CreateThingsResponse
       # For testing a bidirectional streaming call
-      rpc :CreateThingsInStream, stream(Thing), stream(Thing)
+      rpc :CreateThingsInStream, stream(::Rpc::Thing), stream(::Rpc::Thing)
       # Error calls
       # For testing a generic failure
-      rpc :GetFail, GetThingRequest, GetThingResponse
+      rpc :GetFail, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
       # For testing a field error
-      rpc :GetFieldErrorFail, GetThingRequest, GetThingResponse
+      rpc :GetFieldErrorFail, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
       # For testing field errors that _may_ happen
-      rpc :GetContextualFieldErrorFail, GetThingRequest, GetThingResponse
+      rpc :GetContextualFieldErrorFail, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
       # For testing an exception
-      rpc :GetException, GetThingRequest, GetThingResponse
+      rpc :GetException, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
       # For testing an uncaught exception
-      rpc :GetUncaughtException, GetThingRequest, GetThingResponse
+      rpc :GetUncaughtException, ::Rpc::GetThingRequest, ::Rpc::GetThingResponse
     end
 
     Stub = Service.rpc_stub_class

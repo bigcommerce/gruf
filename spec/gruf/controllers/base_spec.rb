@@ -33,17 +33,22 @@ describe ::Gruf::Controllers::Base do
   end
 
   describe '#bind' do
+    subject { controller_class.bind(rpc_service) }
+
     it 'binds the controller to the service and generates the methods' do
+      subject
       expect(Gruf.services).to include(rpc_service)
       expect(rpc_service.instance_methods).to include(:get_thing)
       expect(controller_class.instance_methods).to include(:get_thing)
     end
 
     it 'binds the service name to the service class' do
+      subject
       expect(controller_class.bound_service).to eq rpc_service
     end
 
     it 'does not bind the service name to the base class' do
+      subject
       expect(Gruf::Controllers::Base.bound_service).to be_nil
     end
   end
