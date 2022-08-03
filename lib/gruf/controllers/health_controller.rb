@@ -15,34 +15,23 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
-require 'grpc'
-require 'active_support/core_ext/module/delegation'
-require 'active_support/hash_with_indifferent_access'
-require 'active_support/concern'
-require 'active_support/inflector'
-require 'grpc/health/v1/health_services_pb'
-require 'base64'
-
-# use Zeitwerk to lazily autoload all the files in the lib directory
-require 'zeitwerk'
-loader = ::Zeitwerk::Loader.new
-loader.tag = File.basename(__FILE__, '.rb')
-loader.inflector = ::Zeitwerk::GemInflector.new(__FILE__)
-loader.ignore("#{__dir__}/gruf/integrations/rails/railtie.rb")
-loader.push_dir(__dir__)
-loader.setup
-
-require_relative 'gruf/integrations/rails/railtie' if defined?(::Rails)
-
-##
-# Initializes configuration of gruf core module
-#
 module Gruf
-  extend Configuration
+  module Controllers
+    ##
+    # Dynamic standard grpc health check controller. Can be used as-is, or can use ::Gruf.health_check_hook to
+    # provide custom responses.
+    #
+    class HealthController < Gruf::Controllers::Base
+      bind ::Grpc::Health::V1::Health::Service
 
-  class << self
-    def autoloaders
-      Autoloaders
+      def check
+        health_proc = ::Gruf.health_check_hook
+        return health_proc.call(request, error) if !health_proc.nil? && health_proc.respond_to?(:call)
+
+        ::Grpc::Health::V1::HealthCheckResponse.new(
+          status: ::Grpc::Health::V1::HealthCheckResponse::ServingStatus::SERVING
+        )
+      end
     end
   end
 end

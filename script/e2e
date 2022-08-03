@@ -26,6 +26,8 @@ ok "Running client streamer test..."
 bundle exec rake gruf:demo:create_things
 ok "Running bidi streamer test..."
 bundle exec rake gruf:demo:create_things_in_stream
+ok "Running health check test..."
+bundle exec rake gruf:demo:health_check
 
 ok "Tests successful! Shutting down server..."
 kill -9 $server_pid

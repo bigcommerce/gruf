@@ -154,7 +154,7 @@ namespace :gruf do
     task :get_unauthorized do
       gruf_rake_configure_rpc!
       begin
-        rpc_client = gruf_demo_build_client(password: 'no')
+        rpc_client = gruf_demo_build_client(options: { password: 'no' })
         op = rpc_client.call(:GetThing, id: rand(100_000))
         Gruf.logger.info op.message.inspect
       rescue Gruf::Client::Error => e
@@ -190,14 +190,27 @@ namespace :gruf do
       Gruf.logger.info 'Done.'
     end
 
+    desc 'Call the health check'
+    task :health_check do
+      gruf_rake_configure_rpc!
+      begin
+        rpc_client = gruf_demo_build_client(service: ::Grpc::Health::V1::Health)
+        op = rpc_client.call(:Check)
+        Gruf.logger.info op.message.inspect
+      rescue Gruf::Client::Error => e
+        Gruf.logger.info e.error.to_h
+      end
+    end
+
     ##
     # @return [Gruf::Client]
     #
-    def gruf_demo_build_client(options = {}, client_options = {})
+    def gruf_demo_build_client(service: nil, options: {}, client_options: {})
+      service ||= Rpc::ThingService
       Gruf::Client.new(
-        service: Rpc::ThingService,
+        service: service,
         options: {
-          hostname: ENV.fetch('HOST', '0.0.0.0:8001'),
+          hostname: ENV.fetch('HOST', 'localhost:8001'),
           username: ENV.fetch('USERNAME', 'grpc'),
           password: ENV.fetch('PASSWORD', 'magic')
         }.merge(options),

@@ -36,6 +36,7 @@ describe Gruf::Cli::Executor do
   end
 
   before do
+    ::Gruf.reset
     ::Gruf.services = global_services
   end
 
@@ -121,6 +122,24 @@ describe Gruf::Cli::Executor do
         expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
         subject
       end
+
+      context 'when the health check is enabled' do
+        let(:initializer_services) { [] }
+        let(:cli_services) { [] }
+        let(:args) { %w[--health-check] }
+
+        it 'registers the health check' do
+          expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
+          expect(server).to receive(:start!).once
+          global_services.each do |svc|
+            expect(server).to receive(:add_service).with(svc).ordered
+          end
+          expect(server).to receive(:add_service).with(::Grpc::Health::V1::Health::Service).ordered
+          expect(logger).not_to receive(:fatal)
+          expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
+          subject
+        end
+      end
     end
 
     context 'when no services are set in either the initializer, ARGV, or Gruf.services' do
@@ -176,8 +195,8 @@ describe Gruf::Cli::Executor do
       Gruf.reset
     end
 
-    context 'when --host is' do
-      context 'when --host is passed' do
+    context 'with --host' do
+      context 'when passed' do
         let(:args) { %w[--host 0.0.0.0:9999] }
 
         it 'sets server_binding_url to the host' do
@@ -186,7 +205,7 @@ describe Gruf::Cli::Executor do
         end
       end
 
-      context 'when --host is not passed' do
+      context 'when not passed' do
         let(:args) { [] }
 
         it 'sets server_binding_url to the default host' do
@@ -196,8 +215,8 @@ describe Gruf::Cli::Executor do
       end
     end
 
-    context 'when --suppress-default-interceptors is' do
-      context 'when --suppress-default-interceptors is passed' do
+    context 'with --suppress-default-interceptors' do
+      context 'when passed' do
         let(:args) { %w[--suppress-default-interceptors] }
 
         it 'unsets the default interceptors' do
@@ -206,7 +225,7 @@ describe Gruf::Cli::Executor do
         end
       end
 
-      context 'when --suppress-default-interceptors is not passed' do
+      context 'when not passed' do
         let(:args) { [] }
 
         it 'leaves the default interceptors intact' do
@@ -218,8 +237,8 @@ describe Gruf::Cli::Executor do
       end
     end
 
-    context 'when --backtrace-on-error is' do
-      context 'when --backtrace-on-error is passed' do
+    context 'with --backtrace-on-error' do
+      context 'when passed' do
         let(:args) { %w[--backtrace-on-error] }
 
         it 'sets backtrace_on_error to true' do
@@ -228,10 +247,31 @@ describe Gruf::Cli::Executor do
         end
       end
 
-      context 'when --backtrace-on-error is not passed' do
+      context 'when not passed' do
         it 'leaves backtrace_on_error at the default value' do
           subject
           expect(Gruf.backtrace_on_error).to be_falsey
+        end
+      end
+    end
+
+    context 'with --health-check' do
+      context 'when passed' do
+        let(:args) { %w[--health-check] }
+
+        it 'sets health_check_enabled to true' do
+          subject
+          expect(Gruf.health_check_enabled).to be_truthy
+        end
+      end
+
+      context 'when not passed' do
+        let(:args) { %w[] }
+
+        it 'leaves health_check_enabled alone' do
+          Gruf.health_check_enabled = false
+          subject
+          expect(Gruf.health_check_enabled).to be_falsey
         end
       end
     end
