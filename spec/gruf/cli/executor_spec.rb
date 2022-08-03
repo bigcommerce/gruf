@@ -19,19 +19,22 @@ require 'spec_helper'
 
 describe Gruf::Cli::Executor do
   let(:args) { [] }
-  let(:server) { double(:server, add_service: true, start!: true) }
+  let(:server) { double(:server, add_service: true, start: true, stop: true) }
   let(:services) { [Rpc::ThingService::Service] }
   let(:options_services) { services }
   let(:hook_executor) { double(:hook_executor, call: true) }
   let(:logger) { Gruf.logger }
   let(:executor) do
     described_class.new(
-      args,
+      embedded: false,
       server: server,
       services: options_services,
-      hook_executor: hook_executor,
-      logger: logger
+      hook_executor: hook_executor
     )
+  end
+
+  before do
+    allow(executor).to receive(:wait_till_terminated).and_raise(Interrupt)
   end
 
   describe '#run' do
@@ -42,7 +45,7 @@ describe Gruf::Cli::Executor do
         expect(server).to receive(:add_service).ordered.with(svc)
       end
       expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
-      expect(server).to receive(:start!).once
+      expect(server).to receive(:start).once
       expect(logger).not_to receive(:fatal)
       expect(hook_executor).to receive(:call).with(:after_server_stop, server: server).once
       subject
@@ -64,7 +67,7 @@ describe Gruf::Cli::Executor do
 
       it 'adds each specified service to the server' do
         expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
-        expect(server).to receive(:start!).once
+        expect(server).to receive(:start).once
         global_services.each do |svc|
           expect(server).to receive(:add_service).with(svc).ordered
         end
@@ -84,7 +87,7 @@ describe Gruf::Cli::Executor do
 
       it 'adds each specified service to the server' do
         expect(hook_executor).to receive(:call).with(:before_server_start, server: server).once
-        expect(server).to receive(:start!).once
+        expect(server).to receive(:start).once
         services.each do |svc|
           expect(server).to receive(:add_service).with(svc).ordered
         end
@@ -110,7 +113,7 @@ describe Gruf::Cli::Executor do
       let(:exception) { StandardError.new('Failure') }
 
       before do
-        allow(server).to receive(:start!).once.and_raise(exception)
+        allow(server).to receive(:start).once.and_raise(exception)
       end
 
       it 'still runs the pre and post hooks' do
@@ -131,10 +134,26 @@ describe Gruf::Cli::Executor do
         expect { subject }.to raise_error(exception)
       end
     end
+
+    context 'when TERM signal is received' do
+      it 'stops gracefully' do
+        server_thread = Thread.new do
+          executor = described_class.new(
+            embedded: false,
+            services: options_services
+          )
+          executor.run
+        end
+        sleep 3 # wait for a server to boot up
+        Process.kill('TERM', Process.pid)
+        server_thread.join
+        expect(server_thread.status).to be false # expect thread to exit normally
+      end
+    end
   end
 
-  describe '#setup!' do
-    subject { executor }
+  describe '#setup_options!' do
+    subject { executor.run(args) }
 
     let(:interceptors) { Gruf.interceptors.list }
 

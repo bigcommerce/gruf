@@ -28,17 +28,17 @@ describe Gruf::Server do
     ::Gruf.services = []
   end
 
-  describe '#start!' do
-    subject { gruf_server.start! }
+  describe '#start' do
+    subject { gruf_server.start }
 
     let(:server_mock) do
       double(
         GRPC::RpcServer,
         add_http2_port: nil,
-        run_till_terminated_or_interrupted: nil,
         run: nil,
         wait_till_running: nil,
         handle: nil,
+        running_state: :running,
         stopped?: true
       )
     end
@@ -76,20 +76,6 @@ describe Gruf::Server do
       it 'runs server with default configuration' do
         expect(GRPC::RpcServer).to receive(:new).with(**derived_options).and_return(server_mock)
         subject
-      end
-    end
-
-    context 'when TERM signal is received' do
-      it 'stops gracefully' do
-        server_thread = Thread.new do
-          srv = described_class.new
-          srv.add_service(::Rpc::ThingService::Service)
-          srv.start!
-        end
-        sleep 3 # wait for a server to boot up
-        Process.kill('TERM', Process.pid)
-        server_thread.join
-        expect(server_thread.status).to be false # expect thread to exit normally
       end
     end
   end
@@ -134,7 +120,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do
@@ -163,7 +149,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do
@@ -205,7 +191,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do
@@ -234,7 +220,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do
@@ -275,7 +261,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do
@@ -301,7 +287,7 @@ describe Gruf::Server do
 
     context 'when the server is already started' do
       before do
-        gruf_server.instance_variable_set(:@started, true)
+        allow(gruf_server).to receive(:running?).and_return(true)
       end
 
       it 'raises ServerAlreadyStartedError' do

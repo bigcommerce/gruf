@@ -34,6 +34,14 @@ module Gruf
             end
           end
         end
+
+        # Since Rails 6.1
+        if respond_to?(:server)
+          server do
+            require 'gruf'
+            Gruf::Cli::Executor.embed!
+          end
+        end
       end
     end
   end
