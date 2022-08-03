@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.executables << 'gruf'
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 2.6', '< 3.2'
+  spec.required_ruby_version = '>= 2.7', '< 3.2'
 
   spec.metadata = {
     'bug_tracker_uri' => 'https://github.com/bigcommerce/gruf/issues',
@@ -44,12 +44,7 @@ Gem::Specification.new do |spec|
   }
 
   spec.add_development_dependency 'bundler-audit', '>= 0.6'
-  # rubocop:disable Gemspec/RubyVersionGlobalsUsage
-  spec.add_development_dependency(
-    'factory_bot',
-    (Gem::Version.new(RUBY_VERSION) >= Gem::Version.new('2.5') ? '>= 6.1' : '~> 5.2')
-  )
-  # rubocop:enable Gemspec/RubyVersionGlobalsUsage
+  spec.add_development_dependency 'factory_bot', '>= 6.1'
   spec.add_development_dependency 'ffaker', '>= 2.15'
   spec.add_development_dependency 'pry', '~> 0.12'
   spec.add_development_dependency 'pry-byebug', '>= 3.9'
