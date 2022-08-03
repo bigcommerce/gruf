@@ -19,12 +19,6 @@ gem_cache_key: &gem_cache_key
   gem_cache_key: "gem-cache-v2"
 
 executors:
-  ruby_2_6:
-    <<: *ruby_env
-    parameters:
-      ruby-version:
-        type: string
-        default: "2.6"
   ruby_2_7:
     <<: *ruby_env
     parameters:
@@ -68,7 +62,7 @@ commands:
           command: |
             export GRPC_RUBY_BUILD_PROCS=<<parameters.grpc_ruby_build_procs>>
             # due to needing GRPC_RUBY_BUILD_PROCS, we need to explicitly install at least this version
-            gem install grpc -v '>= 1.44.0.pre2' --verbose --no-document
+            gem install grpc -v '>= 1.48' --verbose --no-document
             bundle config set --local path 'vendor/bundle'
             bundle lock --add-platform x86_64-linux
             bundle check || bundle install
@@ -169,7 +163,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_2_7"
+        default: "ruby_3_0"
     steps:
       - pre-setup
       - bundle-install:
@@ -178,21 +172,6 @@ jobs:
 
 workflows:
   version: 2
-  ruby_2_6:
-    jobs:
-      - bundle-audit:
-          name: "ruby-2_6-bundle_audit"
-          e: "ruby_2_6"
-      - rubocop:
-          name: "ruby-2_6-rubocop"
-          e: "ruby_2_6"
-      - rspec-unit:
-          name: "ruby-2_6-rspec"
-          e: "ruby_2_6"
-          code-climate: false
-      - e2e:
-          name: "ruby-2_6-e2e"
-          e: "ruby_2_6"
   ruby_2_7:
     jobs:
       - bundle-audit:
