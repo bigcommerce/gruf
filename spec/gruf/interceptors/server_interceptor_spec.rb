@@ -48,4 +48,41 @@ describe Gruf::Interceptors::ServerInterceptor do
       end
     end
   end
+
+  describe 'request context propagation' do
+    subject { controller.call(:get_thing) }
+
+    let(:rpc_service) { ::Rpc::ThingService::Service }
+    let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs.values.first }
+    let(:message) { Rpc::GetThingRequest.new(id: 1) }
+    let(:controller_class) { ThingController }
+    let(:controller) do
+      controller_class.new(
+        method_key: :get_thing,
+        service: rpc_service,
+        active_call: Rpc::Test::Call.new,
+        message: message,
+        rpc_desc: rpc_desc
+      )
+    end
+
+    before do
+      Gruf.interceptors.use(TestServerInterceptor, context_setting: 'one')
+      Gruf.interceptors.use(TestServerInterceptor2, context_setting: 'two')
+    end
+
+    it 'allows passing the request context between interceptors' do
+      expect(subject).to be_a(Rpc::GetThingResponse)
+
+      ctx = controller.request.context
+      expect(ctx).to have_key(:setting1)
+      expect(ctx[:setting1]).to eq('one')
+      expect(ctx).to have_key(:setting2)
+      expect(ctx[:setting2]).to eq('two')
+
+      # overwritten in second interceptor
+      expect(ctx).to have_key(:setting)
+      expect(ctx[:setting]).to eq('two')
+    end
+  end
 end
