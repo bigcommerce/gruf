@@ -84,6 +84,7 @@ module Gruf
           Gruf.interceptors.remove(Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
         end
         Gruf.backtrace_on_error = true if @options.backtrace_on_error?
+        Gruf.health_check_enabled = true if @options.health_check?
       end
 
       ##
@@ -99,6 +100,7 @@ module Gruf
           end
           o.string '--host', 'Specify the binding url for the gRPC service'
           o.string '--services', 'Optional. Run gruf with only the passed gRPC service classes (comma-separated)'
+          o.bool '--health-check', 'Serve the default gRPC health check (defaults to false). '
           o.bool '--suppress-default-interceptors', 'Do not use the default interceptors'
           o.bool '--backtrace-on-error', 'Push backtraces on exceptions to the error serializer'
           o.null '-v', '--version', 'print gruf version' do
@@ -119,18 +121,13 @@ module Gruf
         # wait to load controllers until last possible second to allow late configuration
         ::Gruf.autoloaders.load!(controllers_path: Gruf.controllers_path)
 
-        # first check initializer arguments
-        unless @services.any?
-          # next check CLI arguments
-          @services = @options[:services].to_s.split(',').map(&:strip).uniq
-          # finally, if none, use global gruf autoloaded services
-          @services = ::Gruf.services unless @services.any?
-        end
+        services = determine_services(@services)
+        services = bind_health_check!(services) if health_check_enabled?
 
-        @services.map! { |s| s.is_a?(Class) ? s : s.constantize }
+        services.map! { |s| s.is_a?(Class) ? s : s.constantize }
 
-        if @services.any?
-          @services.each { |s| @server.add_service(s) }
+        if services.any?
+          services.each { |s| @server.add_service(s) }
           return
         end
 
@@ -146,6 +143,50 @@ module Gruf
       rescue StandardError => e
         @logger.fatal "FATAL ERROR: Could not start server: #{e.message}"
         exit(1)
+      end
+
+      ##
+      # @return [Boolean]
+      #
+      def health_check_enabled?
+        ::Gruf.health_check_enabled
+      end
+
+      ##
+      # Load the health check if enabled into the services array
+      #
+      # @param [Array<Class>] services
+      # @return [Array<Class>]
+      #
+      def bind_health_check!(services)
+        # do this here to trigger autoloading the controller in zeitwerk, since we don't explicitly load this
+        # controller. This binds the service and makes sure the method handlers are setup.
+        # rubocop:disable Lint/Void
+        Gruf::Controllers::HealthController
+        # rubocop:enable Lint/Void
+        # if we're already bound to the services array (say someone explicitly passes the health check in, skip)
+        return services if services.include?(::Grpc::Health::V1::Health::Service)
+
+        # otherwise, manually add the grpc service
+        services << ::Grpc::Health::V1::Health::Service
+        services
+      end
+
+      ##
+      # Determine how we load services (initializer -> ARGV -> Gruf.services)
+      #
+      # @return [Array<Class>]
+      #
+      def determine_services(services = [])
+        # first check initializer arguments
+        return services if services.any?
+
+        # next check CLI arguments
+        services = @options[:services].to_s.split(',').map(&:strip).uniq
+        # finally, if none, use global gruf autoloaded services
+        services = (::Gruf.services || []) unless services.any?
+
+        services
       end
     end
   end

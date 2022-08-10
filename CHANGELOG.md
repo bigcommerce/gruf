@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+- Add opt-in ability to serve the official [gRPC health check](https://github.com/grpc/grpc/blob/master/src/ruby/pb/grpc/health/v1/health_services_pb.rb)
+  automatically via `health_check_enabled` configuration option (or `GRUF_HEALTH_CHECK_ENABLED` environment
+  variable).
+- Add `health_check_hook` configuration option to implement a custom response for the above gRPC built-in health check
 - [#156] Allow passing a specific list of services to run via the gruf binstub
 - [#163] Add `context` hash attribute to `Gruf::Controllers::Request` to allow interceptors to pass information down
   to a gruf controller

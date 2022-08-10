@@ -77,6 +77,13 @@ module Gruf
     #   @return [Integer] Internal cache expiry period (in seconds) for the SynchronizedClient
     # @!attribute rpc_server_options
     #   @return [Hash] A hash of RPC options for GRPC server configuration
+    # @!attribute health_check_enabled
+    #   @return [Boolean] If true, will load and register `Gruf::Controllers::HealthController` with the default gRPC
+    #     health check to the loaded gRPC server
+    # @!attribute health_check_hook
+    #   @return [NilClass]
+    #   @return [Proc] If set, will call this in the gRPC health check. It is required to return a
+    #     `::Grpc::Health::V1::HealthCheckResponse` object in this proc to indicate the health of the server.
     VALID_CONFIG_KEYS = {
       root_path: '',
       server_binding_url: '0.0.0.0:9001',
@@ -101,6 +108,8 @@ module Gruf
       use_exception_message: true,
       internal_error_message: 'Internal Server Error',
       event_listener_proc: nil,
+      health_check_enabled: false,
+      health_check_hook: nil,
       synchronized_client_internal_cache_expiry: 60,
       rpc_server_options: {
         pool_size: GRPC::RpcServer::DEFAULT_POOL_SIZE,
@@ -181,6 +190,7 @@ module Gruf
         interceptors.use(::Gruf::Interceptors::ActiveRecord::ConnectionReset)
         interceptors.use(::Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
       end
+      self.health_check_enabled = ::ENV.fetch('GRUF_HEALTH_CHECK_ENABLED', 0).to_i.positive?
       options
     end
 

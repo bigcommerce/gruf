@@ -51,6 +51,7 @@ Gruf.configure do |c|
   c.server_binding_url = 'localhost:8001'
   c.error_serializer = Serializers::Proto
   c.backtrace_on_error = true
+  c.health_check_enabled = true
   c.interceptors.use(
     Gruf::Interceptors::Instrumentation::Statsd,
     client: FakeStats.new,
