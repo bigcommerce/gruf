@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.16.0
+
 - Add opt-in ability to serve the official [gRPC health check](https://github.com/grpc/grpc/blob/master/src/ruby/pb/grpc/health/v1/health_services_pb.rb)
   automatically via `health_check_enabled` configuration option (or `GRUF_HEALTH_CHECK_ENABLED` environment
   variable).
