@@ -20,7 +20,6 @@ require 'active_support/core_ext/module/delegation'
 require 'active_support/hash_with_indifferent_access'
 require 'active_support/concern'
 require 'active_support/inflector'
-require 'grpc/health/v1/health_services_pb'
 require 'base64'
 
 # use Zeitwerk to lazily autoload all the files in the lib directory
@@ -29,6 +28,7 @@ loader = ::Zeitwerk::Loader.new
 loader.tag = File.basename(__FILE__, '.rb')
 loader.inflector = ::Zeitwerk::GemInflector.new(__FILE__)
 loader.ignore("#{__dir__}/gruf/integrations/rails/railtie.rb")
+loader.ignore("#{__dir__}/gruf/controllers/health_controller.rb")
 loader.push_dir(__dir__)
 loader.setup
 
