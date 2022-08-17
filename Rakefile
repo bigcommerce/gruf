@@ -32,6 +32,7 @@ def gruf_rake_configure_rpc!
 
   Gruf.configure do |c|
     c.error_serializer = Serializers::Proto
+    c.health_check_enabled = true
   end
 end
 
@@ -192,6 +193,7 @@ namespace :gruf do
 
     desc 'Call the health check'
     task :health_check do
+      require 'gruf/controllers/health_controller'
       gruf_rake_configure_rpc!
       begin
         rpc_client = gruf_demo_build_client(service: ::Grpc::Health::V1::Health)

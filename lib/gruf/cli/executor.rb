@@ -161,9 +161,7 @@ module Gruf
       def bind_health_check!(services)
         # do this here to trigger autoloading the controller in zeitwerk, since we don't explicitly load this
         # controller. This binds the service and makes sure the method handlers are setup.
-        # rubocop:disable Lint/Void
-        Gruf::Controllers::HealthController
-        # rubocop:enable Lint/Void
+        require 'gruf/controllers/health_controller'
         # if we're already bound to the services array (say someone explicitly passes the health check in, skip)
         return services if services.include?(::Grpc::Health::V1::Health::Service)
 

@@ -16,6 +16,7 @@
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 require 'spec_helper'
+require 'gruf/controllers/health_controller'
 
 describe ::Gruf::Controllers::HealthController do
   let(:rpc_service) { ::Grpc::Health::V1::Health::Service }
