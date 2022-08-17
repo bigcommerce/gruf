@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.16.1
+
+* Fix issue where default gRPC health check was loaded even if unused or not desired; now only loaded when requested
+
 ### 2.16.0
 
 - Add opt-in ability to serve the official [gRPC health check](https://github.com/grpc/grpc/blob/master/src/ruby/pb/grpc/health/v1/health_services_pb.rb)
