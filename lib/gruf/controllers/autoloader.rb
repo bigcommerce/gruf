@@ -47,10 +47,10 @@ module Gruf
       # Reload all files managed by the autoloader, if reloading is enabled
       #
       def reload
-        if @reloading_enabled
-          reload_mutex do
-            @loader.reload
-          end
+        return unless @reloading_enabled
+
+        reload_mutex do
+          @loader.reload
         end
       end
 
