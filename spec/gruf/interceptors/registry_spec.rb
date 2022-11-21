@@ -175,8 +175,8 @@ describe Gruf::Interceptors::Registry do
   describe '#prepare' do
     subject { registry.prepare(request, errors) }
 
-    let(:request) { build :controller_request }
-    let(:errors) { build :error }
+    let(:request) { build(:controller_request) }
+    let(:errors) { build(:error) }
 
     before do
       registry.use(interceptor_class)

@@ -24,7 +24,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Plain 
   let(:execution_time) { 0.001 }
   let(:message) { 'foo' }
   let(:params) { { id: 1 } }
-  let(:request) { build :controller_request }
+  let(:request) { build(:controller_request) }
   let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { { message: message, status: status, method: route_key, duration: execution_time, params: params } }
 

@@ -18,8 +18,8 @@
 require 'spec_helper'
 
 describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
-  let(:request) { build :controller_request }
-  let(:errors) { build :error }
+  let(:request) { build(:controller_request) }
+  let(:errors) { build(:error) }
   let(:interceptor) { described_class.new(request, errors) }
 
   describe '#call' do

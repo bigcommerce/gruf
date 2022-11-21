@@ -22,8 +22,8 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
   let(:client) { double(:statsd, increment: true, timing: true) }
   let(:prefix) { 'app' }
 
-  let(:request) { build :controller_request, method_key: :get_thing }
-  let(:errors) { build :error }
+  let(:request) { build(:controller_request, method_key: :get_thing) }
+  let(:errors) { build(:error) }
   let(:interceptor) { described_class.new(request, errors, options) }
 
   let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}rpc.thing_service.get_thing" }
