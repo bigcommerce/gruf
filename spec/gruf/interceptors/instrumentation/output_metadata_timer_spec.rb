@@ -19,8 +19,8 @@ require 'spec_helper'
 
 describe Gruf::Interceptors::Instrumentation::OutputMetadataTimer do
   let(:options) { { metadata_key: :timer } }
-  let(:request) { build :controller_request, method_key: :get_thing }
-  let(:errors) { build :error }
+  let(:request) { build(:controller_request, method_key: :get_thing) }
+  let(:errors) { build(:error) }
   let(:interceptor) { described_class.new(request, errors, options) }
 
   describe '#call' do

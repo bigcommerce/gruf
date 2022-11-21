@@ -43,8 +43,8 @@ describe Gruf::Interceptors::Authentication::Basic do
 
   let(:metadata) { { :authorization.to_s => request_credentials } }
   let(:active_call) { double(:active_call, metadata: metadata) }
-  let(:request) { build :controller_request, active_call: active_call }
-  let(:errors) { build :error }
+  let(:request) { build(:controller_request, active_call: active_call) }
+  let(:errors) { build(:error) }
   let(:interceptor) do
     described_class.new(
       request,

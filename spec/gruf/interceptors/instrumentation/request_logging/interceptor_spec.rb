@@ -30,8 +30,8 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   let(:execution_time) { rand(0.001..10.000).to_f }
   let(:call_signature) { :get_thing_without_intercept }
 
-  let(:controller_request) { build :controller_request, method_key: :get_thing }
-  let(:errors) { build :error }
+  let(:controller_request) { build(:controller_request, method_key: :get_thing) }
+  let(:errors) { build(:error) }
   let(:interceptor) { described_class.new(controller_request, errors, options) }
   let(:call) { interceptor.call { true } }
   let(:logger) { ::Logger.new(File::NULL) }

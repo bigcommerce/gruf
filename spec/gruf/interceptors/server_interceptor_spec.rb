@@ -37,8 +37,8 @@ describe Gruf::Interceptors::ServerInterceptor do
   describe '#call' do
     subject { interceptor.new(request, error, {}).call }
 
-    let(:request) { build :controller_request }
-    let(:error) { build :error }
+    let(:request) { build(:controller_request) }
+    let(:error) { build(:error) }
 
     context 'when it is not extended' do
       let(:interceptor) { described_class }

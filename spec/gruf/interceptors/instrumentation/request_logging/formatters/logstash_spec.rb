@@ -19,7 +19,7 @@ require 'spec_helper'
 
 describe Gruf::Interceptors::Instrumentation::RequestLogging::Formatters::Logstash do
   let(:formatter) { described_class.new }
-  let(:request) { build :controller_request }
+  let(:request) { build(:controller_request) }
   let(:result) { Gruf::Interceptors::Timer.time { Rpc::GetThingResponse.new } }
   let(:payload) { { message: 'foo', params: { one: 2 } } }
 

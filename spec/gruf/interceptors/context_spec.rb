@@ -22,8 +22,8 @@ describe Gruf::Interceptors::Context do
   let(:interceptors) do
     [interceptor_class.new(request, errors)]
   end
-  let(:request) { build :controller_request }
-  let(:errors) { build :error }
+  let(:request) { build(:controller_request) }
+  let(:errors) { build(:error) }
   let(:interceptor_context) { described_class.new(interceptors) }
 
   describe '#intercept!' do
