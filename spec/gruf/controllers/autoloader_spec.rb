@@ -101,6 +101,15 @@ describe ::Gruf::Controllers::Autoloader do
         expect(zeitwerk).to receive(:reload).once
         subject
       end
+
+      it 'accesses the loader in a thread-safe manner' do
+        autoloader.send(:reload_mutex) { true }
+        expect(autoloader.instance_variable_get(:@reload_mutex)).to receive(:synchronize).and_yield.twice
+        threads = []
+        threads << Thread.new { autoloader.reload }
+        threads << Thread.new { autoloader.reload }
+        threads.each(&:join)
+      end
     end
 
     context 'when code reloading is disabled' do

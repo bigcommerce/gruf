@@ -47,7 +47,11 @@ module Gruf
       # Reload all files managed by the autoloader, if reloading is enabled
       #
       def reload
-        @loader.reload if @reloading_enabled
+        if @reloading_enabled
+          reload_mutex do
+            @loader.reload
+          end
+        end
       end
 
       private
@@ -68,6 +72,17 @@ module Gruf
         # to the gRPC Service classes
         @loader.eager_load
         @setup = true
+      end
+
+      ##
+      # Handle thread-safe access to the loader
+      #
+      def reload_mutex(&block)
+        @reload_mutex ||= begin
+          require 'monitor'
+          Monitor.new
+        end
+        @reload_mutex.synchronize(&block)
       end
     end
   end

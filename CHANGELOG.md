@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#175] Fix code reload threadsafety. Calls to `Zeitwerk::Loader#setup` should be made in a thread-safe manner.
+
 ### 2.16.1
 
 * Fix issue where default gRPC health check was loaded even if unused or not desired; now only loaded when requested
