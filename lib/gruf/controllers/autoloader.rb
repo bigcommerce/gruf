@@ -15,6 +15,8 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require 'concurrent/atomic/read_write_lock'
+
 module Gruf
   module Controllers
     ##
@@ -49,8 +51,16 @@ module Gruf
       def reload
         return unless @reloading_enabled
 
-        reload_mutex do
+        reload_lock.with_write_lock do
           @loader.reload
+        end
+      end
+
+      def with_fresh_controller(controller_name)
+        Gruf::Autoloaders.reload
+        reload_lock.with_read_lock do
+          controller = controller_name.constantize
+          yield controller
         end
       end
 
@@ -77,12 +87,8 @@ module Gruf
       ##
       # Handle thread-safe access to the loader
       #
-      def reload_mutex(&block)
-        @reload_mutex ||= begin
-          require 'monitor'
-          Monitor.new
-        end
-        @reload_mutex.synchronize(&block)
+      def reload_lock
+        @reload_lock ||= Concurrent::ReadWriteLock.new
       end
     end
   end

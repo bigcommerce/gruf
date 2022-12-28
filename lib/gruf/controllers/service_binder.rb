@@ -46,54 +46,59 @@ module Gruf
         #
         def bind_method(service_ref, controller, method_name, desc)
           method_key = method_name.to_s.underscore.to_sym
+          controller_name = controller.name
           service_ref.class_eval do
             if desc.request_response?
               define_method(method_key) do |message, active_call|
-                controller = controller.name.constantize
-                c = controller.new(
-                  method_key: method_key,
-                  service: service_ref,
-                  message: message,
-                  active_call: active_call,
-                  rpc_desc: desc
-                )
-                c.call(method_key)
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
+                  c = controller.new(
+                    method_key: method_key,
+                    service: service_ref,
+                    message: message,
+                    active_call: active_call,
+                    rpc_desc: desc
+                  )
+                  c.call(method_key)
+                end
               end
             elsif desc.client_streamer?
               define_method(method_key) do |active_call|
-                controller = controller.name.constantize
-                c = controller.new(
-                  method_key: method_key,
-                  service: service_ref,
-                  message: proc { |&block| active_call.each_remote_read(&block) },
-                  active_call: active_call,
-                  rpc_desc: desc
-                )
-                c.call(method_key)
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
+                  c = controller.new(
+                    method_key: method_key,
+                    service: service_ref,
+                    message: proc { |&block| active_call.each_remote_read(&block) },
+                    active_call: active_call,
+                    rpc_desc: desc
+                  )
+                  c.call(method_key)
+                end
               end
             elsif desc.server_streamer?
               define_method(method_key) do |message, active_call, &block|
-                controller = controller.name.constantize
-                c = controller.new(
-                  method_key: method_key,
-                  service: service_ref,
-                  message: message,
-                  active_call: active_call,
-                  rpc_desc: desc
-                )
-                c.call(method_key, &block)
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
+                  c = controller.new(
+                    method_key: method_key,
+                    service: service_ref,
+                    message: message,
+                    active_call: active_call,
+                    rpc_desc: desc
+                  )
+                  c.call(method_key, &block)
+                end
               end
             else # bidi
               define_method(method_key) do |messages, active_call, &block|
-                controller = controller.name.constantize
-                c = controller.new(
-                  method_key: method_key,
-                  service: service_ref,
-                  message: messages,
-                  active_call: active_call,
-                  rpc_desc: desc
-                )
-                c.call(method_key, &block)
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
+                  c = controller.new(
+                    method_key: method_key,
+                    service: service_ref,
+                    message: messages,
+                    active_call: active_call,
+                    rpc_desc: desc
+                  )
+                  c.call(method_key, &block)
+                end
               end
             end
           end

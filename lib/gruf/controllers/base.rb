@@ -90,7 +90,6 @@ module Gruf
       # @param [block] &block The passed block for executing the method
       #
       def call(method_key, &block)
-        ::Gruf.autoloaders.reload if ::Gruf.development?
         Interceptors::Context.new(@interceptors).intercept! do
           process_action(method_key, &block)
         end
