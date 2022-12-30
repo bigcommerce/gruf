@@ -20,7 +20,9 @@ require 'spec_helper'
 describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
   let(:request) { build(:controller_request) }
   let(:errors) { build(:error) }
-  let(:interceptor) { described_class.new(request, errors) }
+  let(:animals_record) { Class.new(::ActiveRecord::Base) }
+  let(:target_classes) { [animals_record, ::ActiveRecord::Base] }
+  let(:interceptor) { described_class.new(request, errors, { target_classes: target_classes }) }
 
   describe '#call' do
     subject { interceptor.call { true } }
@@ -31,8 +33,10 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       end
 
       it 'tries to clear any active connections' do
-        expect(::ActiveRecord::Base).to receive(:establish_connection).and_call_original
-        expect(::ActiveRecord::Base).to receive(:clear_active_connections!).and_call_original
+        expect(animals_record).to receive(:establish_connection).and_call_original
+        expect(animals_record).to receive(:clear_active_connections!).and_call_original
+        expect(::ActiveRecord::Base).to receive(:establish_connection)
+        expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
         subject
       end
     end
@@ -45,6 +49,8 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       it 'does not try to clear any active connections' do
         expect(::ActiveRecord::Base).not_to receive(:establish_connection)
         expect(::ActiveRecord::Base).not_to receive(:clear_active_connections!)
+        expect(animals_record).not_to receive(:establish_connection)
+        expect(animals_record).not_to receive(:clear_active_connections!)
         subject
       end
     end
