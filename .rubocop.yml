@@ -57,16 +57,12 @@ Metrics/BlockLength:
 Lint/UnusedMethodArgument:
   AllowUnusedKeywordArguments: true
 
-# This cop also affects hash keys, which is bad as we can't always control that. Disabling.
-Naming/VariableNumber:
-  Enabled: false
-
 # We're fine with this
 ThreadSafety/NewThread:
   Enabled: false
 
-# Not necessary
-Layout/EmptyLineBetweenDefs:
+# We prefer the leading constant declaration for easier refactoring
+Style/RedundantConstantBase:
   Enabled: false
 
 ####################################################################################################
