@@ -57,10 +57,11 @@ module Gruf
       end
 
       def with_fresh_controller(controller_name)
-        Gruf::Autoloaders.reload
+        return yield(controller_name.constantize) unless @reloading_enabled
+
+        ::Gruf::Autoloaders.reload
         reload_lock.with_read_lock do
-          controller = controller_name.constantize
-          yield controller
+          yield(controller_name.constantize)
         end
       end
 
