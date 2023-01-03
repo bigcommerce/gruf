@@ -20,6 +20,7 @@ require 'spec_helper'
 class TestLogging
   include Gruf::Logger
 end
+
 class TestGrpcLogging
   include Gruf::GrpcLogger
 end
