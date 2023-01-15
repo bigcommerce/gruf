@@ -27,11 +27,13 @@ module Gruf
         # connection pool, we need to ensure that this is done to properly
         #
         def call
-          ::ActiveRecord::Base.establish_connection if enabled? && !::ActiveRecord::Base.connection.active?
+          if enabled?
+            target_classes.each { |klass| klass.establish_connection unless klass.connection.active? }
+          end
 
           yield
         ensure
-          ::ActiveRecord::Base.clear_active_connections! if enabled?
+          target_classes.each(&:clear_active_connections!) if enabled?
         end
 
         private
@@ -41,6 +43,13 @@ module Gruf
         #
         def enabled?
           defined?(::ActiveRecord::Base)
+        end
+
+        ##
+        # @return [Array<Class>] The list of ActiveRecord classes to reset
+        #
+        def target_classes
+          options[:target_classes] || [::ActiveRecord::Base]
         end
       end
     end
