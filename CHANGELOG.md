@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#180] Support multiple databases connection reset in `Gruf::Interceptors::ActiveRecord::ConnectionReset`.
+
 ### 2.16.2
 
 * [#175] Fix code reload thread-safety. Calls to `Zeitwerk::Loader#setup` are now made in a thread-safe manner.
