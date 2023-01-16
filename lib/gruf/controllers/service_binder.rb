@@ -50,8 +50,8 @@ module Gruf
           service_ref.class_eval do
             if desc.request_response?
               define_method(method_key) do |message, active_call|
-                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
-                  c = controller.new(
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |fresh_controller|
+                  c = fresh_controller.new(
                     method_key: method_key,
                     service: service_ref,
                     message: message,
@@ -63,8 +63,8 @@ module Gruf
               end
             elsif desc.client_streamer?
               define_method(method_key) do |active_call|
-                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
-                  c = controller.new(
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |fresh_controller|
+                  c = fresh_controller.new(
                     method_key: method_key,
                     service: service_ref,
                     message: proc { |&block| active_call.each_remote_read(&block) },
@@ -76,8 +76,8 @@ module Gruf
               end
             elsif desc.server_streamer?
               define_method(method_key) do |message, active_call, &block|
-                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
-                  c = controller.new(
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |fresh_controller|
+                  c = fresh_controller.new(
                     method_key: method_key,
                     service: service_ref,
                     message: message,
@@ -89,8 +89,8 @@ module Gruf
               end
             else # bidi
               define_method(method_key) do |messages, active_call, &block|
-                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |controller|
-                  c = controller.new(
+                Gruf::Autoloaders.controllers.with_fresh_controller(controller_name) do |fresh_controller|
+                  c = fresh_controller.new(
                     method_key: method_key,
                     service: service_ref,
                     message: messages,
