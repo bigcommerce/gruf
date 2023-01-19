@@ -103,8 +103,8 @@ describe ::Gruf::Controllers::Autoloader do
       end
 
       it 'accesses the loader in a thread-safe manner' do
-        autoloader.send(:reload_mutex) { true }
-        expect(autoloader.instance_variable_get(:@reload_mutex)).to receive(:synchronize).and_yield.twice
+        autoloader.send(:reload_lock)
+        expect(autoloader.instance_variable_get(:@reload_lock)).to receive(:with_write_lock).and_yield.twice
         threads = []
         threads << Thread.new { autoloader.reload }
         threads << Thread.new { autoloader.reload }

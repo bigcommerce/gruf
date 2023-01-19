@@ -83,4 +83,30 @@ describe 'Functional server test' do
       end
     end
   end
+
+  describe 'code reloading', :run_thing_server do
+    subject { build_client.call(:GetThing, id: 1) }
+
+    context 'when in development' do
+      before do
+        allow(Gruf).to receive(:development?).and_return(true)
+      end
+
+      it 'reloads the autoloaders' do
+        expect(Gruf.autoloaders).to receive(:reload)
+        subject
+      end
+    end
+
+    context 'when not in development' do
+      before do
+        allow(Gruf).to receive(:development?).and_return(false)
+      end
+
+      it 'does not reload the autoloaders' do
+        expect(Gruf.autoloaders).not_to receive(:reload)
+        subject
+      end
+    end
+  end
 end
