@@ -2,6 +2,9 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.17.0
+
+* [#179] Add Ruby 3.2 support
 * [#178] Introduce read-write lock for code reloading; cover controller class resolution with code reloading.
 * [#180] Support multiple databases connection reset in `Gruf::Interceptors::ActiveRecord::ConnectionReset`.
 
