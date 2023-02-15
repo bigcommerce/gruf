@@ -121,7 +121,7 @@ commands:
       - run: bundle exec bundle-audit check -v <<parameters.additional_args>>
   rubocop:
     steps:
-      - run: bundle exec rubocop -p
+      - run: bundle exec rubocop -P
   e2e:
     steps:
       - run: ./script/e2e
