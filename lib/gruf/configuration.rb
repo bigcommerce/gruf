@@ -186,7 +186,9 @@ module Gruf
         connect_md_proc: nil,
         server_args: {}
       }
-      if use_default_interceptors
+      self.use_default_interceptors = ::ENV.fetch('GRUF_USE_DEFAULT_INTERCEPTORS', 1).to_i.positive?
+
+      if self.use_default_interceptors
         interceptors.use(::Gruf::Interceptors::ActiveRecord::ConnectionReset)
         interceptors.use(::Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
       end
