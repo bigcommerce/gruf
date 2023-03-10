@@ -3,6 +3,18 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 ### Pending release
 
 * [#190] Remove unsued `e2mmap` and `thwait` gems from `runtime_dependency`.
+* [#184] [Breaking] Controller unhandled errors should be passed as BadStatus to interceptors.
+  * Server interceptors should now expect a `GRPC::BadStatus` error in the case of unhandled errors.
+    Orignal unhandled error can be reached via `cause`. example:
+    ```ruby
+    def call
+      begin
+        yield
+      rescue => err
+        err.cause
+      end
+    end
+    ```
 
 ### 2.19.0
 

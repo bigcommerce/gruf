@@ -92,13 +92,13 @@ module Gruf
       def call(method_key, &block)
         Interceptors::Context.new(@interceptors).intercept! do
           process_action(method_key, &block)
+        rescue GRPC::BadStatus
+          raise # passthrough, to be caught by Gruf::Interceptors::Timer
+        rescue GRPC::Core::CallError, StandardError => e # CallError is not a StandardError
+          set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
+          error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
+          fail!(:internal, :unknown, error_message)
         end
-      rescue GRPC::BadStatus
-        raise # passthrough, to be caught by Gruf::Interceptors::Timer
-      rescue GRPC::Core::CallError, StandardError => e # CallError is not a StandardError
-        set_debug_info(e.message, e.backtrace) if Gruf.backtrace_on_error
-        error_message = Gruf.use_exception_message ? e.message : Gruf.internal_error_message
-        fail!(:internal, :unknown, error_message)
       end
     end
   end
