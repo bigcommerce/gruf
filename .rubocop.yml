@@ -113,3 +113,6 @@ RSpec/ContextWording:
       - Prefixes
   Prefixes:
     - and
+
+RSpec/IndexedLet:
+  Enabled: false
