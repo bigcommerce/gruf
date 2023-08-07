@@ -14,13 +14,6 @@ Gemspec/DevelopmentDependencies:
   Exclude:
     - 'gruf.gemspec'
 
-# Offense count: 1
-# Configuration parameters: Prefixes, AllowedPatterns.
-# Prefixes: when, with, without
-RSpec/ContextWording:
-  Exclude:
-    - 'spec/gruf/client/error_factory_spec.rb'
-
 # Offense count: 15
 # Configuration parameters: Max, AllowedIdentifiers, AllowedPatterns.
 RSpec/IndexedLet:

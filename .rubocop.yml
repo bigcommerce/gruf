@@ -106,3 +106,10 @@ RSpec/DescribeClass:
 RSpec/IteratedExpectation:
   Exclude:
     - spec/gruf/functional/**/*
+
+RSpec/ContextWording:
+  inherit_mode:
+    merge:
+      - Prefixes
+  Prefixes:
+    - and
