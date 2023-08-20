@@ -1,3 +1,7 @@
+####################################################################################################
+# AllCops Configurations
+####################################################################################################
+
 AllCops:
   TargetRubyVersion: 2.7
   SuggestExtensions: false
@@ -18,20 +22,40 @@ require:
   - rubocop-rspec
   - rubocop-thread_safety
 
+####################################################################################################
+# Layout Configurations
+####################################################################################################
+
 Layout/EndAlignment:
   Enabled: false
 
+Layout/LineLength:
+  Max: 120
+
+####################################################################################################
+# Lint Configurations
+####################################################################################################
+
+# Rubocop is opinionated here, which makes compositional base classes/interfaces with keyword arguments problematic.
+# Disabling this allows base class stub methods to have keyword args.
+Lint/UnusedMethodArgument:
+  AllowUnusedKeywordArguments: true
+
+####################################################################################################
+# Metrics Configurations
+####################################################################################################
+
 Metrics/AbcSize:
   Max: 147
+
+Metrics/BlockLength:
+  Enabled: false
 
 Metrics/ClassLength:
   Max: 406
 
 Metrics/CyclomaticComplexity:
   Max: 12
-
-Layout/LineLength:
-  Max: 120
 
 Metrics/MethodLength:
   Max: 88
@@ -46,28 +70,40 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 12
 
+####################################################################################################
+# Naming Configurations
+####################################################################################################
+
 Naming/PredicateName:
-  Enabled: false
-
-Metrics/BlockLength:
-  Enabled: false
-
-# Rubocop is opinionated here, which makes compositional base classes/interfaces with keyword arguments problematic.
-# Disabling this allows base class stub methods to have keyword args.
-Lint/UnusedMethodArgument:
-  AllowUnusedKeywordArguments: true
-
-# We're fine with this
-ThreadSafety/NewThread:
-  Enabled: false
-
-# We prefer the leading constant declaration for easier refactoring
-Style/RedundantConstantBase:
   Enabled: false
 
 ####################################################################################################
 # RSpec Configurations
 ####################################################################################################
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/ContextWording:
+  inherit_mode:
+    merge:
+      - Prefixes
+  Prefixes:
+    - and
+
+RSpec/DescribeClass:
+  Exclude:
+    - spec/gruf/functional/**/*
+
+RSpec/ExampleLength:
+  Max: 50
+
+RSpec/IndexedLet:
+  Enabled: false
+
+RSpec/IteratedExpectation:
+  Exclude:
+    - spec/gruf/functional/**/*
 
 RSpec/MessageSpies:
   EnforcedStyle: receive
@@ -75,19 +111,13 @@ RSpec/MessageSpies:
 RSpec/MultipleExpectations:
   Max: 30
 
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+
 RSpec/NamedSubject:
   Enabled: false
 
 RSpec/NestedGroups:
-  Enabled: false
-
-RSpec/MultipleMemoizedHelpers:
-  Enabled: false
-
-RSpec/ExampleLength:
-  Max: 50
-
-RSpec/AnyInstance:
   Enabled: false
 
 RSpec/StubbedMock:
@@ -97,10 +127,18 @@ RSpec/StubbedMock:
 RSpec/VerifiedDoubles:
   Enabled: false
 
-RSpec/DescribeClass:
-  Exclude:
-    - spec/gruf/functional/**/*
+####################################################################################################
+# Style Configurations
+####################################################################################################
 
-RSpec/IteratedExpectation:
-  Exclude:
-    - spec/gruf/functional/**/*
+# We prefer the leading constant declaration for easier refactoring
+Style/RedundantConstantBase:
+  Enabled: false
+
+####################################################################################################
+# ThreadSafety Configurations
+####################################################################################################
+
+# We're fine with this
+ThreadSafety/NewThread:
+  Enabled: false
