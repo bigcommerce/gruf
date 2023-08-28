@@ -79,3 +79,14 @@ class TestClientInterceptor < Gruf::Interceptors::ClientInterceptor
     timed.result
   end
 end
+
+##########################################################################################
+# Base Interceptors
+##########################################################################################
+
+class TestBaseInterceptor < ::Gruf::Interceptors::Base
+  def call
+    Math.sqrt(4)
+    yield
+  end
+end
