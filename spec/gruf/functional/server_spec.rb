@@ -32,7 +32,7 @@ describe 'Functional server test' do
     context 'when it is a request/response call' do
       let(:id) { 1 }
 
-      it 'returns the thing', run_thing_server: true do
+      it 'returns the thing', :run_thing_server do
         client = build_client
         resp = client.call(:GetThing, id: id)
         expect(resp.message).to be_a(Rpc::GetThingResponse)
@@ -42,7 +42,7 @@ describe 'Functional server test' do
     end
 
     context 'when it is a server streaming call' do
-      it 'returns the things in a stream from the server', run_thing_server: true do
+      it 'returns the things in a stream from the server', :run_thing_server do
         client = build_client
         resp = client.call(:GetThings)
         resp.message do |m|
@@ -52,7 +52,7 @@ describe 'Functional server test' do
     end
 
     context 'when it is a client streaming call' do
-      it 'returns the things from the server', run_thing_server: true do
+      it 'returns the things from the server', :run_thing_server do
         things = []
         5.times do
           things << Rpc::Thing.new(
@@ -68,7 +68,7 @@ describe 'Functional server test' do
     end
 
     context 'when it is a bidi streaming call' do
-      it 'returns the things from the server', run_thing_server: true do
+      it 'returns the things from the server', :run_thing_server do
         things = []
         5.times do
           things << Rpc::Thing.new(

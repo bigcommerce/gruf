@@ -25,7 +25,7 @@ describe Gruf::Interceptors::ServerInterceptor do
   describe 'statelessness' do
     let(:interceptor) { TestServerInterceptorInstanceVar }
 
-    it 'does not persist interceptor instance variables across requests', run_thing_server: true do
+    it 'does not persist interceptor instance variables across requests', :run_thing_server do
       client = build_client
       resp = client.call(:GetThing)
       expect(resp.message).to be_a(Rpc::GetThingResponse)

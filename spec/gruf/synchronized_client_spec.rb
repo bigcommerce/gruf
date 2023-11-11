@@ -18,7 +18,7 @@
 require 'spec_helper'
 require 'thwait'
 
-describe Gruf::SynchronizedClient, run_thing_server: true do
+describe Gruf::SynchronizedClient, :run_thing_server do
   subject { build_sync_client(options) }
 
   let(:options) { {} }

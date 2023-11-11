@@ -145,7 +145,7 @@ describe Gruf::Error do
     let(:id) { 1 }
 
     context 'with a call that returns a field error' do
-      it 'raises a Gruf::Client::Error and return the unserialized error object', run_thing_server: true do
+      it 'raises a Gruf::Client::Error and return the unserialized error object', :run_thing_server do
         client = build_client
         expect do
           resp = client.call(:GetContextualFieldErrorFail, id: 1)
@@ -160,7 +160,7 @@ describe Gruf::Error do
     end
 
     context 'with multiple calls, where the first returns a field error, the second does not' do
-      it 'does not raise a Gruf::Client::Error the second time', run_thing_server: true do
+      it 'does not raise a Gruf::Client::Error the second time', :run_thing_server do
         client = build_client
         expect do
           client.call(:GetContextualFieldErrorFail, id: 1)
@@ -174,7 +174,7 @@ describe Gruf::Error do
     end
 
     context 'with multiple calls, with multiple having field errors' do
-      it 'does not aggregate errors across calls', run_thing_server: true do
+      it 'does not aggregate errors across calls', :run_thing_server do
         ts = []
         10.times do
           ts << Thread.new do
@@ -198,7 +198,7 @@ describe Gruf::Error do
     end
 
     context 'with a call that returns no errors' do
-      it 'raises no errors', run_thing_server: true do
+      it 'raises no errors', :run_thing_server do
         client = build_client
         expect do
           resp = client.call(:GetThing, id: 1)
@@ -209,7 +209,7 @@ describe Gruf::Error do
   end
 
   context 'with a call that raises an exception' do
-    it 'fails with an internal error message', run_thing_server: true do
+    it 'fails with an internal error message', :run_thing_server do
       client = build_client
       expect do
         resp = client.call(:GetException, id: 1)
