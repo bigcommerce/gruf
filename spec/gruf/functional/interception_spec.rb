@@ -27,7 +27,7 @@ describe 'Functional interceptors test' do
 
   context 'when there is an interceptor added' do
     context 'with a request/response call' do
-      it 'intercepts the call', run_thing_server: true do
+      it 'intercepts the call', :run_thing_server do
         expect_any_instance_of(interceptor_class).to receive(:call).once.and_call_original
         client = build_client
         resp = client.call(:GetThing)
@@ -36,7 +36,7 @@ describe 'Functional interceptors test' do
     end
 
     context 'with a server streamer call' do
-      it 'intercepts the call', run_thing_server: true do
+      it 'intercepts the call', :run_thing_server do
         expect_any_instance_of(interceptor_class).to receive(:call).and_call_original
         client = build_client
         resp = client.call(:GetThings)
@@ -48,7 +48,7 @@ describe 'Functional interceptors test' do
     end
 
     context 'with a client streamer call' do
-      it 'intercepts the call', run_thing_server: true do
+      it 'intercepts the call', :run_thing_server do
         expect_any_instance_of(interceptor_class).to receive(:call).and_call_original
 
         things = []
@@ -67,7 +67,7 @@ describe 'Functional interceptors test' do
     end
 
     context 'with a bidi streamer call' do
-      it 'intercepts the call', run_thing_server: true do
+      it 'intercepts the call', :run_thing_server do
         expect_any_instance_of(interceptor_class).to receive(:call).and_call_original
         things = []
         5.times do

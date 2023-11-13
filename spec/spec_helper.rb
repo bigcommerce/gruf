@@ -41,7 +41,7 @@ RSpec.configure do |config|
       Gruf.grpc_logger = Logger.new(File::NULL)
     end
   end
-  config.around(:example, run_thing_server: true) do |t|
+  config.around(:example, :run_thing_server) do |t|
     @server = build_server
     run_server(@server) do
       t.run
