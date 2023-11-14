@@ -50,6 +50,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'grpc-tools', '~> 1.10'
   spec.add_runtime_dependency 'json', '>= 2.3'
   spec.add_runtime_dependency 'slop', '>= 4.6'
-  spec.add_runtime_dependency 'thwait', '>= 0.1'
   spec.add_runtime_dependency 'zeitwerk', '>= 2'
 end

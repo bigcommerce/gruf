@@ -31,5 +31,6 @@ gem 'rubocop-performance', '>= 0.0.1'
 gem 'rubocop-rspec', '>= 2.0'
 gem 'rubocop-thread_safety', '>= 0.3'
 gem 'simplecov', '>= 0.16'
+gem 'thwait', '>= 0.1'
 
 gemspec
