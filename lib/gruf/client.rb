@@ -81,7 +81,11 @@ module Gruf
     #
     def call(request_method, params = {}, metadata = {}, opts = {}, &block)
       request_method = request_method.to_sym
-      req = streaming_request?(request_method) ? params : request_object(request_method, params)
+      req = if params.respond_to?(:to_proto) || streaming_request?(request_method)
+              params
+            else
+              request_object(request_method, params)
+            end
       md = build_metadata(metadata)
       call_sig = call_signature(request_method)
 
