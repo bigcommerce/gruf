@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#190] Remove unsued `e2mmap` and `thwait` gems from `runtime_dependency`.
+
 ### 2.19.0
 
 * [#197] Add support for Ruby 3.3
