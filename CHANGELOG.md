@@ -3,6 +3,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 ### Pending release
 
 * Add `GRUF_USE_DEFAULT_INTERCEPTORS` ENV to dynamically enable/disable default interceptors
+* Allow passing of request object directly into `call`
 
 ### 2.17.0
 

@@ -232,6 +232,21 @@ describe Gruf::Client do
         expect { subject }.to raise_error(NotImplementedError)
       end
     end
+
+    context 'when passing the request directly' do
+      subject { client.call(method_name, req, metadata, opts) }
+
+      let(:req) { Rpc::GetThingRequest.new(params) }
+      let(:method_name) { :GetThing }
+
+      it 'calls the appropriate method with the right signature' do
+        expect(client).to receive(:get_thing).with(
+          an_instance_of(::Rpc::GetThingRequest),
+          { return_op: true, metadata: metadata }
+        ).and_return(op)
+        expect(subject).to be_truthy
+      end
+    end
   end
 
   describe '#build_metadata' do
