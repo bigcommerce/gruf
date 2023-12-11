@@ -192,7 +192,7 @@ module Gruf
     # @return [Array<Class>]
     #
     def services
-      @services ||= (::Gruf.services || (options.fetch(:services, nil) || []))
+      @services ||= ::Gruf.services || (options.fetch(:services, nil) || [])
     end
 
     ##

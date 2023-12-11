@@ -146,7 +146,7 @@ describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
         it 'supports nested filtering' do
           expected = Marshal.load(Marshal.dump(params))
           expected[:data][:array] = 'REDACTED'
-          expected[:hello].each do |key, _val|
+          expected[:hello].each_key do |key|
             expected[:hello][key] = 'REDACTED'
           end
           expect(subject).to eq expected
