@@ -108,7 +108,7 @@ module Gruf
           # @return [::Gruf::Logger]
           #
           def logger
-            @logger ||= (options.fetch(:logger, nil) || Gruf.logger)
+            @logger ||= options.fetch(:logger, nil) || Gruf.logger
           end
 
           ##

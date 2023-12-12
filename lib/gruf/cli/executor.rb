@@ -182,7 +182,7 @@ module Gruf
         # next check CLI arguments
         services = @options[:services].to_s.split(',').map(&:strip).uniq
         # finally, if none, use global gruf autoloaded services
-        services = (::Gruf.services || []) unless services.any?
+        services = ::Gruf.services || [] unless services.any?
 
         services
       end
