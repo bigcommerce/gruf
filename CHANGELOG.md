@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#197] Add Ruby 3.3 support
+
 ### 2.18.0
 
 * Add `GRUF_USE_DEFAULT_INTERCEPTORS` ENV to dynamically enable/disable default interceptors
