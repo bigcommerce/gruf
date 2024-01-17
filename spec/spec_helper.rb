@@ -22,7 +22,7 @@ require 'gruf'
 require 'ffaker'
 require 'pry'
 
-Dir["#{File.join(File.dirname(__FILE__), 'support')}/**/*.rb"].sort.each { |f| require f }
+Dir["#{File.join(File.dirname(__FILE__), 'support')}/**/*.rb"].each { |f| require f }
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
