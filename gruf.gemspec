@@ -36,7 +36,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata = {
     'bug_tracker_uri' => 'https://github.com/bigcommerce/gruf/issues',
-    'changelog_uri' => 'https://github.com/bigcommerce/gruf/CHANGELOG.md',
+    'changelog_uri' => 'https://github.com/bigcommerce/gruf/blob/main/CHANGELOG.md',
     'homepage_uri' => 'https://github.com/bigcommerce/gruf',
     'rubygems_mfa_required' => 'true',
     'source_code_uri' => 'https://github.com/bigcommerce/gruf',
