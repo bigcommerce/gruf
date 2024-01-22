@@ -22,11 +22,19 @@ require 'active_support/concern'
 require 'active_support/inflector'
 require 'base64'
 
+# defining this module before the loader setup fixes double loading of this
+# entrypoint file if this is a symlink
+module Gruf
+end
+
 # use Zeitwerk to lazily autoload all the files in the lib directory
 require 'zeitwerk'
 loader = ::Zeitwerk::Loader.new
 loader.tag = File.basename(__FILE__, '.rb')
-loader.inflector = ::Zeitwerk::GemInflector.new(__FILE__)
+# __FILE__ returns symlink path if the file is a symlink but __dir__ returns realpath
+# so without realpath of the file, Zeitwerk custom rule for version file
+# will fail in case of symlink
+loader.inflector = ::Zeitwerk::GemInflector.new(File.realpath(__FILE__))
 loader.ignore("#{__dir__}/gruf/integrations/rails/railtie.rb")
 loader.ignore("#{__dir__}/gruf/controllers/health_controller.rb")
 loader.push_dir(__dir__)

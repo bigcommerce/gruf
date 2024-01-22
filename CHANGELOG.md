@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#201] Fix double loading of the entry file and Zeitwerk::NameError when the entrypoint is a symlink
+
 ### 2.18.0
 
 * Add `GRUF_USE_DEFAULT_INTERCEPTORS` ENV to dynamically enable/disable default interceptors
