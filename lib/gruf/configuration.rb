@@ -121,7 +121,7 @@ module Gruf
       }.freeze
     }.freeze
 
-    attr_accessor(* VALID_CONFIG_KEYS.keys)
+    attr_accessor(*VALID_CONFIG_KEYS.keys)
 
     ##
     # Whenever this is extended into a class, setup the defaults
@@ -164,7 +164,7 @@ module Gruf
     #
     def reset
       VALID_CONFIG_KEYS.each do |k, v|
-        send("#{k}=", v)
+        send(:"#{k}=", v)
       end
       self.server_binding_url = "#{::ENV.fetch('GRPC_SERVER_HOST',
                                                '0.0.0.0')}:#{::ENV.fetch('GRPC_SERVER_PORT', 9_001)}"

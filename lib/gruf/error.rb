@@ -88,7 +88,7 @@ module Gruf
       @field_errors = []
       @metadata = {}
       args.each do |k, v|
-        send("#{k}=", v) if respond_to?(k)
+        send(:"#{k}=", v) if respond_to?(k)
       end
     end
 

@@ -3,7 +3,7 @@
 ####################################################################################################
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.0
   SuggestExtensions: false
   NewCops: enable
   Exclude:
@@ -69,6 +69,9 @@ Metrics/ParameterLists:
 
 Metrics/PerceivedComplexity:
   Max: 12
+
+Style/ArgumentsForwarding:
+  Enabled: false
 
 ####################################################################################################
 # Naming Configurations
