@@ -24,12 +24,10 @@ require 'base64'
 
 # use Zeitwerk to lazily autoload all the files in the lib directory
 require 'zeitwerk'
-loader = ::Zeitwerk::Loader.new
-loader.tag = File.basename(__FILE__, '.rb')
-loader.inflector = ::Zeitwerk::GemInflector.new(__FILE__)
-loader.ignore("#{__dir__}/gruf/integrations/rails/railtie.rb")
-loader.ignore("#{__dir__}/gruf/controllers/health_controller.rb")
-loader.push_dir(__dir__)
+loader = Zeitwerk::Loader.for_gem
+lib = File.dirname(__FILE__)
+loader.ignore("#{lib}/gruf/integrations/rails/railtie.rb")
+loader.ignore("#{lib}/gruf/controllers/health_controller.rb")
 loader.setup
 
 require_relative 'gruf/integrations/rails/railtie' if defined?(::Rails)
