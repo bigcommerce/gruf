@@ -189,6 +189,9 @@ module Gruf
       self.use_default_interceptors = ::ENV.fetch('GRUF_USE_DEFAULT_INTERCEPTORS', 1).to_i.positive?
 
       if use_default_interceptors
+        if defined?(::Rails)
+          interceptors.use(::Gruf::Interceptors::Rails::Reloader, reloader: Rails.application.reloader)
+        end
         interceptors.use(::Gruf::Interceptors::ActiveRecord::ConnectionReset)
         interceptors.use(::Gruf::Interceptors::Instrumentation::OutputMetadataTimer)
       end
