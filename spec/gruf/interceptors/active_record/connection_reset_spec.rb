@@ -21,6 +21,7 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
   let(:request) { build(:controller_request) }
   let(:errors) { build(:error) }
   let(:animals_record) { Class.new(::ActiveRecord::Base) }
+  let(:connection_handler) { double('ActiveRecord::ConnectionHandler') }
   let(:target_classes) { [animals_record, ::ActiveRecord::Base] }
   let(:interceptor) { described_class.new(request, errors, { target_classes: target_classes }) }
 
@@ -30,13 +31,15 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
     context 'when ActiveRecord is loaded' do
       before do
         allow(interceptor).to receive(:enabled?).and_return(true)
+        allow(animals_record).to receive(:connection_handler).and_return(connection_handler)
+        allow(ActiveRecord::Base).to receive(:connection_handler).and_return(connection_handler)
       end
 
       it 'tries to clear any active connections' do
         expect(animals_record).to receive(:establish_connection).and_call_original
-        expect(animals_record).to receive(:clear_active_connections!).and_call_original
+        expect(animals_record.connection_handler).to receive(:clear_active_connections!)
         expect(::ActiveRecord::Base).to receive(:establish_connection)
-        expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
+        expect(::ActiveRecord::Base.connection_handler).to receive(:clear_active_connections!)
         subject
       end
     end
@@ -44,13 +47,15 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
     context 'when ActiveRecord is not loaded' do
       before do
         allow(interceptor).to receive(:enabled?).and_return(false)
+        allow(animals_record).to receive(:connection_handler).and_return(connection_handler)
+        allow(ActiveRecord::Base).to receive(:connection_handler).and_return(connection_handler)
       end
 
       it 'does not try to clear any active connections' do
         expect(::ActiveRecord::Base).not_to receive(:establish_connection)
-        expect(::ActiveRecord::Base).not_to receive(:clear_active_connections!)
+        expect(::ActiveRecord::Base.connection_handler).not_to receive(:clear_active_connections!)
         expect(animals_record).not_to receive(:establish_connection)
-        expect(animals_record).not_to receive(:clear_active_connections!)
+        expect(animals_record.connection_handler).not_to receive(:clear_active_connections!)
         subject
       end
     end
