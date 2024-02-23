@@ -25,8 +25,8 @@ module ActiveRecord
       true
     end
 
-    def self.clear_active_connections!
-      true
+    def self.connection_handler
+      ActiveRecord::ConnectionHandler.new
     end
 
     def self.connected?
@@ -41,6 +41,12 @@ module ActiveRecord
 
     def active?
       false
+    end
+  end
+
+  class ConnectionHandler
+    def clear_active_connections!
+      true
     end
   end
 end
