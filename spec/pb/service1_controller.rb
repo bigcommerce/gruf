@@ -21,8 +21,10 @@ require 'ffaker'
 
 class Service1Controller < ::Gruf::Controllers::Base
   bind ::Rpc::Test::Service1::Service
+  include Gruf::Loggable
 
   def get1
+    logger.info "Received get1: #{request.inspect}"
     ::Rpc::Test::Product1.new(id: request.message.id, name: FFaker::Name.first_name)
   end
 end

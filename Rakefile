@@ -191,6 +191,48 @@ namespace :gruf do
       Gruf.logger.info 'Done.'
     end
 
+    desc 'Perform concurrent calls to different single-process services'
+    task :concurrent, [:times] do |_t, args|
+      args.with_defaults(
+        times: 100
+      )
+      gruf_rake_configure_rpc!
+      Gruf.logger.level = Logger::Severity::INFO
+
+      services = [
+        {
+          service: ::Rpc::Test::Service1,
+          name: 'Service1',
+          method: :Get1
+        },
+        {
+          service: ::Rpc::Test::Service2,
+          name: 'Service2',
+          method: :Get2
+        },
+        {
+          service: ::Rpc::Test::Service3,
+          name: 'Service3',
+          method: :Get3
+        }
+      ]
+      threads = []
+
+      args[:times].to_i.times do |i|
+        services.each do |svc|
+          threads << Thread.new do
+            sleep(rand(0.05..3)) # spread the calls out
+            cl = gruf_demo_build_client(service: svc[:service])
+            Gruf.logger.info "- #{svc[:name]} (#{i}): Making call to #{svc[:method]}"
+            op = cl.call(svc[:method], id: i)
+            Gruf.logger.info "-- #{svc[:name]} (#{i}): #{op.message.inspect}"
+          end
+        end
+      end
+
+      threads.each(&:join)
+    end
+
     desc 'Call the health check'
     task :health_check do
       require 'gruf/controllers/health_controller'
