@@ -27,10 +27,6 @@ module Gruf
         # connection pool, we need to ensure that this is done to properly
         #
         def call
-          if enabled?
-            target_classes.each { |klass| klass.establish_connection unless klass.connection.active? }
-          end
-
           yield
         ensure
           target_classes.each(&:clear_active_connections!) if enabled?

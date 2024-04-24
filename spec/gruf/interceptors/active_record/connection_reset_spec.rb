@@ -33,9 +33,7 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       end
 
       it 'tries to clear any active connections' do
-        expect(animals_record).to receive(:establish_connection).and_call_original
         expect(animals_record).to receive(:clear_active_connections!).and_call_original
-        expect(::ActiveRecord::Base).to receive(:establish_connection)
         expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
         subject
       end
@@ -47,9 +45,7 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       end
 
       it 'does not try to clear any active connections' do
-        expect(::ActiveRecord::Base).not_to receive(:establish_connection)
         expect(::ActiveRecord::Base).not_to receive(:clear_active_connections!)
-        expect(animals_record).not_to receive(:establish_connection)
         expect(animals_record).not_to receive(:clear_active_connections!)
         subject
       end
