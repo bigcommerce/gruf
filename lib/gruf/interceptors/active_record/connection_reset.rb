@@ -24,12 +24,12 @@ module Gruf
       class ConnectionReset < ::Gruf::Interceptors::ServerInterceptor
         ##
         # Reset any ActiveRecord connections after a gRPC service is called. Because of the way gRPC manages its
-        # connection pool, we need to ensure that this is done to properly
+        # connection pool, we need to ensure that this is done properly
         #
         def call
           yield
         ensure
-          target_classes.each(&:clear_active_connections!) if enabled?
+          target_classes.each { |klass| klass.connection_handler.clear_active_connections! } if enabled?
         end
 
         private

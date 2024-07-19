@@ -21,11 +21,17 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
   let(:request) { build(:controller_request) }
   let(:errors) { build(:error) }
   let(:animals_record) { Class.new(::ActiveRecord::Base) }
+  let(:connection_handler) { double('ActiveRecord::ConnectionHandler') }
   let(:target_classes) { [animals_record, ::ActiveRecord::Base] }
   let(:interceptor) { described_class.new(request, errors, { target_classes: target_classes }) }
 
   describe '#call' do
     subject { interceptor.call { true } }
+
+    before do
+      allow(animals_record).to receive(:connection_handler).and_return(connection_handler)
+      allow(ActiveRecord::Base).to receive(:connection_handler).and_return(connection_handler)
+    end
 
     context 'when ActiveRecord is loaded' do
       before do
@@ -33,8 +39,8 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       end
 
       it 'tries to clear any active connections' do
-        expect(animals_record).to receive(:clear_active_connections!).and_call_original
-        expect(::ActiveRecord::Base).to receive(:clear_active_connections!)
+        expect(animals_record.connection_handler).to receive(:clear_active_connections!)
+        expect(::ActiveRecord::Base.connection_handler).to receive(:clear_active_connections!)
         subject
       end
     end
@@ -45,8 +51,8 @@ describe Gruf::Interceptors::ActiveRecord::ConnectionReset do
       end
 
       it 'does not try to clear any active connections' do
-        expect(::ActiveRecord::Base).not_to receive(:clear_active_connections!)
-        expect(animals_record).not_to receive(:clear_active_connections!)
+        expect(::ActiveRecord::Base.connection_handler).not_to receive(:clear_active_connections!)
+        expect(animals_record.connection_handler).not_to receive(:clear_active_connections!)
         subject
       end
     end

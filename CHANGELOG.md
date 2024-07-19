@@ -7,6 +7,7 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 * [#190] Remove unsued `e2mmap` and `thwait` gems from `runtime_dependency`.
 * [#194] Add interceptor to reload Rails app code accross requests
 * [#209] Removes manual `establish_connection` and active connection check for each request from `Gruf::Interceptors::ActiveRecord::ConnectionReset`.
+* [#208] Fix rails `clear_active_connections!` deprecation warning
 
 ### 2.19.0
 
