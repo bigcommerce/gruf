@@ -29,7 +29,7 @@ module Gruf
         def call
           yield
         ensure
-          target_classes.each { |klass| klass.connection_handler.clear_active_connections! } if enabled?
+          target_classes.each { |klass| klass.connection_handler.clear_active_connections!(:all) } if enabled?
         end
 
         private
