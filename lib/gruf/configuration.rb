@@ -179,7 +179,7 @@ module Gruf
       self.ssl_key_file = "#{root_path}config/ssl/#{environment}.key"
       cp = ::ENV.fetch('GRUF_CONTROLLERS_PATH', 'app/rpc').to_s
       self.controllers_path = root_path.to_s.empty? ? cp : "#{root_path}/#{cp}"
-      self.controllers_paths = [self.controllers_path]
+      self.controllers_paths = [controllers_path]
       self.backtrace_on_error = ::ENV.fetch('GRPC_BACKTRACE_ON_ERROR', 0).to_i.positive?
       self.rpc_server_options = {
         max_waiting_requests: ::ENV.fetch('GRPC_SERVER_MAX_WAITING_REQUESTS',
