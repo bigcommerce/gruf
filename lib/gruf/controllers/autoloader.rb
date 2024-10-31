@@ -20,24 +20,24 @@ require 'concurrent/atomic/read_write_lock'
 module Gruf
   module Controllers
     ##
-    # Handles autoloading of Gruf controllers in the application path. This allows for code reloading on Gruf
+    # Handles autoloading of Gruf controllers in the application paths. This allows for code reloading on Gruf
     # controllers.
     #
     class Autoloader
       include ::Gruf::Loggable
 
-      # @!attribute [r] path
-      #   @return [String] The path for this autoloader
-      attr_reader :path
+      # @!attribute [r] paths
+      #   @return [Array<String>] The paths for this autoloader
+      attr_reader :paths
 
       ##
-      # @param [String] path
+      # @param [Array<String>] paths
       # @param [Boolean] reloading
       # @param [String] tag
       #
-      def initialize(path:, reloading: nil, tag: nil)
+      def initialize(paths:, reloading: nil, tag: nil)
         super()
-        @path = path
+        @paths = paths
         @loader = ::Zeitwerk::Loader.new
         @loader.tag = tag || 'gruf-controllers'
         @setup = false
@@ -73,11 +73,14 @@ module Gruf
       def setup!
         return true if @setup
 
-        return false unless File.directory?(@path)
+        directories = @paths.select { |path| File.directory?(path) }
+        return false unless directories.any?
 
         @loader.enable_reloading if @reloading_enabled
-        @loader.ignore("#{@path}/**/*_pb.rb")
-        @loader.push_dir(@path)
+        directories.each do |path|
+          @loader.ignore("#{path}/**/*_pb.rb")
+          @loader.push_dir(path)
+        end
         @loader.setup
         # always eager load RPC files, so that the service binder can bind the Gruf::Controller instantiation
         # to the gRPC Service classes
