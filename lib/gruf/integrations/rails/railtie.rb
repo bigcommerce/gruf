@@ -26,10 +26,10 @@ module Gruf
           config.before_configuration do
             # Remove autoloading of the controllers path from Rails' zeitwerk, so that we ensure Gruf's zeitwerk
             # properly manages them itself. This allows us to manage code reloading and logging in Gruf specifically
-            app.config.eager_load_paths -= [::Gruf.controllers_path] if app.config.respond_to?(:eager_load_paths)
+            app.config.eager_load_paths -= ::Gruf.controllers_paths if app.config.respond_to?(:eager_load_paths)
             if ::Rails.respond_to?(:autoloaders) # if we're on a late enough version of rails
               ::Rails.autoloaders.each do |autoloader|
-                autoloader.ignore(Gruf.controllers_path)
+                autoloader.ignore(Gruf.controllers_paths)
               end
             end
           end
