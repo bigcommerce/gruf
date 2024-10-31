@@ -44,6 +44,8 @@ module Gruf
     #   @return [String] If use_ssl is true, the relative path from the root_path to the key file for the server
     # @!attribute controllers_path
     #   @return [String] The relative path from root_path to locate Gruf Controllers in
+    # @!attribute controllers_paths
+    #   @return [Array<String>] The relative paths from root_path to locate Gruf Controllers in
     # @!attribute services
     #   @return [Array<Class>] An array of services to serve with this Gruf server
     # @!attribute logger
@@ -96,6 +98,7 @@ module Gruf
       ssl_crt_file: '',
       ssl_key_file: '',
       controllers_path: '',
+      controllers_paths: [],
       services: [],
       logger: nil,
       grpc_logger: nil,
@@ -176,6 +179,7 @@ module Gruf
       self.ssl_key_file = "#{root_path}config/ssl/#{environment}.key"
       cp = ::ENV.fetch('GRUF_CONTROLLERS_PATH', 'app/rpc').to_s
       self.controllers_path = root_path.to_s.empty? ? cp : "#{root_path}/#{cp}"
+      self.controllers_paths = [self.controllers_path]
       self.backtrace_on_error = ::ENV.fetch('GRPC_BACKTRACE_ON_ERROR', 0).to_i.positive?
       self.rpc_server_options = {
         max_waiting_requests: ::ENV.fetch('GRPC_SERVER_MAX_WAITING_REQUESTS',
