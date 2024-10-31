@@ -119,7 +119,7 @@ module Gruf
       #
       def register_services!
         # wait to load controllers until last possible second to allow late configuration
-        ::Gruf.autoloaders.load!(controllers_path: Gruf.controllers_path)
+        ::Gruf.autoloaders.load!(controllers_paths: Gruf.controllers_paths)
 
         services = determine_services(@services)
         services = bind_health_check!(services) if health_check_enabled?
