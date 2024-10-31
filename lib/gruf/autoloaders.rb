@@ -24,12 +24,12 @@ module Gruf
       include Enumerable
 
       ##
-      # Initialize the autoloaders with a given controllers path
+      # Initialize the autoloaders with a given controllers paths
       #
-      # @param [String] controllers_path The path to Gruf Controllers
+      # @param [Array<String>] controllers_paths The path to Gruf Controllers
       #
-      def load!(controllers_path:)
-        controllers(controllers_path: controllers_path)
+      def load!(controllers_paths:)
+        controllers(controllers_paths: controllers_paths)
       end
 
       ##
@@ -52,9 +52,9 @@ module Gruf
       # @return [::Gruf::Controllers::Autoloader]
       #
       # rubocop:disable ThreadSafety/ClassInstanceVariable
-      def controllers(controllers_path: nil)
+      def controllers(controllers_paths: [])
         controllers_mutex do
-          @controllers ||= ::Gruf::Controllers::Autoloader.new(path: controllers_path || ::Gruf.controllers_path)
+          @controllers ||= ::Gruf::Controllers::Autoloader.new(paths: controllers_paths || ::Gruf.controllers_paths)
         end
       end
       # rubocop:enable ThreadSafety/ClassInstanceVariable
