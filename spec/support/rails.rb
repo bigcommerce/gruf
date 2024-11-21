@@ -32,6 +32,10 @@ module ActiveRecord
     def self.connected?
       true
     end
+
+    def self.current_role
+      :writing
+    end
   end
 
   class Connection
@@ -45,7 +49,7 @@ module ActiveRecord
   end
 
   class ConnectionHandler
-    def clear_active_connections!
+    def clear_active_connections!(role)
       true
     end
   end
