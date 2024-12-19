@@ -66,9 +66,9 @@ module Gruf
         service_class = service.name.constantize
         ::Gruf.logger.debug "[gruf] Binding #{service_class} to #{name}"
         ::Gruf.services << service_class
-        # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
+        # rubocop:disable ThreadSafety/ClassInstanceVariable
         @bound_service = service_class
-        # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
+        # rubocop:enable ThreadSafety/ClassInstanceVariable
         ServiceBinder.bind!(service: service_class, controller: self)
       end
 
