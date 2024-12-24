@@ -94,7 +94,6 @@ module Gruf
       grpc_server&.stop
       t&.join
       t&.kill
-      nil
     end
 
     ##
