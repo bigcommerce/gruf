@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* [#221] Add support for Ruby 3.4
+
 ### 2.20.1
 
 * [#208] Fix rails `clear_active_connections!` deprecation warning
