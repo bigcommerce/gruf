@@ -51,18 +51,18 @@ module Gruf
       #
       # @return [::Gruf::Controllers::Autoloader]
       #
-      # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
+      # rubocop:disable ThreadSafety/ClassInstanceVariable
       def controllers(controllers_path: nil)
         controllers_mutex do
           @controllers ||= ::Gruf::Controllers::Autoloader.new(path: controllers_path || ::Gruf.controllers_path)
         end
       end
-      # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
+      # rubocop:enable ThreadSafety/ClassInstanceVariable
 
       ##
       # Handle mutations to the controllers autoloader in a thread-safe manner
       #
-      # rubocop:disable ThreadSafety/InstanceVariableInClassMethod
+      # rubocop:disable ThreadSafety/ClassInstanceVariable
       def controllers_mutex(&block)
         @controllers_mutex ||= begin
           require 'monitor'
@@ -70,7 +70,7 @@ module Gruf
         end
         @controllers_mutex.synchronize(&block)
       end
-      # rubocop:enable ThreadSafety/InstanceVariableInClassMethod
+      # rubocop:enable ThreadSafety/ClassInstanceVariable
     end
   end
 end
