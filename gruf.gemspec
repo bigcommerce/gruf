@@ -32,7 +32,7 @@ Gem::Specification.new do |spec|
   spec.executables << 'gruf'
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 3.0', '< 3.4'
+  spec.required_ruby_version = '>= 3.0', '< 3.5'
 
   spec.metadata = {
     'bug_tracker_uri' => 'https://github.com/bigcommerce/gruf/issues',

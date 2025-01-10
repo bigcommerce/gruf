@@ -43,6 +43,12 @@ executors:
       ruby-version:
         type: string
         default: "3.3"
+  ruby_3_4:
+    <<: *ruby_env
+    parameters:
+      ruby-version:
+        type: string
+        default: "3.4"
 
 commands:
   pre-setup:
