@@ -19,12 +19,6 @@ gem_cache_key: &gem_cache_key
   gem_cache_key: "gem-cache-v2"
 
 executors:
-  ruby_3_0:
-    <<: *ruby_env
-    parameters:
-      ruby-version:
-        type: string
-        default: "3.0"
   ruby_3_1:
     <<: *ruby_env
     parameters:
@@ -43,6 +37,12 @@ executors:
       ruby-version:
         type: string
         default: "3.3"
+  ruby_3_4:
+    <<: *ruby_env
+    parameters:
+      ruby-version:
+        type: string
+        default: "3.4"
 
 commands:
   pre-setup:
@@ -132,7 +132,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_3_0"
+        default: "ruby_3_1"
     steps:
       - pre-setup
       - bundle-install:
@@ -143,7 +143,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_3_0"
+        default: "ruby_3_1"
     steps:
       - pre-setup
       - bundle-install:
@@ -154,7 +154,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_3_0"
+        default: "ruby_3_1"
       code-climate:
         type: boolean
         default: false
@@ -169,7 +169,7 @@ jobs:
     parameters:
       e:
         type: executor
-        default: "ruby_3_0"
+        default: "ruby_3_1"
     steps:
       - pre-setup
       - bundle-install:
@@ -178,21 +178,6 @@ jobs:
 
 workflows:
   version: 2
-  ruby_3_0:
-    jobs:
-      - bundle-audit:
-          name: "ruby-3_0-bundle_audit"
-          e: "ruby_3_0"
-      - rubocop:
-          name: "ruby-3_0-rubocop"
-          e: "ruby_3_0"
-      - rspec-unit:
-          name: "ruby-3_0-rspec"
-          e: "ruby_3_0"
-          code-climate: true
-      - e2e:
-          name: "ruby-3_0-e2e"
-          e: "ruby_3_0"
   ruby_3_1:
     jobs:
       - bundle-audit:
@@ -238,3 +223,18 @@ workflows:
       - e2e:
           name: "ruby-3_3-e2e"
           e: "ruby_3_3"
+  ruby_3_4:
+    jobs:
+      - bundle-audit:
+          name: "ruby-3_4-bundle_audit"
+          e: "ruby_3_4"
+      - rubocop:
+          name: "ruby-3_4-rubocop"
+          e: "ruby_3_4"
+      - rspec-unit:
+          name: "ruby-3_4-rspec"
+          e: "ruby_3_4"
+          code-climate: true
+      - e2e:
+          name: "ruby-3_4-e2e"
+          e: "ruby_3_4"

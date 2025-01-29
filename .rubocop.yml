@@ -3,7 +3,7 @@
 ####################################################################################################
 
 AllCops:
-  TargetRubyVersion: 3.0
+  TargetRubyVersion: 3.1
   SuggestExtensions: false
   NewCops: enable
   Exclude:
@@ -78,6 +78,9 @@ Style/ArgumentsForwarding:
 ####################################################################################################
 
 Naming/PredicateName:
+  Enabled: false
+
+Naming/BlockForwarding:
   Enabled: false
 
 ####################################################################################################
