@@ -87,7 +87,7 @@ module Gruf
       # @return [String] The mapped service key
       #
       def service_key
-        @service.name.to_s.underscore.tr('/', '.').gsub('.service', '')
+        @service.name.to_s.underscore.tr('/', '.').delete_suffix('.service')
       end
 
       ##
