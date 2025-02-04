@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.21.0
+
 * [#221] Add support for Ruby 3.4
 
 ### 2.20.1
