@@ -32,7 +32,11 @@ Gem::Specification.new do |spec|
   spec.executables << 'gruf'
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '>= 3.0', '< 3.4'
+  # The range of supported Ruby major versions is intentionally capped to ensure that the latest Ruby major version is
+  # supported by grpc gem before bumping the maximum Ruby major version that this gem officially supports.
+  # grpc gem has a history of lagging behind the latest Ruby version support post-new-year every year.
+  # See: https://github.com/bigcommerce/gruf/pull/221#issuecomment-2573428792
+  spec.required_ruby_version = '>= 3.0', '< 3.5'
 
   spec.metadata = {
     'bug_tracker_uri' => 'https://github.com/bigcommerce/gruf/issues',
