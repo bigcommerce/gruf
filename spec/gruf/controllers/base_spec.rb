@@ -97,6 +97,16 @@ describe ::Gruf::Controllers::Base do
         end
       end
 
+      it 'raises a GRPC::Internal error to interceptors' do
+        Gruf.interceptors.use(TestServerInterceptor)
+        expect_any_instance_of(TestServerInterceptor).to receive(:call) do |&block|
+          error = nil
+          expect { block.call }.to raise_error(GRPC::Internal) { |err| error = err }
+          raise error if error
+        end
+        expect { subject }.to raise_error(GRPC::Internal)
+      end
+
       context 'when backtrace_on_error is set to true' do
         before do
           Gruf.backtrace_on_error = true
