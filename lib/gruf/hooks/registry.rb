@@ -90,7 +90,7 @@ module Gruf
           raise HookNotFoundError if pos.nil?
 
           @registry.insert(
-            (pos + 1),
+            pos + 1,
             klass: hook_class,
             options: options
           )

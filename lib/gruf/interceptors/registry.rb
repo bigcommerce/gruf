@@ -90,7 +90,7 @@ module Gruf
           raise InterceptorNotFoundError if pos.nil?
 
           @registry.insert(
-            (pos + 1),
+            pos + 1,
             klass: interceptor_class,
             options: options
           )
