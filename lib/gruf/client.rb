@@ -159,7 +159,7 @@ module Gruf
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
-      desc&.input ? desc.input.new(params) : nil
+      desc&.input&.new(params)
     end
 
     ##
