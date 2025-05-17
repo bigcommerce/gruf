@@ -29,6 +29,22 @@ describe Gruf::Autoloaders do
       expect(autoloaders.controllers).to be_a(::Gruf::Controllers::Autoloader)
       expect(autoloaders.controllers.paths).to eq [controllers_path]
     end
+
+    context 'when deprecated controllers_path is passed' do
+      subject { autoloaders.load!(controllers_path: controllers_path) }
+
+      it 'creates a controller autoloader for the passed path' do
+        subject
+        expect(autoloaders.controllers).to be_a(::Gruf::Controllers::Autoloader)
+        expect(autoloaders.controllers.paths).to eq [controllers_path]
+      end
+
+      it 'logs a deprecation warning' do
+        expect(::Gruf.logger)
+          .to receive(:warn).with('controllers_path is deprecated. Please use controllers_paths instead.')
+        subject
+      end
+    end
   end
 
   describe '#each' do

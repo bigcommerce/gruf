@@ -24,11 +24,16 @@ module Gruf
       include Enumerable
 
       ##
-      # Initialize the autoloaders with a given controllers paths
+      # Initialize the autoloaders with given controllers paths
       #
+      # @param [String] controllers_path The path to Gruf Controllers
       # @param [Array<String>] controllers_paths The path to Gruf Controllers
       #
-      def load!(controllers_paths:)
+      def load!(controllers_path: nil, controllers_paths: [])
+        if controllers_path
+          ::Gruf.logger.warn('controllers_path is deprecated. Please use controllers_paths instead.')
+          controllers_paths = [controllers_path]
+        end
         controllers(controllers_paths: controllers_paths)
       end
 
@@ -53,8 +58,9 @@ module Gruf
       #
       # rubocop:disable ThreadSafety/ClassInstanceVariable
       def controllers(controllers_paths: [])
+        controllers_paths = ::Gruf.controllers_paths if controllers_paths.empty?
         controllers_mutex do
-          @controllers ||= ::Gruf::Controllers::Autoloader.new(paths: controllers_paths || ::Gruf.controllers_paths)
+          @controllers ||= ::Gruf::Controllers::Autoloader.new(paths: controllers_paths)
         end
       end
       # rubocop:enable ThreadSafety/ClassInstanceVariable
