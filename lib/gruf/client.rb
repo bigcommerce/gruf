@@ -156,20 +156,24 @@ module Gruf
     # @param [Symbol] request_method The method name being called on the remote service
     # @param [Hash] params (Optional) A hash of parameters that will populate the request object
     # @return [Class] The request object that corresponds to the method being called
+    # @return [NilClass] if the descriptor is not found or the input is not defined
     #
     def request_object(request_method, params = {})
       desc = rpc_desc(request_method)
-      desc&.input ? desc.input.new(params) : nil
+      desc&.input&.new(params)
     end
 
     ##
     # Properly find the appropriate call signature for the GRPC::GenericService given the request method name
     #
     # @return [Symbol]
+    # @return [NilClass] If the descriptor is not found
     #
     def call_signature(request_method)
       desc = rpc_desc(request_method)
-      desc&.name ? desc.name.to_s.underscore.to_sym : nil
+      return nil unless desc
+
+      desc.name.to_s.underscore.to_sym
     end
 
     ##
