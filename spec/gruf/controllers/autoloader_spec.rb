@@ -21,7 +21,7 @@ describe ::Gruf::Controllers::Autoloader do
   let(:path) { 'spec/pb' }
   let(:reloading) { nil }
   let(:tag) { 'gruf-controllers' }
-  let(:autoloader) { described_class.new(path: path, reloading: reloading) }
+  let(:autoloader) { described_class.new(paths: [path], reloading: reloading) }
   let(:zeitwerk) do
     instance_spy(::Zeitwerk::Loader, setup: true, 'tag=': tag, tag: tag, ignore: true, push_dir: true, eager_load: true)
   end
