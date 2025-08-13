@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.21.1
+
+* [#230] Add fix for load order issues with reloader in some non-Rails environments
+
 ### 2.21.0
 
 * [#221] Add support for Ruby 3.4

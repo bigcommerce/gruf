@@ -17,7 +17,7 @@ AllCops:
     - spec/fixtures/**/*
     - spec/pb/**/*
     - spec/demo_server
-require:
+plugins:
   - rubocop-performance
   - rubocop-rspec
   - rubocop-thread_safety
@@ -77,7 +77,7 @@ Style/ArgumentsForwarding:
 # Naming Configurations
 ####################################################################################################
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false
 
 ####################################################################################################

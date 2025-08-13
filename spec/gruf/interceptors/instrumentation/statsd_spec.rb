@@ -26,7 +26,8 @@ describe Gruf::Interceptors::Instrumentation::Statsd do
   let(:errors) { build(:error) }
   let(:interceptor) { described_class.new(request, errors, options) }
 
-  let(:expected_route_key) { "#{prefix ? "#{prefix}." : ''}rpc.thing_service.get_thing" }
+  let(:method_prefix) { prefix ? "#{prefix}." : '' }
+  let(:expected_route_key) { "#{method_prefix}rpc.thing_service.get_thing" }
 
   describe '#call' do
     subject { interceptor.call { true } }
