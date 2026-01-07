@@ -49,6 +49,12 @@ executors:
       ruby-version:
         type: string
         default: "3.4"
+  ruby_4_0:
+    <<: *ruby_env
+    parameters:
+      ruby-version:
+        type: string
+        default: "4.0"
 
 commands:
   pre-setup:
@@ -259,3 +265,18 @@ workflows:
       - e2e:
           name: "ruby-3_4-e2e"
           e: "ruby_3_4"
+  ruby_4_0:
+    jobs:
+      - bundle-audit:
+          name: "ruby-4_0-bundle_audit"
+          e: "ruby_4_0"
+      - rubocop:
+          name: "ruby-4_0-rubocop"
+          e: "ruby_4_0"
+      - rspec-unit:
+          name: "ruby-4_0-rspec"
+          e: "ruby_4_0"
+          code-climate: false
+      - e2e:
+          name: "ruby-4_0-e2e"
+          e: "ruby_4_0"
