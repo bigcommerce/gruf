@@ -85,7 +85,7 @@ module Gruf
         t.join
         t.kill
       end
-    rescue StandardError, RuntimeError, Exception => e
+    rescue StandardError, RuntimeError, Exception
       grpc_server&.stop
       t&.join
       t&.kill
@@ -94,7 +94,6 @@ module Gruf
       grpc_server&.stop
       t&.join
       t&.kill
-      nil
     end
 
     ##
