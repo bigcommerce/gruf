@@ -19,7 +19,7 @@ require 'spec_helper'
 
 describe ::Gruf::Controllers::Request do
   let(:method_key) { :get_thing }
-  let(:service) { Rpc::ThingService }
+  let(:service) { Rpc::ThingService::Service }
   let(:rpc_desc) { Rpc::ThingService::Service.rpc_descs[:GetThing] }
   let(:active_call) { Rpc::Test::Call.new }
   let(:message) { Rpc::GetThingRequest.new(id: 1) }
@@ -39,6 +39,20 @@ describe ::Gruf::Controllers::Request do
 
     it 'returns the translated name' do
       expect(subject).to eq 'rpc.thing_service'
+    end
+
+    context 'when service name contains .service in the middle and at the end' do
+      let(:service) do
+        Class.new do
+          def self.name
+            'Rpc::ServiceHandler::TestService::Service'
+          end
+        end
+      end
+
+      it 'only removes the trailing .service suffix, not all occurrences' do
+        expect(subject).to eq 'rpc.service_handler.test_service'
+      end
     end
   end
 
