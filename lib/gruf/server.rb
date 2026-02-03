@@ -203,6 +203,13 @@ module Gruf
     end
 
     ##
+    # @param [Array<String>]
+    #
+    def controllers_paths
+      options.fetch(:controllers_paths, Gruf.controllers_paths)
+    end
+
+    ##
     # Load the SSL/TLS credentials for this server
     #
     # @return [GRPC::Core::ServerCredentials|Symbol]
