@@ -2,6 +2,12 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.21.2
+
+* [#225] Only replace `.service` as a suffix in `service_key`
+* [#220] Fix runtime warnings in Ruby 3.4+
+* [#217] Fix clear_active_connections! with no argument deprecation warning
+
 ### 2.21.1
 
 * [#230] Add fix for load order issues with reloader in some non-Rails environments
