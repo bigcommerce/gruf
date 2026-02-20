@@ -2,6 +2,10 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+### 2.22.0
+
+* Add support for Ruby 4.x
+
 ### 2.21.2
 
 * [#225] Only replace `.service` as a suffix in `service_key`

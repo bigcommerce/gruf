@@ -40,7 +40,7 @@ describe Gruf::Client::ErrorFactory do
       Gruf::Client::Errors.constants
                           .reject { |e| rejected_exceptions.include?(e) }
                           .each do |error_class|
-                            context "and is a GRPC::#{error_class} exception" do
+                            context "when is a GRPC::#{error_class} exception" do
                               let(:exception) { "GRPC::#{error_class}".constantize.new(error_message) }
                               let(:expected_class) { "Gruf::Client::Errors::#{error_class}".constantize }
 
