@@ -34,6 +34,4 @@ end
 ##
 # Implements gruf's gRPC logger into the gRPC library logger
 #
-module GRPC
-  extend Gruf::GrpcLogger
-end
+::GRPC.extend(::Gruf::GrpcLogger)
