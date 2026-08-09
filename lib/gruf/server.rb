@@ -192,7 +192,8 @@ module Gruf
     # @return [Array<Class>]
     #
     def services
-      @services ||= ::Gruf.services || (options.fetch(:services, nil) || [])
+      global_services = ::Gruf.services
+      @services ||= global_services&.any? ? global_services : options.fetch(:services, [])
     end
 
     ##
