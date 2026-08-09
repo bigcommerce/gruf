@@ -103,6 +103,31 @@ describe Gruf::Server do
       threads << Thread.new { gruf_server.server }
       threads.each(&:join)
     end
+
+    context 'when a custom interceptor registry is configured' do
+      let(:interceptor_registry) { Gruf::Interceptors::Registry.new }
+      let(:options) { super().merge(interceptor_registry: interceptor_registry) }
+      let(:server_mock) { double(GRPC::RpcServer, add_http2_port: nil) }
+
+      before do
+        gruf_server.add_service(::Rpc::ThingService::Service)
+        allow(GRPC::RpcServer).to receive(:new).and_return(server_mock)
+      end
+
+      it 'passes the registry to bound services' do
+        bound_service = nil
+        allow(server_mock).to receive(:handle) { |service| bound_service = service }
+        expect(interceptor_registry).to receive(:prepare).with(
+          an_instance_of(Gruf::Controllers::Request),
+          an_instance_of(Gruf::Error)
+        ).and_return([])
+
+        gruf_server.server
+
+        expect(bound_service).to be_a(Rpc::ThingService::Service)
+        bound_service.get_thing(Rpc::GetThingRequest.new(id: 1), Rpc::Test::Call.new)
+      end
+    end
   end
 
   describe '#add_service' do

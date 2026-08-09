@@ -33,6 +33,9 @@ module Gruf
         # @param [Class<Gruf::Controllers::Base>] controller
         #
         def bind!(service:, controller:)
+          service.class_eval do
+            attr_writer :interceptor_registry
+          end
           rpc_methods = service.rpc_descs.map { |rd| BoundDesc.new(rd) }
           rpc_methods.each { |name, desc| bind_method(service, controller, name, desc) }
         end
@@ -56,7 +59,8 @@ module Gruf
                     service: service_ref,
                     message: message,
                     active_call: active_call,
-                    rpc_desc: desc
+                    rpc_desc: desc,
+                    interceptor_registry: @interceptor_registry
                   )
                   c.call(method_key)
                 end
@@ -69,7 +73,8 @@ module Gruf
                     service: service_ref,
                     message: proc { |&block| active_call.each_remote_read(&block) },
                     active_call: active_call,
-                    rpc_desc: desc
+                    rpc_desc: desc,
+                    interceptor_registry: @interceptor_registry
                   )
                   c.call(method_key)
                 end
@@ -82,7 +87,8 @@ module Gruf
                     service: service_ref,
                     message: message,
                     active_call: active_call,
-                    rpc_desc: desc
+                    rpc_desc: desc,
+                    interceptor_registry: @interceptor_registry
                   )
                   c.call(method_key, &block)
                 end
@@ -95,7 +101,8 @@ module Gruf
                     service: service_ref,
                     message: messages,
                     active_call: active_call,
-                    rpc_desc: desc
+                    rpc_desc: desc,
+                    interceptor_registry: @interceptor_registry
                   )
                   c.call(method_key, &block)
                 end

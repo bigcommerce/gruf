@@ -79,7 +79,7 @@ module Gruf
           # execution paths (such as vanilla ruby, grape, multiple Rails versions, etc). The autoloaders are
           # initially loaded in `Gruf::Cli::Executor` _directly_ before the gRPC services are loaded into the gRPC
           # server, to allow for loading services as late as possible in the execution chain.
-          services.each { |s| server.handle(s) }
+          services.each { |s| server.handle(service_with_interceptor_registry(s)) }
           server
         end
       end
@@ -193,6 +193,21 @@ module Gruf
     #
     def services
       @services ||= ::Gruf.services || (options.fetch(:services, nil) || [])
+    end
+
+    ##
+    # @param [Class|Object] service
+    # @return [Class|Object]
+    #
+    def service_with_interceptor_registry(service)
+      if service.is_a?(Class)
+        return service unless service.method_defined?(:interceptor_registry=)
+
+        service = service.new
+      end
+      return service unless service.respond_to?(:interceptor_registry=)
+
+      service.tap { |instance| instance.interceptor_registry = @interceptors }
     end
 
     ##
