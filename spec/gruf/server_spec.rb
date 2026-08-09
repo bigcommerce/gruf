@@ -105,6 +105,30 @@ describe Gruf::Server do
     end
   end
 
+  describe '#services' do
+    subject { gruf_server.send(:services) }
+
+    let(:options) { { services: [Rpc::ThingService::Service] } }
+
+    context 'when no global services are configured' do
+      it 'uses services passed to the server' do
+        expect(subject).to eq options[:services]
+      end
+    end
+
+    context 'when global services are configured' do
+      let(:global_services) { [Rpc::Test::Service1::Service] }
+
+      before do
+        Gruf.services = global_services
+      end
+
+      it 'uses global services instead of services passed to the server' do
+        expect(subject).to eq global_services
+      end
+    end
+  end
+
   describe '#add_service' do
     subject { gruf_server.add_service(service) }
 
