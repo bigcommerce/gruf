@@ -44,8 +44,9 @@ module Gruf
       # @param [GRPC::RpcDesc] rpc_desc The RPC descriptor for this service method
       # @param [GRPC::ActiveCall] active_call The gRPC ActiveCall object
       # @param [Google::Protobuf::MessageExts] message The incoming protobuf request message
+      # @param [Gruf::Interceptors::Registry] interceptor_registry The interceptor registry for the server
       #
-      def initialize(method_key:, service:, rpc_desc:, active_call:, message:)
+      def initialize(method_key:, service:, rpc_desc:, active_call:, message:, interceptor_registry: nil)
         @request = Request.new(
           method_key: method_key,
           service: service,
@@ -54,7 +55,8 @@ module Gruf
           message: message
         )
         @error = Gruf::Error.new
-        @interceptors = Gruf.interceptors.prepare(@request, @error)
+        registry = interceptor_registry || Gruf.interceptors
+        @interceptors = registry.prepare(@request, @error)
       end
 
       ##
