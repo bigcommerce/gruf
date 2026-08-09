@@ -22,7 +22,7 @@ describe Gruf::Interceptors::Authentication::Basic do
   let(:request_password) { 'magic' }
   let(:server_username) { 'grpc' }
   let(:server_password) { 'magic' }
-  let(:prefixed_req_username) { (request_username.empty? ? '' : "#{request_username}:") }
+  let(:prefixed_req_username) { request_username.empty? ? '' : "#{request_username}:" }
 
   let(:server_credentials1) do
     {
