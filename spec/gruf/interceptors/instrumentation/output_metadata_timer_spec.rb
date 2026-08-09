@@ -39,5 +39,22 @@ describe Gruf::Interceptors::Instrumentation::OutputMetadataTimer do
         expect(request.active_call.output_metadata[:foo]).not_to be_nil
       end
     end
+
+    context 'when the active call does not support output metadata' do
+      let(:active_call) { double(:active_call) }
+      let(:request) { build(:controller_request, method_key: :get_thing, active_call: active_call) }
+
+      it 'still executes the request' do
+        executed = false
+
+        result = interceptor.call do
+          executed = true
+          :result
+        end
+
+        expect(executed).to be(true)
+        expect(result).to eq(:result)
+      end
+    end
   end
 end
