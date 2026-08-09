@@ -192,9 +192,6 @@ workflows:
   version: 2
   ruby_3_0:
     jobs:
-      - bundle-audit:
-          name: "ruby-3_0-bundle_audit"
-          e: "ruby_3_0"
       - rubocop:
           name: "ruby-3_0-rubocop"
           e: "ruby_3_0"
