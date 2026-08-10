@@ -15,6 +15,8 @@
 # COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 # OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
+require 'active_support/core_ext/object/deep_dup'
+
 module Gruf
   ##
   # Represents configuration settings for the system
@@ -163,8 +165,8 @@ module Gruf
     # @return [Hash] options The reset options hash
     #
     def reset
-      VALID_CONFIG_KEYS.each do |k, v|
-        send(:"#{k}=", v)
+      VALID_CONFIG_KEYS.each do |k, default|
+        send(:"#{k}=", default.deep_dup)
       end
       self.server_binding_url = "#{::ENV.fetch('GRPC_SERVER_HOST',
                                                '0.0.0.0')}:#{::ENV.fetch('GRPC_SERVER_PORT', 9_001)}"

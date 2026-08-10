@@ -34,6 +34,25 @@ describe Gruf::Configuration do
       obj.reset
       expect(subject).not_to eq 'test.dev'
     end
+
+    it 'does not share mutable defaults between resets' do
+      obj.reset
+      services = obj.services
+      server_options = obj.server_options
+      rpc_server_options = obj.rpc_server_options
+
+      services << :service
+      server_options[:custom] = true
+      rpc_server_options[:server_args][:custom] = true
+      obj.reset
+
+      expect(obj.services).to eq([])
+      expect(obj.services).not_to equal(services)
+      expect(obj.server_options).to eq({})
+      expect(obj.server_options).not_to equal(server_options)
+      expect(obj.rpc_server_options[:server_args]).to eq({})
+      expect(obj.rpc_server_options).not_to equal(rpc_server_options)
+    end
   end
 
   describe '.environment' do
