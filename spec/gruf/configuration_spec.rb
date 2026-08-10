@@ -34,6 +34,28 @@ describe Gruf::Configuration do
       obj.reset
       expect(subject).not_to eq 'test.dev'
     end
+
+    context 'when a Rails root path is configured' do
+      before do
+        stub_const('Rails', double(root: '/app/', logger: nil, env: 'production'))
+      end
+
+      it 'joins the SSL paths with the root path separator' do
+        obj.reset
+
+        expect(obj.ssl_crt_file).to eq '/app/config/ssl/production.crt'
+        expect(obj.ssl_key_file).to eq '/app/config/ssl/production.key'
+      end
+    end
+
+    context 'when no Rails root path is configured' do
+      it 'keeps the SSL paths relative' do
+        obj.reset
+
+        expect(obj.ssl_crt_file).to eq "config/ssl/#{obj.send(:environment)}.crt"
+        expect(obj.ssl_key_file).to eq "config/ssl/#{obj.send(:environment)}.key"
+      end
+    end
   end
 
   describe '.environment' do

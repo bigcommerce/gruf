@@ -172,8 +172,9 @@ module Gruf
       self.hooks = ::Gruf::Hooks::Registry.new
       self.root_path = ::Rails.root.to_s.chomp('/') if defined?(::Rails)
       determine_loggers
-      self.ssl_crt_file = "#{root_path}config/ssl/#{environment}.crt"
-      self.ssl_key_file = "#{root_path}config/ssl/#{environment}.key"
+      ssl_path = root_path.to_s.empty? ? 'config/ssl' : "#{root_path}/config/ssl"
+      self.ssl_crt_file = "#{ssl_path}/#{environment}.crt"
+      self.ssl_key_file = "#{ssl_path}/#{environment}.key"
       cp = ::ENV.fetch('GRUF_CONTROLLERS_PATH', 'app/rpc').to_s
       self.controllers_path = root_path.to_s.empty? ? cp : "#{root_path}/#{cp}"
       self.backtrace_on_error = ::ENV.fetch('GRPC_BACKTRACE_ON_ERROR', 0).to_i.positive?
