@@ -50,7 +50,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'activesupport', '> 4'
   spec.add_dependency 'concurrent-ruby', '> 1'
   spec.add_dependency 'grpc', '~> 1.10'
-  spec.add_dependency 'grpc-tools', '~> 1.10'
   spec.add_dependency 'json', '>= 2.3'
   spec.add_dependency 'slop', '>= 4.6'
   spec.add_dependency 'zeitwerk', '>= 2'
