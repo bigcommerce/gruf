@@ -2,6 +2,8 @@ Changelog for the gruf gem. This includes internal history before the gem was ma
 
 ### Pending release
 
+* Drop the runtime dependency on `grpc-tools`. Gruf never required it at runtime; it is only needed to generate stubs with `grpc_tools_ruby_protoc`, so add it to your own Gemfile if you rely on it coming from gruf. It ships `protoc` binaries for every platform (~42MB installed), so dropping it shrinks production bundles.
+
 ### 2.22.0
 
 * Add support for Ruby 4.x

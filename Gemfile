@@ -21,6 +21,8 @@ gem 'bundler-audit', '>= 0.6'
 gem 'factory_bot', '>= 6.1'
 gem 'ffaker', '>= 2.15'
 gem 'grpc', '>= 1.44.0.pre2'
+# Only needed to regenerate the protobuf stubs under spec/pb (see spec/pb/generate.sh)
+gem 'grpc-tools', '~> 1.10'
 gem 'pry', '~> 0.12'
 gem 'pry-byebug', '>= 3.9'
 gem 'rake', '>= 10.0'
