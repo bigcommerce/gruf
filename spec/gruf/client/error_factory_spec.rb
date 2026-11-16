@@ -37,18 +37,17 @@ describe Gruf::Client::ErrorFactory do
 
     context 'when the exception is a BadStatus' do
       rejected_exceptions = %i[Error Validation Exception Base].freeze
-      Gruf::Client::Errors.constants
-                          .reject { |e| rejected_exceptions.include?(e) }
-                          .each do |error_class|
-                            context "when is a GRPC::#{error_class} exception" do
-                              let(:exception) { "GRPC::#{error_class}".constantize.new(error_message) }
-                              let(:expected_class) { "Gruf::Client::Errors::#{error_class}".constantize }
+      error_classes = Gruf::Client::Errors.constants.reject { |e| rejected_exceptions.include?(e) }
+      error_classes.each do |error_class|
+        context "when is a GRPC::#{error_class} exception" do
+          let(:exception) { "GRPC::#{error_class}".constantize.new(error_message) }
+          let(:expected_class) { "Gruf::Client::Errors::#{error_class}".constantize }
 
-                              it "wraps it with the Gruf::Client::Errors::#{error_class} class" do
-                                expect(subject).to be_a(expected_class)
-                                expect(subject.error).to eq exception
-                              end
-                            end
+          it "wraps it with the Gruf::Client::Errors::#{error_class} class" do
+            expect(subject).to be_a(expected_class)
+            expect(subject.error).to eq exception
+          end
+        end
       end
     end
 

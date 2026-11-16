@@ -34,6 +34,7 @@ end
 ##
 # Implements gruf's gRPC logger into the gRPC library logger
 #
+# rubocop:disable-next Style/OneClassPerFile
 module GRPC
   extend Gruf::GrpcLogger
 end

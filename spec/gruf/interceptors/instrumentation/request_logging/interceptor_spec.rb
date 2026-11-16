@@ -17,9 +17,8 @@
 #
 require 'spec_helper'
 
-# rubocop:disable Lint/EmptyClass
+# rubocop:disable-next Lint/EmptyClass
 class FakeRequestLogFormatter; end
-# rubocop:enable Lint/EmptyClass
 
 describe Gruf::Interceptors::Instrumentation::RequestLogging::Interceptor do
   let(:options) { {} }

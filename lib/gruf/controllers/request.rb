@@ -121,9 +121,8 @@ module Gruf
       #
       def messages
         if client_streamer?
-          # rubocop:disable Style/ExplicitBlockArgument
+          # rubocop:disable-next Style/ExplicitBlockArgument
           @message.call { |msg| yield msg }
-          # rubocop:enable Style/ExplicitBlockArgument
         elsif bidi_streamer?
           @message
         else
