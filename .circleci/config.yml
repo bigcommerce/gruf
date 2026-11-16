@@ -145,11 +145,15 @@ jobs:
       e:
         type: executor
         default: "ruby_3_0"
+      additional_args:
+        type: string
+        default: ""
     steps:
       - pre-setup
       - bundle-install:
           <<: *gem_cache_key
-      - bundle-audit
+      - bundle-audit:
+          additional_args: <<parameters.additional_args>>
   rubocop:
     executor: <<parameters.e>>
     parameters:
@@ -195,6 +199,8 @@ workflows:
       - bundle-audit:
           name: "ruby-3_0-bundle_audit"
           e: "ruby_3_0"
+          # activesupport resolves to 7.1.x on Ruby 3.0. The fixed releases require Ruby 3.2+.
+          additional_args: "--ignore CVE-2026-33169 CVE-2026-33170 CVE-2026-33176 GHSA-8474-xrp6-wh69"
       - rubocop:
           name: "ruby-3_0-rubocop"
           e: "ruby_3_0"
@@ -210,6 +216,8 @@ workflows:
       - bundle-audit:
           name: "ruby-3_1-bundle_audit"
           e: "ruby_3_1"
+          # activesupport resolves to 7.2.x on Ruby 3.1. The fixed releases require Ruby 3.2+.
+          additional_args: "--ignore GHSA-8474-xrp6-wh69"
       - rubocop:
           name: "ruby-3_1-rubocop"
           e: "ruby_3_1"
